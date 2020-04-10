@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>script加载性能</title>
+</head>
+<body>
+  <div>script</div>
+  
+  <!-- js -->
+  <!-- <script src="./file1.js"></script>
+  <script src="./file2.js"></script> -->
+  <script src="./file3.js" defer></script>
+  <script src="./file4.js"></script>
+  <script>
+    console.log('内嵌js')
+    window.onload = function() {
+      console.log('load')
+    }
+    window.onafterprint = function() {
+      console.log('onafterprint')
+    }
+    window.onbeforeprint = function() {
+      console.log('onbeforeprint')
+    }
+    document.onreadystatechange = function() {
+      console.log(document.readyState)
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOMContentLoaded')
+    })
+
+    document.addEventListener('visibilitychange', function() {
+      console.log('document.onvisibilitychange:', document.visibilityState)
+    })
+
+    window.addEventListener('pageshow', function() {
+      console.log('window__pageshow')
+    })
+    
+  </script>
+</body>
+</html>

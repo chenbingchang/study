@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>videojs自定义皮肤</title>
+    <!-- 远程的由于网速问题下载不了，使用本地资源， -->
+    <link rel="stylesheet" href="./assets/video-js.css" />
+    <link rel="stylesheet" href="./assets/font/iconfont.css" />
+    <link rel="stylesheet" href="./vjs-customer.css" />
+  </head>
+  <body>
+    <!-- <i class="iconfont icon-pause"></i> -->
+    <!--video进行宽高width、height和控制controls和默认图片poster和data-setup(必须)的初始设置-->
+    <video
+      id="example_video_1"
+      class="video-js"
+      controls
+      width="930"
+      height="571"
+    >
+      <!--引入视屏的三种格式(video播放对视屏格式有要求)-->
+      <!-- <source src="./assets/test.mp4" type="video/mp4"></source> -->
+      <!-- <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4"></source>
+    <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm"></source>
+    <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg"></source>
+    <p class="vjs-no-js">
+      To view this video please enable JavaScript, and consider upgrading to a web browser that
+      <a href="http://videojs.com/html5-video-support/" target="_blank">
+        supports HTML5 video
+      </a>
+    </p> -->
+    </video>
+
+    <!-- js -->
+    <script src="./assets/video.js"></script>
+    <!-- <script src="./assets/video.min.js"></script>  -->
+    <script src="./index.js"></script>
+  </body>
+</html>

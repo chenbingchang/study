@@ -1,0 +1,39 @@
+/* .video-js {
+  margin: 0 auto;
+} */
+
+/* video海报100%显示 */
+.vjs-poster {
+  background-size: 100% 100% !important;
+  object-fit: fill !important;
+  /* 背景显示的区域，只在content显示 */
+  background-clip: content-box;
+  background-origin: content-box;
+}
+
+.vjs-tech[poster] {
+  object-fit: fill;
+  background-color: transparent;
+}
+
+/* 去掉选中时的蓝色边框 */
+video:focus {
+  outline: none;
+}
+
+/* 这里的padding-bottom是留给controlBar的 */
+.vjs-tech,
+.vjs-tech,
+.vjs-poster {
+  padding-bottom: 48px;
+}
+
+/* 自定义controlBar */
+.my-control-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 48px;
+  background-color: #000;
+}
