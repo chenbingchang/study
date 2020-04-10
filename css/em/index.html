@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>em单位</title>
+  </head>
+  <body>
+    <ul>
+      <li>
+        Top level
+        <ul>
+          <li>
+            Second level
+            <ul>
+              <li>
+                Third level
+                <ul>
+                  <li>
+                    Fourth level
+                    <ul>
+                      <li>Fifth level</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
+    <style>
+      body {
+        font-size: 40px;
+      }
+
+      ul {
+        font-size: 0.8em;
+      }
+
+      ul ul {
+        font-size: 1em;
+      }
+    </style>
+    <!-- 除font-size外，em单位最终的计算值是以当前元素的font-size * em ；
+      而font-size以em为单位，则是以继承的font-size * em计算；
+      如果元素font-size和别的样式都是以em为单位，则会先计算当前元素font-size的值，然后别的样式根据当前元素的font-size值再进行计算；
+
+      常见问题：多层嵌套缩放，比如嵌套ul
+
+      现在一般都用rem
+   -->
+  </body>
+</html>

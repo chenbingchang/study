@@ -37,8 +37,9 @@ let player = videojs("example_video_1", options, function() {
   const ControlBar = videojs.getComponent('ControlBar')
   const PlayToggle = videojs.getComponent('PlayToggle')
   const Component = videojs.getComponent('Component')
+  const ProgressControl = videojs.getComponent('ProgressControl')
 
-
+  // let progressWrap = 
 
   // 自定义播放按钮
   let myPlayToggle = videojs.extend(PlayToggle, {
@@ -46,9 +47,10 @@ let player = videojs("example_video_1", options, function() {
       PlayToggle.apply(this, arguments);
     },
     createEl: function() {
+      // <i class="iconfont icon-pause"></i>
       return videojs.createEl('div', {
         className: 'my-play-toggle',
-        innerHTML: '播放按钮'
+        innerHTML: `</i><i class="iconfont icon-play is-active"></i><i class="iconfont icon-pause">`
       }, {
 
       });
@@ -60,7 +62,7 @@ let player = videojs("example_video_1", options, function() {
   // 自定义控制条
   let myControlBar = videojs.extend(ControlBar, {
     constructor: function(player, options) {
-      options.children = ['myPlayToggle']
+      options.children = ['ProgressControl']
       // options.children = []
       ControlBar.apply(this, arguments);
     },
