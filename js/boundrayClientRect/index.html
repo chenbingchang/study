@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Element.getBoundingClientRect()</title>
+</head>
+<body>
+  <div class="box"></div>
+  <br>
+  <div class="operation">
+    <button id="btn">获取信息</button>  
+    <p id="result"></p>
+  </div>
+
+  <style>
+    .body {
+      width: 100%;
+      height: 100%;
+      background: lime;
+      overflow: auto;
+    }
+
+    .operation {
+      position: fixed;
+      left: 20px;
+      top: 20px;
+    }
+
+    .box {
+      height: 12000px;
+      background: gold;
+    }
+  </style>
+  <!-- js -->
+  <script>
+    let boxEl = document.querySelectorAll('.box')[0]
+    let btnEl = document.querySelectorAll('#btn')[0]
+    let resultEl = document.querySelectorAll('#result')[0]
+    
+    btnEl.addEventListener('click', function() {
+      let rect = boxEl.getBoundingClientRect()
+      let rects = boxEl.getClientRects()
+      debugger
+      resultEl.innerHTML = `top: ${rect.top}, width: ${rect.width}, height: ${rect.height}, scrollY: ${window.pageYOffset}`
+
+    })
+  </script>
+</body>
+</html>

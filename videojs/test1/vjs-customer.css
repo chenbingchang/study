@@ -41,3 +41,85 @@ video:focus {
 .my-play-toggle .iconfont {
 
 }
+
+
+
+
+
+
+
+
+
+
+
+/* ########################################################### */
+
+
+.my-progress-wrap {
+  /* width: 600px; */
+  height: 8px;
+  cursor: pointer;
+}
+
+.my-progress-wrap:hover .my-progress {
+  transform: scaleY(1);
+}
+
+.my-progress-wrap:hover .my-progress__play__point-wrap {
+  transform: scale(1) translate(50%, -50%);
+}
+
+.my-progress {
+  position: relative;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scaleY(.5);
+  transition: all .15s ease;
+  outline: none;
+}
+
+.my-progress__load,
+.my-progress__play {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+}
+
+.my-progress__load {
+  /* width需要根据进度动态设置 */
+  /* width: 60%; */
+  width: 100%;
+  background-color: rgba(255,255,255,.5);
+}
+
+.my-progress__play {
+  /* width需要根据进度动态设置 */
+  /* width: 35%; */
+  width: 0%;
+  background-color: #ff6429;
+  background-color: #fe6429;
+}
+
+.my-progress__play__point-wrap,
+.my-progress__play__point {
+  position: absolute;
+  top: 50%;
+  border-radius: 50%;
+}
+
+.my-progress__play__point-wrap {
+  right: 0;
+  transform: scale(0) translate(50%, -50%);
+  width: 12px;
+  height: 12px;
+  background-color: #fe6429;
+}
+
+.my-progress__play__point {
+  right: 50%;
+  transform: translate(50%, -50%);
+  width: 20px;
+  height: 20px;
+  background-color: rgba(254,100,41,.3);
+}
