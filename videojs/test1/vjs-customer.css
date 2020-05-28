@@ -57,6 +57,7 @@ video:focus {
 
 .my-progress-wrap {
   /* width: 600px; */
+  position: relative;
   height: 8px;
   cursor: pointer;
 }
@@ -67,6 +68,11 @@ video:focus {
 
 .my-progress-wrap:hover .my-progress__play__point-wrap {
   transform: scale(1) translate(50%, -50%);
+}
+
+.my-progress-wrap:hover .my-progress__mouse-time {
+  /* visibility: visible; */
+  opacity: 1;
 }
 
 .my-progress {
@@ -122,4 +128,23 @@ video:focus {
   width: 20px;
   height: 20px;
   background-color: rgba(254,100,41,.3);
+}
+
+.my-progress__mouse-time {
+  position: absolute;
+  /* left根据鼠标的位置定 */
+  left: 0;
+  top: -2px;
+  /* visibility: hidden; */
+  opacity: 0;
+  padding: 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0);
+  transform: translateY(-100%) scale(1);
+  font-size: 14px;
+  color: #fff;
+}
+
+.my-button-wrap {
+  height: 40px;
 }

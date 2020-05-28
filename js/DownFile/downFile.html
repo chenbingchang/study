@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>下载文件</title>
+  </head>
+  <body>
+    <button id="btn">导出reject列表</button>
+    <script>
+      let btnEl = document.querySelectorAll("#btn")[0]
+
+      btnEl.onclick = function () {
+        let xhr = new XMLHttpRequest()
+        xhr.open("get", "http://120.77.212.58:31364/statistic/exportRejectList")
+        xhr.responseType = 'blob'// 设置返回类型为blob流
+
+        xhr.onreadystatechange = function () {
+          console.log('xhr.onreadystatechange')
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            // 后台返回的是二进制流
+            // 手动创建blob对象
+            console.log(xhr)
+            let contentType = xhr.getResponseHeader('content-type')
+            /*
+            xhr.responseText
+            xhr.response
+            有区别，xhr.responseText是responseType为文本时才会有值
+            xhr.response是responseType为blob、bufferArry等对象时的内容
+            */
+            // let blob = new Blob([xhr.responseText], {
+            //   type: contentType
+            // })
+            let blob = xhr.response
+            console.log(Object.prototype.toString.call(blob))
+            let aEl = document.createElement('a')
+            let objUrl = URL.createObjectURL(blob)
+
+            aEl.href = objUrl
+            aEl.download = 'reject列表.xlsx' // 下载文件名
+            aEl.style.width = '0'
+            aEl.style.height = '0'
+            aEl.style.display = 'none'
+            document.body.appendChild(aEl)// 插入body中
+            aEl.click() // 点击
+            document.body.removeChild(aEl)// 从body中移除
+            URL.revokeObjectURL(objUrl)// 释放blob对象
+
+          }
+        }
+
+
+        xhr.send()
+      }
+    </script>
+  </body>
+</html>

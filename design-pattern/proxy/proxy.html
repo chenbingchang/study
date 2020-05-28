@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>代理模式</title>
+</head>
+<body>
+  <div style="height: 3000px;"></div>
+
+  <script>
+    /* 
+    当客户不方便直接访问一个 对象或者不满足需要的时候，提供一个替身对象 来控制对这个对象的访问，客户实际上访问的是 替身对象。
+  替身对象对请求做出一些处理之后， 再把请求转交给本体对象
+  代理和本体的接口具有一致性，本体定义了关键功能，而代理是提供或拒绝对它的访问，或者在访问本体之前做一 些额外的事情
+  主要有三种：保护代理、虚拟代理、缓存代理
+    */
+
+
+    // 主体
+    function add() {
+      var arg = [].slice.call(arguments)
+
+      return arg.reduce(function(a, b) {
+        return a + b
+      })
+    }
+
+    // 代理
+    var proxyAdd = (function() {
+      var cache = {}
+
+      return function() {
+        var arg = [].slice.call(arguments).join(',')
+
+        // 如果有，则直接从缓存返回
+        if(cache[arg]) {
+          console.log('有缓存', arg)
+          return cache[arg]
+        } else {
+          var ret = add.apply(this, arguments)
+          cache[arg] = ret
+
+          return ret
+        }
+      }
+    })()
+
+    console.log(
+      add(1, 2, 3, 4), 
+      add(1, 2, 3, 4),
+      proxyAdd(2, 3, 4, 7),
+      proxyAdd(2, 3, 4, 7),
+      proxyAdd(12, 22, 11, 7),
+      proxyAdd(2, 3, 4, 7),
+    )
+
+
+    // // 函数节流
+    // function debounce(fn, delay = 200) {
+    //   let timer =null
+
+    //   return function() {
+    //     let arg = arguments
+
+    //     if(timer) {
+    //       clearInterval(timer)
+    //     }
+    //     timer = null
+
+    //     timer = setTimeout(function() {
+    //       fn.apply(this, arg)
+    //     }, delay)
+    //   }
+    // }
+
+    // var count = 0
+
+    // // 主体
+    // function scrollHandle(e) {
+    //   console.log(e.type, ++count)
+    // }
+
+    // // 代理
+    // var proxyScollHandle = debounce(scrollHandle, 500)
+
+    // window.onscroll = proxyScollHandle
+
+
+    // // 主体，发送消息
+    // function sendMsg(msg) {
+    //   console.log(msg)
+    // }
+
+    // // 代理，对消息进行过滤
+    // function proxySendMsg(msg) {
+    //   // 无消息直接返回
+    //   if(!msg) {
+    //     console.log('消息不能为空')
+    //     return
+    //   }
+
+    //   // 过滤不文明、安全、等的信息
+    //   msg = ('' + msg).replace(/(傻逼)|(草泥马)|(傻屌)/, '***')
+    //   sendMsg(msg)
+    // }
+
+    // proxySendMsg('你是傻逼吗？')
+    // proxySendMsg('你个傻屌')
+    // proxySendMsg('我在这里')
+    // proxySendMsg('')
+  </script>
+</body>
+</html>
