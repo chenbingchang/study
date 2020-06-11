@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>职责链模式</title>
+  </head>
+  <body>
+    <script>
+      /*
+    使多个对象都有机会处理请求，从而避免请求的发送者和接收者之间的耦合关系，将这些对象连成一条链，并沿着这条链 传递该请求，直到有一个对象处理它为止
+
+    请求发送者只需要知道链中的第一个节点，弱化发送者和一组接收者之间的强联系，可以便捷地在职责链中增加或删除一个节点，同样地，指定谁是第一个节点也很便捷
+
+    可以把多条件判断，拆分开
+    */
+
+      // 定义链的某一项
+      function ChainItem(fn) {
+        this.fn = fn
+        this.next = null
+      }
+
+      ChainItem.prototype = {
+        constructor: ChainItem,
+        // 设置下一项
+        setNext(next) {
+          this.next = next
+
+          return next
+        },
+        // 开始执行
+        start() {
+          this.fn.apply(this, arguments)
+        },
+        // 执行下一个
+        toNext() {
+          if (this.next) {
+            this.start.apply(this.next, arguments)
+          } else {
+            console.log("无匹配项")
+          }
+        },
+      }
+
+      // 判断是否是数字
+      function showNumber(val) {
+        if (typeof val === "number") {
+          console.log(val, "  类型是数字")
+        } else {
+          // 下一项
+          this.toNext(val)
+        }
+      }
+
+      function showString(val) {
+        if (typeof val === "string") {
+          console.log(val, "  类型是字符串")
+        } else {
+          this.toNext(val)
+        }
+      }
+
+      function showObject(val) {
+        if (typeof val === "object") {
+          console.log(val, "  类型是对象（包括对象、数组）")
+        } else {
+          this.toNext(val)
+        }
+      }
+
+      let chainNumber = new ChainItem(showNumber)
+      let chainString = new ChainItem(showString)
+      let chainObject = new ChainItem(showObject)
+
+      chainObject.setNext(chainNumber).setNext(chainString)
+
+      chainString.start("12") // string 12
+      chainNumber.start({}) // 无匹配的执行项目
+      chainObject.start({}) // object {}
+      chainObject.start(123) // number 123
+    </script>
+  </body>
+</html>

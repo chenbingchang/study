@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="scrollbar">
+      <!-- 内容 -->
+      <div class="scrollbar-wrap">
+        <div class="scrollbar-view">
+          <!-- 滚动的内容，根据实际进行修改 -->
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">111</div>
+          <div class="temp">222</div>
+          <div class="temp">222</div>
+          <br />
+          <div class="temp" style="display: inline-block;">
+            111111111111111111111111222222222222222222222333333333333333333344444444444444444444445555555555555555555666666666666666666666666677777777777777777888888888888888888888888888899999999999999999999endendendendendendendendendFINISHED
+          </div>
+          <br />
+          <div class="temp">222</div>
+          <div class="temp">222</div>
+          <div class="temp">222</div>
+          <div class="temp">222</div>
+          <div class="temp">222</div>
+          <div class="temp">222</div>
+          <div class="temp">222</div>
+          <div class="temp">222</div>
+          <div class="temp">222</div>
+          <div class="temp">222</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">333</div>
+          <div class="temp">end</div>
+        </div>
+      </div>
+      <!-- 垂直滚动条 -->
+      <div class="scrollbar-bar is-vertical">
+        <div class="scrollbar-thumb"></div>
+      </div>
+      <!-- 水平滚动条 -->
+      <div class="scrollbar-bar is-horizontal">
+        <div class="scrollbar-thumb"></div>
+      </div>
+    </div>
+
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+
+      .scrollbar {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .scrollbar:hover .scrollbar-bar {
+        opacity: 1;
+      }
+
+      .scrollbar-wrap {
+        /* 为了监听宽高 */
+        position: relative;
+        /* 视窗的高度，根据实际进行设置 */
+        height: 250px;
+        overflow: scroll;
+      }
+
+      .scrollbar-view {
+        position: relative;
+      }
+
+      .scrollbar-bar {
+        position: absolute;
+        z-index: 1;
+        border-radius: 4px;
+        opacity: 0;
+        transition: opacity 0.12s ease-out;
+        cursor: pointer;
+        -moz-user-select: none; /*火狐*/
+        -webkit-user-select: none; /*webkit浏览器*/
+        -ms-user-select: none; /*IE10*/
+        -khtml-user-select: none; /*早期浏览器*/
+        user-select: none;
+      }
+
+      .is-vertical {
+        top: 0;
+        right: 2px;
+        width: 6px;
+        height: 100%;
+      }
+
+      .is-horizontal {
+        left: 0;
+        bottom: 2px;
+        width: 100%;
+        height: 6px;
+      }
+
+      .scrollbar-bar .scrollbar-thumb {
+        position: relative;
+        display: block;
+        border-radius: inherit;
+        background-color: rgba(135, 141, 153, 0.3);
+        /* transition: all 0.3s; */
+        cursor: pointer;
+      }
+
+      .is-vertical .scrollbar-thumb {
+        width: 100%;
+        height: 0;
+      }
+
+      .is-horizontal .scrollbar-thumb {
+        width: 0;
+        height: 100%;
+      }
+    </style>
+    <style>
+      /* 监听元素尺寸变化(monitorElementResize)需要的css */
+      .monitor-size-expand,
+      .monitor-size-shrink {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: scroll;
+        visibility: hidden;
+      }
+
+      /* 监听变大,则子元素宽高 > 父容器宽高 即可，一般动态设置，避免到达一定程度后不满足该条件 */
+      .monitor-size-expand-content {
+      }
+
+      /* 监听变小,则子元素宽高要 >= 200%父容器宽高 */
+      .monitor-size-shrink-content {
+        width: 240%;
+        height: 240%;
+      }
+    </style>
+    <style>
+      .temp {
+        height: 40px;
+        font-size: 18px;
+        line-height: 40px;
+      }
+    </style>
+
+    <script>
+      /*
+      scrollbar/scrollbar-wrap/scrollbar-view可以自定义添加类名、样式
+      调用组件时，直接传入需要滚动条的内容即可
+      通过margin隐藏原生的滚动条
+      滑轮滚动：自定义滚动条跟着原生滚动条滚动
+      左键单击：计算点击位置距离视窗顶部的距离，计算出距离/视窗的高度*原生滚动条的scrollHeight，设置原生滚动条scrollTop，导致原生滚动条滚动（回到滑轮滚动）
+      拖动：和拖拽定位原生移动一个道理
+      thumb小于固定宽度：scrollTop占最大scrollTop的百分比，转换成thumb可滚动距离（wrap.clientHeight - thumb的高度）的多少
+      监听内容大小动态改变自定义滚动条大小
+      方向键滚动：由于原生的滚动条只是隐藏了，所以直接可以使用
+
+      参考：1、https://blog.crimx.com/2017/07/15/element-onresize/
+      2、https://juejin.im/entry/5a9a7fcdf265da23866f5885
+       */
+
+      let wrap = document.getElementsByClassName("scrollbar-wrap")[0];
+      let view = document.getElementsByClassName("scrollbar-view")[0];
+      let verticalBar = document.querySelectorAll(
+        ".scrollbar-bar.is-vertical"
+      )[0];
+      let horizontalBar = document.querySelectorAll(
+        ".scrollbar-bar.is-horizontal"
+      )[0];
+      let verticalThumb = document.querySelectorAll(
+        ".is-vertical .scrollbar-thumb"
+      )[0];
+      let horizontalThumb = document.querySelectorAll(
+        ".is-horizontal .scrollbar-thumb"
+      )[0];
+      let nativeScrollBarWidth = 0; // 原生滚动条的宽度
+      let hasVerticalScroll = false; // 是否有垂直滚动条
+      let hasHorizontalScroll = false; // 是否有水平滚动条
+      const MIN_THUMB_WIDTH = 30; // thumb最小的宽度，单位px，避免过短不便于拖动
+      let verticalThumbHeight = null; // 垂直滚动条的原来高度，单位px，当小于minThumbWidth才会记录
+      let horizontalThumbWidth = null; // 水平滚动条原来的宽度，单位px，当小于minThumbWidth才会记录
+      let startX = 0; // 拖动开始的X
+      let startY = 0; // 拖动开始的Y
+
+      var os = (function() {
+        // SymbianOS 塞班手机系统
+        var ua = navigator.userAgent,
+          isWindowsPhone = /(?:Windows Phone)/.test(ua),
+          isSymbian = /(?:SymbianOS)/.test(ua) || isWindowsPhone,
+          isAndroid = /(?:Android)/.test(ua),
+          isFireFox = /(?:Firefox)/.test(ua),
+          isChrome = /(?:Chrome|CriOS)/.test(ua),
+          isTablet =
+            /(?:iPad|PlayBook)/.test(ua) ||
+            (isAndroid && !/(?:Mobile)/.test(ua)) ||
+            (isFireFox && /(?:Tablet)/.test(ua)),
+          isPhone = /(?:iPhone)/.test(ua) && !isTablet,
+          isPc = !isPhone && !isAndroid && !isSymbian;
+
+        return {
+          isTablet: isTablet,
+          isPhone: isPhone,
+          isAndroid: isAndroid,
+          isPc: isPc
+        };
+      })();
+
+      nativeScrollBarWidth = getNativeScrollBarWidth();
+
+      if (nativeScrollBarWidth) {
+        wrap.style.marginRight = `-${nativeScrollBarWidth}px`;
+        wrap.style.marginBottom = `-${nativeScrollBarWidth}px`;
+      }
+
+      /*
+        获取原生滚动条的宽度
+      */
+      function getNativeScrollBarWidth() {
+        const outer = document.createElement("div");
+        outer.style.width = "100px";
+        outer.style.visibility = "hidden";
+        outer.style.position = "absolute";
+        outer.style.top = "-9999px";
+        outer.style.overflow = "scroll"; // 必须显示滚动条，否则无法计算滚动条宽度
+        document.body.appendChild(outer);
+
+        let scrollBarWidth = outer.offsetWidth - outer.clientWidth;
+        outer.parentNode.removeChild(outer); // 完成后移除该元素
+
+        return scrollBarWidth;
+      }
+
+      /* 设置滚动条的宽度或者高度
+       */
+      function updateThumb() {
+        console.log("updateThumb");
+        // 判断是否有垂直滚动条
+        if (wrap.scrollHeight > wrap.clientHeight) {
+          hasVerticalScroll = true;
+          // 垂直滚动条的高度
+          let percent = wrap.clientHeight / wrap.scrollHeight;
+          let height =
+            parseFloat(getComputedStyle(verticalBar).height) * percent;
+
+          // 判断是否小于最小thumb宽度
+          if (height < MIN_THUMB_WIDTH) {
+            verticalThumbHeight = height;
+            verticalThumb.style.height = MIN_THUMB_WIDTH + "px"; // 滚动的时候就要进行相应的转换，否则滚动条到底部的时候显示会有问题
+          } else {
+            verticalThumbHeight = null;
+            verticalThumb.style.height = `${percent * 100}%`;
+          }
+        } else {
+          hasVerticalScroll = false;
+          verticalThumb.style.height = "0";
+        }
+
+        // 判断是否有滚动条
+        if (wrap.scrollWidth > wrap.clientWidth) {
+          hasHorizontalScroll = true;
+          // 水平滚动条的宽度
+          let percent = wrap.clientWidth / wrap.scrollWidth;
+          let width =
+            parseFloat(getComputedStyle(horizontalBar).width) * percent;
+
+          // 判断是否小于最小thumb宽度
+          if (width < MIN_THUMB_WIDTH) {
+            horizontalThumbWidth = width;
+            horizontalThumb.style.width = MIN_THUMB_WIDTH + "px";
+          } else {
+            horizontalThumbWidth = null;
+            horizontalThumb.style.width = `${percent * 100}%`;
+          }
+        } else {
+          hasHorizontalScroll = false;
+          horizontalThumb.style.width = "0";
+        }
+
+        // 初始化滚动条位置
+        handleScroll();
+      }
+      // 初始化滚动条宽度
+      updateThumb();
+
+      /*
+      原生滚动条滚动，自定义滚动条也跟随滚动(通过translate来滚动)
+      */
+      function handleScroll() {
+        if (hasVerticalScroll) {
+          // 判断滚动条的高度是否设置了最小宽度，verticalThumbHeight不为null则设置了
+          if (verticalThumbHeight) {
+            // 滚动距离占最大滚动距离百分比
+            let percent =
+              wrap.scrollTop / (wrap.scrollHeight - wrap.clientHeight);
+            // 换算成可视窗最大滚动距离的百分比
+            let resultPercent =
+              (percent * (wrap.clientHeight - MIN_THUMB_WIDTH)) /
+              MIN_THUMB_WIDTH;
+
+            verticalThumb.style.transform = `translateY(${resultPercent *
+              100}%)`;
+          } else {
+            verticalThumb.style.transform = `translateY(${(wrap.scrollTop /
+              wrap.clientHeight) *
+              100}%)`;
+          }
+        }
+
+        if (hasHorizontalScroll) {
+          // 判断滚动条的高度是否设置了最小宽度，horizontalThumbWidth不为null则设置了
+          if (horizontalThumbWidth) {
+            let percent =
+              wrap.scrollLeft / (wrap.scrollWidth - wrap.clientWidth);
+            let resultPercent =
+              (percent * (wrap.clientWidth - MIN_THUMB_WIDTH)) /
+              MIN_THUMB_WIDTH;
+
+            horizontalThumb.style.transform = `translateX(${resultPercent *
+              100}%)`;
+          } else {
+            horizontalThumb.style.transform = `translateX(${(wrap.scrollLeft /
+              wrap.clientWidth) *
+              100}%)`;
+          }
+        }
+      }
+
+      // 监听原生滚动条滚动
+      wrap.addEventListener("scroll", handleScroll);
+
+      /*
+      垂直滚动条点击
+      */
+      function verticalBarClick(e) {
+        // 点击bar才滚动，点击thumb不滚动
+        if (e.target !== verticalBar) {
+          return;
+        }
+
+        // 获取点击位置与滚动框顶部之间的距离，优化：直接使用e.offsetY 鼠标指针相对于目标节点内边位置的Y坐标。旧的是(e.target.getBoundingClientRect().top - e.clientY)计算得出
+        const offset = e.offsetY;
+        // 让点击位置处于滚动条中间
+        const halfThumb = verticalThumb.clientHeight / 2;
+        // 滚动条移动距离占整个视窗的比例
+        let moveRate = (offset - halfThumb) / wrap.clientHeight;
+        let scrollTop = moveRate * wrap.scrollHeight;
+
+        // wrap.scrollHeight - wrap.clientHeigh是最大滚动高度
+        if (scrollTop > wrap.scrollHeight - wrap.clientHeight) {
+          scrollTop = wrap.scrollHeight - wrap.clientHeight;
+        }
+        wrap.scrollTop = scrollTop;
+      }
+      verticalBar.addEventListener("click", verticalBarClick);
+
+      /*
+      水平滚动条点击
+      */
+      function horizontalBarClick(e) {
+        // 点击bar才滚动，点击thumb不滚动
+        if (e.target !== horizontalBar) {
+          return;
+        }
+
+        // 获取点击位置与滚动框顶部之间的距离，优化：直接使用e.offsetY 鼠标指针相对于目标节点内边位置的Y坐标。旧的是(e.target.getBoundingClientRect().top - e.clientY)计算得出
+        const offset = e.offsetX;
+        // 让点击位置处于滚动条中间
+        const halfThumb = horizontalThumb.clientWidth / 2;
+        // 滚动条移动距离占整个视窗的比例
+        let moveRate = (offset - halfThumb) / wrap.clientWidth;
+        let scrollLeft = moveRate * wrap.scrollWidth;
+
+        // wrap.scrollWidth - wrap.clientWidth是最大滚动宽度
+        if (scrollLeft > wrap.scrollWidth - wrap.clientWidth) {
+          scrollLeft = wrap.scrollWidth - wrap.clientWidth;
+        }
+        wrap.scrollLeft = scrollLeft;
+      }
+      horizontalBar.addEventListener("click", horizontalBarClick);
+
+      // 垂直滚动条拖动
+      // if(os.isPc) {
+
+      // }
+      verticalThumb.addEventListener("mousedown", startVerticalDrag);
+
+      function startVerticalDrag(e) {
+        startX = e.clientX;
+        startY = e.clientY;
+        document.onselectstart = function() {
+          return false;
+        }; // 拖动时阻止选中，否则拖动过程中有选中文本导致文本变蓝影响体验
+        document.addEventListener("mousemove", verticalMoving);
+        document.addEventListener("mouseup", endVerticalDrag);
+      }
+
+      function endVerticalDrag(e) {
+        console.log("移除mousemove事件");
+        document.onselectstart = null; // 恢复选中
+        document.removeEventListener("mousemove", verticalMoving);
+        document.removeEventListener("mouseup", endVerticalDrag);
+      }
+
+      function verticalMoving(e) {
+        let moveY = e.clientY - startY;
+        const thumbPositionPercentage = moveY / wrap.clientHeight;
+        let setpScrollTop = thumbPositionPercentage * wrap.scrollHeight;
+        let nextScrollTop = wrap.scrollTop + setpScrollTop;
+
+        if (nextScrollTop > wrap.scrollHeight - wrap.clientHeight) {
+          nextScrollTop = wrap.scrollHeight - wrap.clientHeight;
+        } else if (nextScrollTop < 0) {
+          nextScrollTop = 0;
+        }
+
+        // console.log(nextScrollTop);
+        wrap.scrollTop = nextScrollTop;
+        startY = e.clientY;
+      }
+
+      // 水平滚动条拖动
+      horizontalThumb.addEventListener("mousedown", startHorizontalDrag);
+
+      function startHorizontalDrag(e) {
+        startX = e.clientX;
+        startY = e.clientY;
+        document.onselectstart = function() {
+          return false;
+        }; // 拖动时阻止选中，否则拖动过程中有选中文本导致文本变蓝影响体验
+        document.addEventListener("mousemove", horizontalMoving);
+        document.addEventListener("mouseup", endHorizontalDrag);
+      }
+
+      function endHorizontalDrag(e) {
+        // console.log("移除mousemove事件");
+        document.onselectstart = null; // 恢复选中
+        document.removeEventListener("mousemove", horizontalMoving);
+        document.removeEventListener("mouseup", endHorizontalDrag);
+      }
+
+      function horizontalMoving(e) {
+        let moveX = e.clientX - startX;
+        const thumbPositionPercentage = moveX / wrap.clientWidth;
+        let setpScrollLeft = thumbPositionPercentage * wrap.scrollWidth;
+        let nextScrollLeft = wrap.scrollLeft + setpScrollLeft;
+
+        if (nextScrollLeft > wrap.scrollWidth - wrap.clientWidth) {
+          nextScrollLeft = wrap.scrollWidth - wrap.clientWidth;
+        } else if (nextScrollLeft < 0) {
+          nextScrollLeft = 0;
+        }
+
+        // console.log(nextScrollLeft);
+        wrap.scrollLeft = nextScrollLeft;
+        startX = e.clientX;
+      }
+
+      // 动态改变thumb的宽度、高度
+      /*
+      监听元素大小改变
+      el要相对定位，在css中自己添加，就不用在js中添加了
+      */
+      function monitorElementResize(el, handler) {
+        // 判断是否是元素
+        if (!(el instanceof HTMLElement)) {
+          throw new TypeError("Parameter 1 is not instance of 'HTMLElement'.");
+        }
+        // https://www.w3.org/TR/html/syntax.html#writing-html-documents-elements，部分元素无法监听大小
+        if (
+          /^(area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr|script|style|textarea|title)$/i.test(
+            el.tagName
+          )
+        ) {
+          throw new TypeError(
+            "Unsupported tag type. Change the tag or wrap it in a supported tag(e.g. div)."
+          );
+        }
+        // 判断回调函数
+        if (typeof handler !== "function") {
+          throw new TypeError("Parameter 2 is not of type 'function'.");
+        }
+
+        let expand = document.createElement("div");
+        let shrink = document.createElement("div");
+        let expandChild = document.createElement("div");
+        let shrinkChild = document.createElement("div");
+        let resetEmitTimes = 0; // 因为重置scroll，而需要取消滚动事件回调的次数
+
+        expand.className = "monitor-size-expand";
+        shrink.className = "monitor-size-shrink";
+        expandChild.className = "monitor-size-expand-content";
+        shrinkChild.className = "monitor-size-shrink-content";
+
+        function resetExpandChildSize(resizeType) {
+          /* 变小时，改变expandChild的宽高，scroll自动会变小，导致resetScroll这里检测不到 */
+          if (resizeType === "shrink") {
+            resetEmitTimes += 1;
+          }
+          let styleObj = getComputedStyle(el);
+          expandChild.style.width = parseFloat(styleObj.width) * 2 + "px";
+          expandChild.style.height = parseFloat(styleObj.height) * 2 + "px";
+        }
+
+        resetExpandChildSize("");
+        expand.appendChild(expandChild);
+        shrink.appendChild(shrinkChild);
+        el.appendChild(expand);
+        el.appendChild(shrink);
+
+        function resetScroll() {
+          let expandScrollMaxTop = expand.scrollHeight - expand.clientHeight;
+          let expandScrollMaxLeft = expand.scrollWidth - expand.clientWidth;
+          let shrinkScrollMaxTop = shrink.scrollHeight - shrink.clientHeight;
+          let shrinkScrollMaxLeft = shrink.scrollWidth - shrink.clientWidth;
+
+          // 如果滚动条没有到底部，则设置到底部，让滚动条一直处于底部
+          if (
+            expand.scrollTop !== expandScrollMaxTop ||
+            expand.scrollLeft !== expandScrollMaxLeft
+          ) {
+            resetEmitTimes += 1;
+            expand.scrollTop = expandScrollMaxTop;
+            expand.scrollLeft = expandScrollMaxLeft;
+          }
+          if (
+            shrink.scrollTop !== shrinkScrollMaxTop ||
+            shrink.scrollLeft !== shrinkScrollMaxLeft
+          ) {
+            resetEmitTimes += 1;
+            shrink.scrollTop = shrinkScrollMaxTop;
+            shrink.scrollLeft = shrinkScrollMaxLeft;
+          }
+        }
+        resetScroll();
+
+        function onScroll(resizeType) {
+          if (resetEmitTimes > 0) {
+            resetEmitTimes--;
+            return;
+          }
+          resetExpandChildSize(resizeType);
+          resetScroll();
+
+          // 触发回调函数
+          handler();
+        }
+        expand.addEventListener("scroll", function() {
+          onScroll("expand");
+        });
+        shrink.addEventListener("scroll", function() {
+          onScroll("shrink");
+        });
+      }
+      monitorElementResize(wrap, updateThumb);
+      monitorElementResize(view, updateThumb);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  aaaaa
+  <script>
+    console.log(this)
+    let obj = {}
+    obj = Object.assign(obj, {
+      name: '我是一个类似vue实例的东西',
+      age: 18,
+      say: (function() {
+        console.log(this, this.name)
+      }).bind(obj),
+      fnBind() {
+        document.addEventListener('keydown', this.say)
+      }
+    })
+
+    /*
+    this指向绑定事件的元素
+    */
+    // document.addEventListener('keydown', obj.say)
+
+
+    obj.fnBind()
+  </script>
+</body>
+</html>

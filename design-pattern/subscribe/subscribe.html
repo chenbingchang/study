@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      /**
+       * 发布订阅模式（或称 观测者模式）
+       * 定义了对象间的一种一对多的依赖关系，当一个对象的状态发 生改变时，所有依赖于它的对象都将得到通知
+       * 优点
+
+一为时间上的解耦，二为对象之间的解耦。可以用在异步编程中与MV*框架中
+
+缺点
+
+创建订阅者本身要消耗一定的时间和内存，订阅的处理函数不一定会被执行，驻留内存有性能开销
+
+弱化了对象之间的联系，复杂的情况下可能会导致程序难以跟踪维护和理解
+      */
+
+      let observer = {
+        // 事件集合
+        eventSet: {},
+        // once，只触发一次
+        once(eventName, fn) {
+          if (!Reflect.has(this.eventSet, eventName)) {
+            if(typeof fn === 'function') {
+              // 事件集合中没有该事件，新增一个
+              this.eventSet[eventName] = {
+                on: [],
+                once: [fn],
+              }
+            } else {
+              console.error('fn 必须是方法')
+            }
+          } else {
+            // 存在则直接加
+            this.eventSet[eventName].once.push(fn)
+          }
+        },
+        // 订阅
+        on(eventName, fn) {
+          if (!Reflect.has(this.eventSet, eventName)) {
+            if(typeof fn === 'function') {
+              // 事件集合中没有该事件，新增一个
+              this.eventSet[eventName] = {
+                on: [fn],
+                once: [],
+              }
+            } else {
+              console.error('fn 必须是方法')
+            }
+          } else {
+            // 存在则直接加
+            this.eventSet[eventName].on.push(fn)
+          }
+        },
+        // 发布
+        emit(eventName) {
+          // 没有订阅该事件，直接返回
+          if(!Reflect.has(this.eventSet, eventName)) {
+            return
+          }
+
+          this.eventSet[eventName].on.forEach(fn => {
+            fn()
+          })
+          this.eventSet[eventName].once.forEach(fn => {
+            fn()
+          })
+          // 删除一次性订阅
+          this.eventSet[eventName].once = []
+        },
+        // 移除事件
+        off(eventName, fn = null) {
+          // 没有订阅该事件，直接返回
+          if(!Reflect.has(this.eventSet, eventName)) {
+            return
+          }
+
+          if(fn) {
+            if(typeof fn !== 'function') {
+              console.error('fn 必须是方法')
+              return
+            }
+            
+            // 有指定方法，则删除指定的方法
+            let onIndex = this.eventSet[eventName].on.findIndex(item => item.toString() === fn.toString())
+            let onceIndex = this.eventSet[eventName].once.findIndex(item => item.toString() === fn.toString())
+
+            if(onIndex !== -1) {
+              this.eventSet[eventName].on.splice(onIndex, 1)
+            }
+            if(onceIndex !== -1) {
+              this.eventSet[eventName].once.splice(onceIndex, 1)
+            }
+          } else {
+            // 没有指定方法，则该事件全删除
+            Reflect.deleteProperty(this.eventSet, eventName)
+          }
+        },
+        // 移除全部事件
+        offAll() {
+          // 重置
+          this.eventSet = {}
+        }
+      }
+
+      observer.on('finish', function() {
+        console.log('你回来了!')
+      })
+      observer.on('finish', function() {
+        console.log('鱼买完了!')
+      })
+      observer.on('finish', function() {
+        console.log('茶叶买完了!')
+      })
+      observer.once('finish', function() {
+        console.log('我只交一次税!')
+      })
+      observer.emit('finish')
+      console.log('--------------------------------')
+      observer.off('finish', function() {
+        console.log('茶叶买完了!')
+      })
+      observer.emit('finish')
+    </script>
+  </body>
+</html>

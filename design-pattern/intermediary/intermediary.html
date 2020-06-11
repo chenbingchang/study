@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>中介者模式</title>
+  </head>
+  <body>
+    <script>
+      /*
+      所有的相关 对象都通过中介者对象来通信，而不是互相引用，所以当一个对象发生改变时，只需要通知中介者对象即可
+      使网状的多对多关系变成了相对简单的一对多关系（复杂的调度处理都交给中介者）
+
+      中介者模式和观察者模式有类似
+      */
+      var mediator = (function () {
+        var topics = {}
+        var subUid = -1
+
+        var publish = function (topic, args) {
+          if (!topics[topic]) {
+            return false
+          }
+
+          var subscribers = topics[topic]
+          var len = subscribers ? subscribers.length : 0
+          while (len--) {
+            subscribers[len].func(topic, args)
+          }
+
+          return true
+        }
+
+        var subscribe = function (topic, func) {
+          if (!topics[topic]) {
+            topics[topic] = []
+          }
+
+          var token = (++subUid).toString()
+          topics[topic].push({
+            token: token,
+            func: func,
+          })
+
+          return token
+        }
+
+        return {
+          publish: publish,
+          subscribe: subscribe,
+          installTo: function (obj) {
+            obj.publish = publish
+            obj.subscribe = subscribe
+          },
+        }
+      })()
+
+      // 具体应用
+      var mod1 = {
+        run: function (arg) {
+          console.log("mod1 received " + arg)
+        },
+      }
+      var mod2 = {}
+      var topic = "myTopic"
+      mediator.installTo(mod1)
+      mediator.installTo(mod2)
+      // mod1订阅消息
+      mod1.subscribe(topic, function (t, arg) {
+        mod1.run(arg)
+      })
+      // mod2发布消息
+      mod2.publish(topic, "data")
+
+
+
+      // let A = {
+      //   score: 10,
+      //   changeTo(score) {
+      //     this.score = score
+      //     // 自己获取
+      //     this.getRank()
+      //   },
+      //   getRank() {
+      //     // 倒序
+      //     let scores = [this.score, B.score, C.score].sort(function (a, b) {
+      //       return b - a
+      //     })
+
+      //     console.log(scores, scores.indexOf(this.score) + 1)
+      //   },
+      // }
+      // let B = {
+      //   score: 20,
+      //   changeTo(score) {
+      //     this.score = score
+      //     // 通过中介者获取
+      //     rankMediator(B)
+      //   },
+      // }
+      // let C = {
+      //   score: 30,
+      //   changeTo(score) {
+      //     this.score = score
+      //     // 通过中介者获取
+      //     rankMediator(C)
+      //   },
+      // }
+
+      // // 中介者，计算排名
+      // function rankMediator(person) {
+      //   // 倒序
+      //   let scores = [A.score, B.score, C.score].sort(function (a, b) {
+      //     return b - a
+      //   })
+
+      //   console.log(scores, scores.indexOf(person.score) + 1)
+      // }
+
+      // // A通过自身来处理
+      // A.changeTo(100) // 1
+
+      // // B和C交由中介者处理
+      // B.changeTo(200) // 1
+      // C.changeTo(50) // 3
+    </script>
+  </body>
+</html>

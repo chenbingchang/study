@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>装饰者模式</title>
+</head>
+<body>
+  <script>
+    /*
+    以动态地给某个对象添加一些额外的职责，而不会影响从这个类中派生的其他对象。
+是一种“即用即付”的方式，能够在不改变对 象自身的基础上，在程序运行期间给对象动态地 添加职责
+
+    是为对象动态加入行为，经过多重包装，可以形成一条装饰链
+    */
+    function Person() {
+
+    }
+    Person.prototype.skill = function() {
+      console.log('数学')
+    }
+
+    // 装饰器，添加音乐
+    function MusicDecorator(person) {
+      this.person = person
+    }
+    MusicDecorator.prototype.skill = function() {
+      this.person.skill()
+      console.log('音乐')
+    }
+    
+    // 装饰器，添加跑步
+    function RunDecorate(person) {
+      this.person = person
+    }
+    RunDecorate.prototype.skill = function() {
+      this.person.skill()
+      console.log('跑步')
+    }
+
+    let person = new Person()
+    let person1 = new MusicDecorator(person)
+    person1 = new RunDecorate(person1)
+    person.skill()
+    person1.skill()
+  </script>
+</body>
+</html>

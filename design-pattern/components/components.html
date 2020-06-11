@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>组合模式</title>
+  </head>
+  <body>
+    <script>
+      /*
+      组合模式：是用小的子对象来构建更大的 对象，而这些小的子对象本身也许是由更小 的“孙对象”构成的。
+      和vue的组件差不多
+    */
+      class Node {
+        name
+        parent
+        children
+
+        constructor(id, name, parent = null, children = []) {
+          this.id = id
+          this.name = name
+          this.parent = parent
+          this.children = children
+        }
+
+        addChild(node) {
+          node.parent = this
+          this.children.push(node)
+
+          return this
+        }
+        removeChild(node) {
+          for (let i = 0; i < this.children.length; i++) {
+            if (this.children[i] === node) {
+              this.children.splice(i, 1)
+
+              return this
+            }
+          }
+
+          return this
+        }
+      }
+
+      let node0 = new Node("node0", "根结点")
+      let node1_1 = new Node("node1_1", "结点1_1")
+      let node1_2 = new Node("node1_2", "结点1_2")
+      let node1_3 = new Node("node1_3 ", "结点1_3 ")
+      let node2_1 = new Node("node2_1", "结点2_1")
+      let node2_2 = new Node("node2_2", "结点2_2")
+      let node2_3 = new Node("node2_3", "结点2_3")
+      let node3_1 = new Node("node3_1", "结点3_1")
+      let node4_1 = new Node("node4_1", "结点4_1")
+
+      node0.addChild(node1_1).addChild(node1_2).addChild(node1_3)
+      node1_1.addChild(node2_1).addChild(node2_2)
+      node1_2.addChild(node2_3)
+      node2_1.addChild(node3_1)
+      node3_1.addChild(node4_1)
+
+      console.log(node0)
+    </script>
+  </body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .wrap {
+      box-sizing: border-box;
+      display: inline-block;
+      width: 150px;
+      height: 150px;
+      padding: 20px;
+      border: 5px solid #333;
+      /* margin: 50px; */
+      background-color: goldenrod;
+      /* overflow: scroll; */
+      overflow: auto;
+    }
+
+    .view {
+      height: 100px;
+      background-color: red;
+    }
+
+    .div2 {
+      box-sizing: border-box;
+      display: inline-block;
+      width: 150px;
+      height: 150px;
+      padding: 20px;
+      border: 5px solid #333;
+      /* margin: 50px; */
+      background-color: greenyellow;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="view"></div>
+  </div>
+  <div class="div2">
+
+  </div>
+  <button id="btn">获取信息</button>
+  <script>
+    /**
+     * clientHeight: content + padding  的高度
+     * offsetHeight: content + padding + border + 滚动条的高度
+     * 如果元素的border为0，并且没有滚动条，则 clientHeight = offsetHeight
+     * 
+     * 滚动条可视区域是clientHeight部分，所以滚动条的最大滚动高度 = scrollHeight - clientHeight
+     * 出现滚动条的条件：scrollHeight > clientHeight
+    */
+    let wrapEl = document.querySelectorAll('.wrap')[0]
+    let btnEl = document.querySelectorAll('#btn')[0]
+
+    btnEl.onclick = function() {
+      let maxScrollTop = wrapEl.scrollHeight - wrapEl.offsetHeight
+      console.log(' clientHeight: ', wrapEl.clientHeight,
+      ' offsetHeight: ', wrapEl.offsetHeight,
+      ' scrollHeight: ', wrapEl.scrollHeight,
+      ' scrollTop: ', wrapEl.scrollTop,
+       ' maxScrollTop: ', maxScrollTop)
+    }
+
+  </script>
+</body>
+</html>

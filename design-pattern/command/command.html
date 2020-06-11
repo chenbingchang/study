@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      /**
+     * 命令模式
+     * 用一种松耦合的方式来设计程序，使得请求发送者和请求接收者能够消除彼此之间的耦合关系
+命令（command）指的是一个执行某些特定事情的指令
+    */
+      var MacroCommand = {
+        commands: [],
+
+        add: function (command) {
+          this.commands.push(command)
+
+          return this
+        },
+
+        remove: function (command) {
+          if (!command) {
+            this.commands = []
+            return
+          }
+
+          for (var i = 0; i < this.commands.length; ++i) {
+            if (this.commands[i] === command) {
+              this.commands.splice(i, 1)
+            }
+          }
+        },
+
+        execute: function () {
+          for (var i = 0; i < this.commands.length; ++i) {
+            this.commands[i].execute()
+          }
+        },
+      }
+
+      var showTime = {
+        execute: function () {
+          console.log("time")
+        },
+      }
+
+      var showName = {
+        execute: function () {
+          console.log("name")
+        },
+      }
+
+      var showAge = {
+        execute: function () {
+          console.log("age")
+        },
+      }
+
+      MacroCommand.add(showTime).add(showName).add(showAge)
+
+      MacroCommand.remove(showName)
+
+      MacroCommand.execute() // time age
+    </script>
+  </body>
+</html>

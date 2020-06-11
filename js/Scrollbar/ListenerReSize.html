@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>监听元素尺寸变化</title>
+  </head>
+  <body>
+    <p id="result">0</p>
+    <div id="wrap">
+      asdfasdfaaaaaaaaaa
+    </div>
+
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+
+      #wrap {
+        position: relative;
+        display: inline-block;
+        width: 200px;
+        height: 200px;
+      }
+
+      .monitor-size-expand,
+      .monitor-size-shrink {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: scroll;
+        visibility: hidden;
+      }
+
+      /* 监听变大,则子元素宽高 > 父容器宽高 即可，一般动态设置，避免到达一定程度后不满足该条件 */
+      .monitor-size-expand-content {
+      }
+
+      /* 监听变小,则子元素宽高要 >= 200%父容器宽高 */
+      .monitor-size-shrink-content {
+        width: 240%;
+        height: 240%;
+      }
+    </style>
+
+    <script>
+      let times = 0;
+      let result = document.getElementById("result");
+      let wrap = document.getElementById("wrap");
+
+      /*
+      监听元素大小改变
+      el要相对定位，在css中自己添加
+      */
+      function monitorElementResize(el, handler) {
+        // 判断是否是元素
+        if (!(el instanceof HTMLElement)) {
+          throw new TypeError("Parameter 1 is not instance of 'HTMLElement'.");
+        }
+        // https://www.w3.org/TR/html/syntax.html#writing-html-documents-elements，部分元素无法监听大小
+        if (
+          /^(area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr|script|style|textarea|title)$/i.test(
+            el.tagName
+          )
+        ) {
+          throw new TypeError(
+            "Unsupported tag type. Change the tag or wrap it in a supported tag(e.g. div)."
+          );
+        }
+        // 判断回调函数
+        if (typeof handler !== "function") {
+          throw new TypeError("Parameter 2 is not of type 'function'.");
+        }
+
+        let expand = document.createElement("div");
+        let shrink = document.createElement("div");
+        let expandChild = document.createElement("div");
+        let shrinkChild = document.createElement("div");
+        let isResetEmit = false; // 是否是因为重置scroll和expandChild的宽高而触发的滚动事件
+        let isInit = false;
+        let resetEmitTimes = 0; // 因为重置scroll，而需要取消滚动事件回调的次数
+
+        expand.className = "monitor-size-expand";
+        shrink.className = "monitor-size-shrink";
+        expandChild.className = "monitor-size-expand-content";
+        shrinkChild.className = "monitor-size-shrink-content";
+
+        function resetExpandChildSize(resizeType) {
+          /* 变小时，改变expandChild的宽高，scroll自动会变小，导致resetScroll这里检测不到 */
+          if (resizeType === "shrink") {
+            resetEmitTimes += 1;
+          }
+          let styleObj = getComputedStyle(el);
+          expandChild.style.width = parseFloat(styleObj.width) * 2 + "px";
+          expandChild.style.height = parseFloat(styleObj.height) * 2 + "px";
+        }
+
+        resetExpandChildSize("");
+        expand.appendChild(expandChild);
+        shrink.appendChild(shrinkChild);
+        el.appendChild(expand);
+        el.appendChild(shrink);
+
+        function resetScroll() {
+          let expandScrollMaxTop = expand.scrollHeight - expand.clientHeight;
+          let expandScrollMaxLeft = expand.scrollWidth - expand.clientWidth;
+          let shrinkScrollMaxTop = shrink.scrollHeight - shrink.clientHeight;
+          let shrinkScrollMaxLeft = shrink.scrollWidth - shrink.clientWidth;
+
+          // 如果滚动条没有到底部，则设置到底部，让滚动条一直处于底部
+          if (
+            expand.scrollTop !== expandScrollMaxTop ||
+            expand.scrollLeft !== expandScrollMaxLeft
+          ) {
+            resetEmitTimes += 1;
+            expand.scrollTop = expandScrollMaxTop;
+            expand.scrollLeft = expandScrollMaxLeft;
+          }
+          if (
+            shrink.scrollTop !== shrinkScrollMaxTop ||
+            shrink.scrollLeft !== shrinkScrollMaxLeft
+          ) {
+            resetEmitTimes += 1;
+            shrink.scrollTop = shrinkScrollMaxTop;
+            shrink.scrollLeft = shrinkScrollMaxLeft;
+          }
+        }
+        resetScroll();
+
+        function onScroll(resizeType) {
+          if (resetEmitTimes > 0) {
+            resetEmitTimes--;
+            return;
+          }
+          resetExpandChildSize(resizeType);
+          resetScroll();
+
+          // 触发回调函数
+          handler();
+        }
+        expand.addEventListener("scroll", function() {
+          onScroll("expand");
+        });
+        shrink.addEventListener("scroll", function() {
+          onScroll("shrink");
+        });
+      }
+
+      monitorElementResize(wrap, function() {
+        times += 1;
+        result.innerText = times;
+      });
+    </script>
+  </body>
+</html>

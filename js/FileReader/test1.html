@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <input type="file"  id="file">
+
+  <script>
+    let fileEl = document.querySelectorAll('#file')[0]
+    console.log(fileEl)
+
+
+    fileEl.onchange = function() {
+      console.log('选择了文件')
+      let file = this.files[0]
+
+      if(file) {
+        let reader = new FileReader()
+
+        reader.readAsArrayBuffer(file)
+        reader.onload = function(event) {
+          console.log("文件内容如下：")
+          console.log(this.result)
+          console.log(new Blob([this.result]))
+        }
+      }
+      this.value = ''
+    }
+  </script>
+</body>
+</html>
