@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .wrap {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+        background-color: goldenrod;
+      }
+    </style>
+  </head>
+  <body>
+    <script></script>
+
+    <div class="wrap wrap1" onclick="func()">1</div>
+    <div class="wrap wrap2" onclick="func2(this)">2</div>
+    <div class="wrap wrap3">3</div>
+    <div class="wrap wrap4">4</div>
+    <div class="wrap wrap5">5</div>
+    <script>
+      /*
+        1、在html中直接写onclick属性的值，方法中是this指向window，因为：在html中绑定事件其实是在元素的onclick默认的方法中插入写入的值，如下：
+        ƒ onclick(event) {
+          func()
+        }
+        由于方法是单独运行的，所有this指向全局window
+        如果在html绑定的执行语句中加入this，则变成
+        ƒ onclick(event) {
+          func2(this)
+        }
+        所以this是当参数传进来的，fun2中获取到的参数是  元素本身
+
+        2、在js中通过onclick绑定事件，由于是把方法直接赋值给 element.onclick，所以方法运行时是element.onclick()，属于this中的隐式绑定this指向element（即：元素本身）
+        3、在js中通过element.addEventListener绑定事件，addEventListener是默认把方法里面的this指向元素本身
+      */
+      function func() {
+        // this是window
+        console.log(this)
+      }
+      function func2(val) {
+        // val是绑定该事件的元素
+        console.log(val)
+        // this是window
+        console.log(this)
+      }
+
+      let wrap1 = document.querySelectorAll(".wrap1")[0]
+      let wrap2 = document.querySelectorAll(".wrap2")[0]
+      let wrap3 = document.querySelectorAll(".wrap3")[0]
+      let wrap4 = document.querySelectorAll(".wrap4")[0]
+      let wrap5 = document.querySelectorAll(".wrap5")[0]
+
+      console.log(wrap1.onclick)
+
+      wrap3.onclick = func3
+      function func3() {
+        // this是绑定该事件的元素
+        console.log(this)
+      }
+
+      wrap4.addEventListener("click", func4)
+      function func4(e) {
+        console.log(e)
+        // this是绑定该事件的元素
+        console.log(this)
+      }
+
+      wrap5.addEventListener("click", function (e) {
+        console.log(e)
+        // this是绑定该事件的元素
+        console.log(this)
+      })
+    </script>
+  </body>
+</html>

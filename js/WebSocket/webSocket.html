@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    let total = 5
+    let i = 1
+    let ws
+    let wsUrl = 'ws://120.77.212.58:31365'
+    let t
+
+    t = setInterval(function() {
+      if(i === total) {
+        clearInterval(t)
+        return
+      }
+
+      i++
+      if(ws) {
+        ws.close()
+        ws = null
+      }
+      ws = new WebSocket(wsUrl);
+      ws.onmessage = function(evt) {
+        console.log(evt.data)
+      }
+    }, 5000)
+  </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+    <script>
+      // Boolean/Number/null/undefined/String/Symbol
+      let arr = [null, '我前面是null', undefined, '我前面是undefined', 3, 15, false, '我前面是false', true, 0, '我的前面的数字0', [], '我的前面是空数组', {}, '我的前面是空对象']
+      arr.forEach(function(item, index, arr) {
+        console.log(index, item)
+      })
+
+      console.log('arr2----------------------------------------------------------------')
+      let arr2 = Array(10)
+      arr2.forEach(function(item, index, arr) {
+        console.log(index, item)
+      })
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box {
+        display: block;
+        width: 100px;
+        height: 300px;
+      }
+      .box1 {
+        background-color: blueviolet;
+      }
+      .box2 {
+        background-color: orange;
+      }
+      .box3 {
+        background-color: blue;
+      }
+      .box4 {
+        background-color: red;
+      }
+      .box5 {
+        background-color: goldenrod;
+      }
+
+      .wrap {
+        margin-top: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <span class="box box1">box1</span>
+    <span class="box box2">box2</span>
+    <!-- <div class="wrap">
+  </div> -->
+    <span class="box box3">box3</span>
+    <span class="box box4">box4</span>
+    <span class="box box5">box5</span>
+
+    <script>
+      /*
+      touchstart/touchend/touchmove都会和scroll冲突，
+    */
+      let boxElList = document.querySelectorAll(".box")
+
+      // boxEl1.ontouchstart = function(e) {
+      //   console.log('boxEl1---------------ontouchstart', e.type)
+      // }
+      // boxEl1.ontouchmove = function(e) {
+      //   console.log('boxEl1---------------ontouchmove', e.type)
+      // }
+      // boxEl1.onclick = function(e) {
+      //   console.log('boxEl1---------------onclick', e.type)
+      // }
+      // boxEl2.ontouchstart = function(e) {
+      //   console.log('boxEl2---------------ontouchstart', e.type)
+      // }
+      // boxEl2.ontouchmove = function(e) {
+      //   console.log('boxEl2---------------ontouchmove', e.type)
+      // }
+
+      for (let i = 0; i < boxElList.length; i++) {
+        boxElList[i].addEventListener("touchend", function (e) {
+          console.log("box", i + 1, "---------------touchend")
+        })
+      }
+
+      function stopTouchendPropagationAfterScroll() {
+        let locked = false
+
+        window.addEventListener(
+          "touchmove",
+          function (ev) {
+            locked ||
+              ((locked = true),
+              window.addEventListener(
+                "touchend",
+                stopTouchendPropagation,
+                true
+              ))
+          },
+          true
+        )
+
+        function stopTouchendPropagation(ev) {
+          ev.stopPropagation()
+
+          window.removeEventListener("touchend", stopTouchendPropagation, true)
+
+          locked = false
+        }
+      }
+
+      stopTouchendPropagationAfterScroll()
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1 @@
+window.setSm(123456)
