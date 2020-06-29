@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>内存泄露1</title>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="context">内容</div>
+    </div>
+    <button class="error">错误移除节点</button>
+    <button class="valid">正确移除节点</button>
+    <div id="nodes"></div>
+    <script>
+      // let wrap = document.getElementsByClassName('wrap')[0]
+      // let context = document.getElementsByClassName('context')[0]
+      // let error = document.getElementsByClassName('error')[0]
+      // let valid = document.getElementsByClassName('valid')[0]
+
+      // context.addEventListener('click', say)
+
+      // function say() {
+      //   console.log('say hello from context')
+      // }
+
+      // error.onclick = function() {
+      //   wrap.removeChild(context)
+      //   console.log('error')
+      // }
+
+      // valid.onclick = function() {
+      //   context.removeEventListener('click', say)
+      //   wrap.removeChild(context)
+      //   context = null
+      //   console.log('valid')
+      // }
+
+      var x = []
+
+      function createSomeNodes() {
+        var div,
+          i = 100,
+          frag = document.createDocumentFragment()
+        for (; i > 0; i--) {
+          div = document.createElement("div")
+          div.appendChild(
+            document.createTextNode(i + " - " + new Date().toTimeString())
+          )
+          frag.appendChild(div)
+        }
+        document.getElementById("nodes").appendChild(frag)
+      }
+      function grow() {
+        x.push(new Array(1000000).join("x"))
+        createSomeNodes()
+        setTimeout(grow, 1000)
+      }
+
+      // grow()
+    </script>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    /*
+    变量提升：变量的声明会被提升到所在作用域的顶端去执行。注意：函数提升排在变量提升之前（函数优先规则）
+    函数提升：函数的声明（必须是函数声明，而不是函数字面量声明）会被提升到所在作用域的顶端去执行。注意：函数提升排在变量提升之前（函数优先规则）
+
+
+    函数字面量式的声明和变量提升的结果是一样的，函数只是一个具体的值；
+    */
+    
+
+    // 示例1：变量提升
+    // console.log(name)
+    // var name = '张三'
+    /*
+    var name
+    console.log(name)
+    name = '张三'
+    */
+    
+    // 示例2：函数字面量式声明
+    // console.log(say)
+    // var say = function() {
+    //   console.log('我说：xxxx')
+    // }
+    /*
+    var say
+    console.log(say)
+    say = function() {
+      console.log('我说：xxxx')
+    }
+    */
+    
+    // 示例3：函数声明
+    // console.log(add)
+    // function add() {
+    //   console.log('我可以计算两个数的和')
+    // }
+    /*
+    function add() {
+      console.log('我可以计算两个数的和')
+    }
+    console.log(add)
+    */
+
+    // 示例4：函数优先规则
+    // foo()
+    // var foo
+    // function foo() {
+    //   console.log(1)
+    // }
+    // foo = function () {
+    //   console.log(2)
+    // }
+    /*
+    function foo() {
+      console.log(1)
+    }
+    var foo
+    foo()
+    foo = function () {
+      console.log(2)
+    }
+    */
+
+    // 示例5：在低版本的浏览器中，函数提升不会被条件判断所控制，输出2；但是在高版本的浏览器中会报错，所以应该尽可能避免在块内部声明函数
+    // foo()
+    // var a = true
+    // if(a) {
+    //   function foo () { console.log(1); }
+    // } else {
+    //   function foo () { console.log(2); }
+    // }
+
+    // 示例6：
+    f()
+    var f = function () {
+      console.log(1);
+    }
+    f()
+    function f() {
+      console.log(2);
+    }
+    f()
+
+    /*
+    原理：我们习惯将var a = 2;看做是一个声明，而实际上javascript引擎并不这么认为。它将var a和a = 2看做是两个单独的声明，第一个是解析阶段的任务，而第二个则是运行阶段的任务。
+
+    所以当同时使用函数声明和函数字面量声明同一个函数名时，由于函数声明是在解析阶段先执行，字面量声明是在运行阶段，
+    所以在字面量声明之前，函数名是函数声明，在字面量声明之后，则函数名是字面量声明
+    */
+  </script>
+</body>
+</html>
