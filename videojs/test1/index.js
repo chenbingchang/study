@@ -1,14 +1,14 @@
 let options = {
-  controls: true, // 确定播放器是否具有用户可以与之交互的控件。如果没有控件，则开始播放视频的唯一方法是使用autoplay属性或通过Player API。
-  autoplay: false, // 是否自动播放
-  preload: "auto", // 预加载
-  loop: false, // 视频在结束时是否重新开始。
-  children: {
-    MediaLoader: true, // children数组必须包含'MediaLoader'。这不是可见元素，但是对于视频加载和播放来说是必需的。
-    PosterImage: true, // 视频海报
-    LoadingSpinner: true, // 加载中遮罩层
-    // 控制条自己定义
-  }
+  // controls: true, // 确定播放器是否具有用户可以与之交互的控件。如果没有控件，则开始播放视频的唯一方法是使用autoplay属性或通过Player API。
+  // autoplay: false, // 是否自动播放
+  // preload: "auto", // 预加载
+  // loop: false, // 视频在结束时是否重新开始。
+  // children: {
+  //   MediaLoader: true, // children数组必须包含'MediaLoader'。这不是可见元素，但是对于视频加载和播放来说是必需的。
+  //   PosterImage: true, // 视频海报
+  //   LoadingSpinner: true, // 加载中遮罩层
+  //   // 控制条自己定义
+  // }
 }
 
 let player = videojs("example_video_1", options, function() {
@@ -19,6 +19,17 @@ let player = videojs("example_video_1", options, function() {
   this.src(
     "https://blshe.oss-cn-hangzhou.aliyuncs.com/video/DEV/2020/04/01/4f8cb7a/91dd9bf.mp4"
   )
+
+  // 结束
+  this.on('ended', function () {
+    console.log('-----------ended---------')
+    console.log('-----------播放结束---------')
+  })
+  // 全屏
+  this.on('fullscreenchange', function () {
+    console.log('-----------fullscreenchange---------')
+    console.log('-----------改变全屏---------')
+  })
 })
 
 // let PosterImage = videojs.getComponent('PosterImage')
@@ -189,7 +200,9 @@ let player = videojs("example_video_1", options, function() {
       this.isPause = this.player().paused()
       console.log(event.target)
     },
-    
+    handleMouseMove(event) {
+        // 清除进度条拖拽
+    }
   })
   videojs.registerComponent('MySeekBar', MySeekBar);
 
@@ -225,7 +238,7 @@ let player = videojs("example_video_1", options, function() {
         className: 'my-progress__play',
         innerHTML: `
         <div class="my-progress__play__point-wrap">
-          <span class="my-progress__play__point"></span>
+          <div class="my-progress__play__point"></div>
         </div>
         `
       }, {
@@ -301,14 +314,14 @@ let player = videojs("example_video_1", options, function() {
   })
   videojs.registerComponent('MyControlBar', MyControlBar);
 
-  player.addChild('MyControlBar')
+  // player.addChild('MyControlBar')
 
-  player.on('timeupdate', function(e) {
-    // 更新已播放进度条
-    // console.log('已播放百分比', player.currentTime(), player.currentTime() / player.duration())
-    document.querySelectorAll('.my-control-bar .my-progress__play')[0].style.width = `${(player.currentTime() / player.duration()) * 100}%`
-  })
+  // player.on('timeupdate', function(e) {
+  //   // 更新已播放进度条
+  //   // console.log('已播放百分比', player.currentTime(), player.currentTime() / player.duration())
+  //   document.querySelectorAll('.my-control-bar .my-progress__play')[0].style.width = `${(player.currentTime() / player.duration()) * 100}%`
+  // })
 
-  player.on('play', function(event) {
-    this.isShowPoster = false
-  })
+  // player.on('play', function(event) {
+  //   this.isShowPoster = false
+  // })

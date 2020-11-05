@@ -43,7 +43,14 @@ video:focus {
 }
 
 
-
+.test-drag {
+  display: inline-block;
+  box-sizing: border-box;
+  width: 80px;
+  height: 80px;
+  background-color: gold;
+  border: 1px solid #333;
+}
 
 
 
@@ -60,6 +67,7 @@ video:focus {
   position: relative;
   height: 8px;
   cursor: pointer;
+  user-select: none;
 }
 
 .my-progress-wrap:hover .my-progress {

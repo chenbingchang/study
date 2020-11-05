@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<!-- 设置根字体大小 -->
+<html lang="en" style="font-size: 103.3px;">
+<head>
+  <meta charset="UTF-8">
+  <!-- 缩小页面 -->
+  <meta name="viewport" content="width=device-width, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5, user-scalable=no">
+  <title>Document</title>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+    }
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .main {
+      position: relative;
+      height: 3.5rem;
+      margin: 0 auto;
+      background-color: gold;
+    }
+
+    .wrap {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0.3rem;
+      display: flex;
+      justify-content: center;
+      list-style: none;
+    }
+
+    .point {
+      width: 0.32rem;
+      height: 0.1rem;
+      background-color: red;
+    }
+
+    .point.is-active {
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="main">
+    <ul class="wrap">
+      <li class="point"></li>
+      <li class="point"></li>
+      <li class="point"></li>
+      <li class="point"></li>
+      <li class="point"></li>
+    </ul>
+  </div>
+</body>
+</html>

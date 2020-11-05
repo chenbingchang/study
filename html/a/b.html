@@ -4,12 +4,44 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+
+      .wrap {
+        position: relative;
+        width: 400px;
+        height: 400px;
+        margin-left: 100px;
+        background-color: greenyellow;
+      }
+
+      .box {
+        font-size: 14px;
+        background-color: gold;
+      }
+
+      .abs {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: blue;
+        background-image: url(https://img.wbp5.com/upload/images/fxchat/2020/08/17/172211813.jpg);
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+      }
+    </style>
   </head>
   <body>
-    <button id="btn">创建</button>
-    <script>
-      var testDetached = document.createElement('div')
-      testDetached.className = 'test-div-ele'
-    </script>
+    <div class="wrap">
+      <div class="box">我这里有点文章</div>
+      <div class="abs"></div>
+    </div>
+
+    <script></script>
   </body>
 </html>

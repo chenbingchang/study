@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    /* 
+    box1和box2一开始的宽度是0
+    由于父元素的宽度是1000px，所以有剩余空间
+    box1的flex: 1 3 700px;
+    box2的flex: 1 1 700px;
+    由于一共700 + 700 = 1400，超过了父元素的总宽度，会进行缩小
+    1400 - 1000 = 400，一共需要缩小400px
+    box1占3份，box2占1分
+    400 / 4 = 100，每份缩小100px
+    所以box1是700 - 3 * 100 = 400
+    box2是700 - 1 * 100 = 600
+    
+    
+    */
+    .wrap {
+      display: flex;
+      width: 1000px;
+      height: 100px;
+      background: blue;
+    }
+
+    .box1 {
+      flex: 1 3 700px;
+      width: 0;
+      background: greenyellow;
+    }
+
+    .box1__main {
+      display: flex;
+      background: coral;
+      overflow: auto;
+    }
+
+    .box1__item {
+      flex: 0 0 auto;
+      width: 80px;
+      margin-right: 14px;
+      background: cyan;
+    }
+
+    .box2 {
+      flex: 1 1 700px;
+      width: 0;
+      background: gold;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="box1">
+      <div class="box1__main">
+        <div class="box1__item">aaaf</div>
+        <div class="box1__item">aaa</div>
+        <div class="box1__item">aaa</div>
+        <div class="box1__item">aaa</div>
+        <div class="box1__item">aaa</div>
+        <div class="box1__item">aaa</div>
+        <div class="box1__item">aaa</div>
+        <div class="box1__item">aaa</div>
+        <div class="box1__item">aaa</div>
+        <div class="box1__item">aaae</div>
+      </div>
+    </div>
+    <div class="box2">bbb</div>
+  </div>
+</body>
+</html>

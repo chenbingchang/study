@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div>测试箭头函数this</div>
+  <script>
+    function add(x, y) {
+      
+    }
+
+    let obj = {
+      name: 'xxx',
+      age: 18,
+      desc: '我是一个程序员',
+      say: function() {
+        console.log('你好', this)
+        // setTimeout(
+        //   () => {
+        //     console.log('箭头函数里面', this)
+        //   },
+        //   100
+        // )
+
+        let a = () => {
+          console.log('箭头函数里面2', this)
+        }
+        a()
+      }
+
+    }
+
+    obj.say()
+  </script>
+</body>
+</html>

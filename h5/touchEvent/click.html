@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Document</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    html, body {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .content {
+      height: 300px;
+      background-color: greenyellow;
+    }
+
+    .mask {
+      position: fixed;
+      left: 20px;
+      top: 50px;
+      width: 100px;
+      height: 100px;
+      background-color: gold;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="content"></div>
+  <div class="mask"></div>
+
+  <script>
+    let contentEl = document.querySelectorAll('.content')[0]
+    let maskEl = document.querySelectorAll('.mask')[0]
+
+    contentEl.addEventListener('click', function(e) {
+      console.log('contentEl-----------click', e)
+    })
+
+    maskEl.addEventListener('touchstart', function(e) {
+      console.log('maskEl-----------touchstart')
+      console.time('计时开始')
+      // setTimeout(function() {
+      //   console.log('299毫秒过去了')
+      // }, 299)
+    })
+    maskEl.addEventListener('click', function(e) {
+      console.timeEnd('计时开始')
+      maskEl.style.display = 'none'
+      console.log('maskEl-----------click')
+    })
+  </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .wrap {
+      width: 600px;
+      height: 600px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: greenyellow;
+    }
+
+    .main {
+      width: 200px;
+      height: 200px;
+      background-color: gold;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="main">11111</div>
+  </div>
+
+  <script>
+    let wrapEl = document.querySelectorAll('.wrap')[0]
+    let mainEl = document.querySelectorAll('.main')[0]
+
+    // 绑定捕获事件
+    document.documentElement.addEventListener('click', function(e) {
+      console.log('documentElement', e)
+    }, true)
+
+    wrapEl.addEventListener('click', function(e) {
+      console.log('wrapEl', e)
+    }, true)
+
+    mainEl.addEventListener('click', function(e) {
+      // 在最内层的div给event加一个属性
+      e.bb_abcd = '我手动给Event添加了一个属性'
+      console.log('mainEl', e)
+    }, true)
+  </script>
+</body>
+</html>

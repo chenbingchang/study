@@ -8,12 +8,37 @@
 <body>
   
   <script>
+    /*
+    数组变异方法：
+      push()  往数组最后面添加一个元素，成功返回当前数组的长度
+      pop()  删除数组的最后一个元素，成功返回删除元素的值
+      shift()  删除数组的第一个元素，成功返回删除元素的值
+      unshift()  往数组最前面添加一个元素，成功返回当前数组的长度
+     splice()  有三个参数，第一个是想要删除的元素的下标（必选），第二个是想要删除的个数（必选），第三个是删除
+                  后想要在原位置替换的值（可选）
+     sort()  使数组按照字符编码默认从小到大排序,成功返回排序后的数组
+    reverse()  将数组倒序，成功返回倒序后的数组
+
+    数组的非变异方法会返回一个新数组，这样就可以赋值的时候不是应用了
+    比如：
+    let arr = []
+    let arr2 = arr.slice(0)
+    */
     console.log('开始')
     let arr = ['asdf', 'aaa', 134, 'aaa', 'bbb', '可爱', '可怜']
     arr.forEach(function(item) {
       console.log(item)
     })
     console.log('结束')
+
+    let arr2 = arr
+    // arr2[0] = '我是第一个元素'
+    arr.splice(1, 1)
+    arr.splice(2, 1)
+    arr2.splice(1, 1)
+    arr2.splice(2, 1)
+    console.log(arr, arr2)
+    
   </script>
 </body>
 </html>

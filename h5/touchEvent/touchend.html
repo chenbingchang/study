@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .wrap {
+      width: 200px;
+      height: 200px;
+      border: 1px solid #333;
+    }
+    .main {
+      width: 100px;
+      height: 100px;
+      border: 1px solid orange;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="main"></div>
+  </div>
+
+  <script>
+    const wrapEl = document.querySelectorAll('.wrap')[0]
+    const mainEl = document.querySelectorAll('.main')[0]
+
+    // wrapEl.ontouchend = function(e) {
+    //   console.log('wrapEl----------touchend')
+    //   e.stopPropagation()
+    //   /*
+    //   e.preventDefault()可以阻止后续click事件的触发
+    //   */
+    //   e.preventDefault()
+    // }
+    // wrapEl.onclick = function(e) {
+    //   console.log('wrapEl----------click')
+    // }
+
+    mainEl.addEventListener('touchend', function() {
+      console.log('mainEl--------touchend----捕获')
+    }, true)
+    mainEl.addEventListener('touchend', function() {
+      console.log('mainEl--------touchend----冒泡')
+    }, false)
+    wrapEl.addEventListener('touchend', function() {
+      console.log('wrapEl--------touchend----捕获')
+    }, true)
+    wrapEl.addEventListener('touchend', function() {
+      console.log('wrapEl--------touchend----冒泡')
+    }, false)
+  </script>
+</body>
+</html>

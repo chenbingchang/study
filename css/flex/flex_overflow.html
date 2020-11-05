@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <style>
+    .flex {
+      display: flex;
+      width: 400px;
+      margin: 50px;
+      background: greenyellow;
+    }
+
+    .item {
+      width: 50px;
+      height: 30px;
+      margin-top: -20px;
+      background: gold;
+    }
+
+    .item:nth-child(n + 2) {
+      margin-left: 40px
+    }
+
+    .item1 {
+      position: relative;
+    }
+
+    .abs {
+      position: absolute;
+      top: -25px;
+      right: 0;
+      background: #f56c6c;
+    }
+  </style>
+</head>
+<body>
+  <div class="flex">
+    <div class="item item1">
+      11111
+      <!-- <div class="abs">内容</div> -->
+    </div>
+    <div class="item">2</div>
+    <div class="item">3</div>
+  </div>
+</body>
+</html>

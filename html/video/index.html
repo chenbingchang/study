@@ -6,9 +6,17 @@
     <title>Document</title>
   </head>
   <body>
-    <video width="500" height="350" class="video1" src="https://blshe.oss-cn-hangzhou.aliyuncs.com/video/DEV/2020/04/01/4f8cb7a/91dd9bf.mp4" controls></video>
+    <!-- <video width="500" height="350" class="video1" src="https://blshe.oss-cn-hangzhou.aliyuncs.com/video/DEV/2020/04/01/4f8cb7a/91dd9bf.mp4" controls></video> -->
+    <video id="test" src="https://blshe.oss-cn-hangzhou.aliyuncs.com/video/DEV/2020/04/01/4f8cb7a/91dd9bf.mp4" poster="" controls></video>
 
     <!-- js -->
-    <script src="./index.js"></script>
+    <!-- <script src="./index.js"></script> -->
+    <script>
+      let testEl = document.getElementById('test')
+      window.setTimeout(function() {
+
+        testEl.setAttribute('poster', 'https://img.wbp5.com/upload/t-e/images/bailuncommunity/original/2020/08/11/113640751.jpg')
+      }, 800)
+    </script>
   </body>
 </html>

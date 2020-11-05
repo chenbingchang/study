@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style></style>
+  </head>
+  <body>
+    <input type="text" oninput="format_input_num(this)" />
+    <br>
+    
+
+    <script>
+      // 格式化限制数字文本框输入，只能数字或者两位小数
+      function format_input_num(obj) {
+        // 清除"数字"和"."以外的字符
+        obj.value = obj.value.replace(/[^\d.]/g, "")
+        // 验证第一个字符是数字
+        obj.value = obj.value.replace(/^\./g, "")
+        // 只保留第一个, 清除多余的
+        obj.value = obj.value.replace(/\.{2,}/g, ".")
+        obj.value = obj.value
+          .replace(".", "$#$")
+          .replace(/\./g, "")
+          .replace("$#$", ".")
+        // 只能输入两个小数
+        obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/, "$1$2.$3")
+      }
+      
+      let arr = [
+        {
+          id: 1,
+          name: 'aaaa',
+          isShow: false,
+        },
+        {
+          id: 2,
+          name: 'bbbbb',
+          isShow: true,
+        },
+        {
+          id: 3,
+          name: 'ccccc',
+          isShow: true,
+        },
+      ]
+
+      // let newArr = arr.filter((item) => item.isShow)
+      let newArr = arr.slice(0, 3)
+      console.log(arr)
+      console.log(newArr)
+
+      console.log('#####################################')
+      newArr[0].name = '修改你的名字'
+      newArr[0].id  = 18
+      console.log(arr)
+      console.log(newArr)
+    </script>
+  </body>
+</html>
