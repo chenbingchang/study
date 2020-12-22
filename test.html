@@ -4,58 +4,126 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <style></style>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+      }
+
+      table {
+        border: 1px solid #333;
+        border-collapse: collapse;
+      }
+
+      caption {
+        font-size: 16px;
+        line-height: 20px;
+        font-weight: 700;
+      }
+
+      thead {
+      }
+
+      th {
+        padding: 4px;
+        border: 1px solid #333;
+        text-align: center;
+        font-size: 14px;
+        line-height: 1;
+      }
+
+      tbody {
+      }
+
+      tr {
+      }
+
+      td {
+        padding: 4px;
+        border: 1px solid #333;
+        text-align: center;
+        font-size: 14px;
+        line-height: 1;
+      }
+    </style>
   </head>
   <body>
-    <input type="text" oninput="format_input_num(this)" />
-    <br>
-    
+    <table>
+      <caption>修改快讯占比(2020-12-15)</caption>
+      <thead>
+        <tr>
+          <th>名称</th>
+          <th>修改占比</th>
+          <th>组长更正数</th>
+          <th>自行修改数</th>
+          <th>已翻译快讯数</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>张三</td>
+          <td>20%</td>
+          <td>21</td>
+          <td>2</td>
+          <td>357</td>
+        </tr>
+        <tr>
+          <td>李四</td>
+          <td>35%</td>
+          <td>231</td>
+          <td>2</td>
+          <td>737</td>
+        </tr>
+      </tbody>
+    </table>
 
     <script>
-      // 格式化限制数字文本框输入，只能数字或者两位小数
-      function format_input_num(obj) {
-        // 清除"数字"和"."以外的字符
-        obj.value = obj.value.replace(/[^\d.]/g, "")
-        // 验证第一个字符是数字
-        obj.value = obj.value.replace(/^\./g, "")
-        // 只保留第一个, 清除多余的
-        obj.value = obj.value.replace(/\.{2,}/g, ".")
-        obj.value = obj.value
-          .replace(".", "$#$")
-          .replace(/\./g, "")
-          .replace("$#$", ".")
-        // 只能输入两个小数
-        obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/, "$1$2.$3")
+      function formatter(params) {
+        const length = params.length
+        const tableStyle = 'border-collapse: collapse;'
+        const captionStyle = 'text-align: center; color: #fff; font-size: 16px; line-height: 20px; '
+        const thStyle = 'padding: 4px; border: 1px solid #ddd; text-align: center; font-size: 14px; line-height: 1;'
+        const thead = `<thead>
+            <tr>
+              <th style="${thStyle}">名称</th>
+              <th style="${thStyle}">修改占比</th>
+              <th style="${thStyle}">组长更正数</th>
+              <th style="${thStyle}">自行修改数</th>
+              <th style="${thStyle}">已翻译快讯数</th>
+            </tr>
+          </thead>`
+        let result = ''
+        let xName = ''
+
+        for (let i = 0; i < length; i++) {
+          const param = params[i]
+
+          result += `
+          <tr>
+            <td style="${thStyle}">${param.marker}${param.seriesName}</td>
+            <td style="${thStyle}">${param.value}</td>
+            <td style="${thStyle}">${param.data.normal}</td>
+            <td style="${thStyle}">${param.data.danger}</td>
+            <td style="${thStyle}">${param.data.danger}</td>
+          </tr>
+          `
+          xName = param.name
+        }
+
+        return `<table style="${tableStyle}">
+          <caption style="${captionStyle}">修改快讯占比(${xName})</caption>
+          ${thead}
+          <tbody>
+            ${result}
+          </tbody>
+        </table>`
       }
-      
-      let arr = [
-        {
-          id: 1,
-          name: 'aaaa',
-          isShow: false,
-        },
-        {
-          id: 2,
-          name: 'bbbbb',
-          isShow: true,
-        },
-        {
-          id: 3,
-          name: 'ccccc',
-          isShow: true,
-        },
-      ]
-
-      // let newArr = arr.filter((item) => item.isShow)
-      let newArr = arr.slice(0, 3)
-      console.log(arr)
-      console.log(newArr)
-
-      console.log('#####################################')
-      newArr[0].name = '修改你的名字'
-      newArr[0].id  = 18
-      console.log(arr)
-      console.log(newArr)
     </script>
   </body>
 </html>
