@@ -89,7 +89,7 @@ function parseHTML(html) {
     }
     if (text) {
       advance(text.length)
-      // 创建虚拟文本节点
+      // 创建虚拟文本节点，并确定父元素
       chars(text)
     }
   }

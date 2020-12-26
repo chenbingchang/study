@@ -1,13 +1,7 @@
 let appEl = document.querySelector("#app")
+let testEl = document.querySelector("#test")
 
-function sum() {
-  with(this) {
-    return 'Hello World'
-  }
+console.log(appEl.nextSibling)
+console.log(testEl.nextSibling)
 
-  // add(this) {
-  //   return 'Hello World 2'
-  // }
-}
-
-console.log(sum())
+appEl.parentNode.insertBefore(testEl, appEl.nextSibling)
