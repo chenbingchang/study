@@ -1,7 +1,11 @@
+import {pushTarget, popTarget} from './dep';
+
 let id = 0
 
 class Watcher {
   constructor(vm, exprOrFn, cb, options) {
+    this.deps = []
+    this.depsId = new Set()
     this.vm = vm
     this.exprOrFn = exprOrFn
     if(typeof exprOrFn === 'function') {
@@ -14,7 +18,23 @@ class Watcher {
   }
 
   get() {
+    pushTarget(this)
     this.getter()
+    popTarget()
+  }
+
+  addDep(dep) {
+    let id = dep.id
+
+    if(!this.depsId.has(id)) {
+      this.depsId.add(id)
+      this.deps.push(dep)
+      dep.addSub(this)
+    }
+  }
+
+  update() {
+    this.get()
   }
 }
 

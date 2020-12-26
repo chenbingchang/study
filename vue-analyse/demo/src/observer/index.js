@@ -1,4 +1,5 @@
 import {arrayMethods} from './array';
+import Dep from './dep';
 
 /**
  * 观测值
@@ -11,7 +12,8 @@ class Observer {
       configurable: false,
       value: this
     })
-
+    
+    this.dep = new Dep() // 专门为数组设计的
     if(Array.isArray(value)) {
       value.__proto__ = arrayMethods // 重写数组原型方法
       this.observeArray(value)
@@ -46,11 +48,19 @@ class Observer {
  * @param {*} value 
  */
 function definedReactive(data, key, value) {
-  observe(value)// 判断值是否也需要响应式
+  let childOb = observe(value)// 判断值是否也需要响应式
+  let dep = new Dep()
 
   // 存取器函数
   Object.defineProperty(data, key, {
     get() {
+      if(Dep.target) { // 如果取值时有watcher
+        dep.depend() // 让watcher保存dep，并且让dep 保存watcher
+        if(childOb) {
+          childOb.dep.depend() // 收集数组依赖
+        }
+      }
+
       return value
     },
     set(newValue) {
@@ -61,6 +71,7 @@ function definedReactive(data, key, value) {
 
       observe(newValue)
       value = newValue
+      dep.notify() // 通知渲染watcher去更新
     }
   })
 }
