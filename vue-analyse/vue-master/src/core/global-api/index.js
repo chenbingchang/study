@@ -44,19 +44,19 @@ export function initGlobalAPI (Vue: GlobalAPI) {
   Vue.delete = del
   Vue.nextTick = nextTick
 
-  Vue.options = Object.create(null)
-  ASSET_TYPES.forEach(type => {
+  Vue.options = Object.create(null) // Vue.options保存Vue的全局的东西
+  ASSET_TYPES.forEach(type => { // 存放各种已经注册的资源(组件、指令、过滤)
     Vue.options[type + 's'] = Object.create(null)
   })
 
   // this is used to identify the "base" constructor to extend all plain-object
   // components with in Weex's multi-instance scenarios.
-  Vue.options._base = Vue
+  Vue.options._base = Vue // 指向Vue
 
-  extend(Vue.options.components, builtInComponents)
+  extend(Vue.options.components, builtInComponents) // 增加keep-alive
 
-  initUse(Vue)
-  initMixin(Vue)
-  initExtend(Vue)
-  initAssetRegisters(Vue)
+  initUse(Vue) // 插件use方法
+  initMixin(Vue) // mixin混入
+  initExtend(Vue) // extend继承函数
+  initAssetRegisters(Vue) // 注册全局组件、指令、过滤方法
 }

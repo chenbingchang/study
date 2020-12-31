@@ -66,11 +66,11 @@ export const hasSymbol =
  * Defer a task to execute it asynchronously.
  */
 export const nextTick = (function () {
-  const callbacks = []
-  let pending = false
-  let timerFunc
+  const callbacks = []  // 存放nextTick回调
+  let pending = false // 是否执行中
+  let timerFunc // 异步调用nextTick的回调方法
 
-  function nextTickHandler () {
+  function nextTickHandler () {// 清空队列
     pending = false
     const copies = callbacks.slice(0)
     callbacks.length = 0
@@ -88,7 +88,7 @@ export const nextTick = (function () {
   // that consistently queues the callback after all DOM events triggered in the
   // same loop is by using MessageChannel.
   /* istanbul ignore if */
-  if (typeof setImmediate !== 'undefined' && isNative(setImmediate)) {
+  if (typeof setImmediate !== 'undefined' && isNative(setImmediate)) {// setImmediate  IE/edge才有的东西,宏任务(macro task)
     timerFunc = () => {
       setImmediate(nextTickHandler)
     }
@@ -96,7 +96,7 @@ export const nextTick = (function () {
     isNative(MessageChannel) ||
     // PhantomJS
     MessageChannel.toString() === '[object MessageChannelConstructor]'
-  )) {
+  )) {// MessageChannel 消息通道，宏任务(macro task)
     const channel = new MessageChannel()
     const port = channel.port2
     channel.port1.onmessage = nextTickHandler
@@ -105,13 +105,13 @@ export const nextTick = (function () {
     }
   } else
   /* istanbul ignore next */
-  if (typeof Promise !== 'undefined' && isNative(Promise)) {
+  if (typeof Promise !== 'undefined' && isNative(Promise)) {// Promise.then 微任务(micro task)，注意是.then才是
     // use microtask in non-DOM environments, e.g. Weex
     const p = Promise.resolve()
     timerFunc = () => {
       p.then(nextTickHandler)
     }
-  } else {
+  } else {// setTimeout 是宏任务(macro task)
     // fallback to setTimeout
     timerFunc = () => {
       setTimeout(nextTickHandler, 0)
@@ -123,7 +123,7 @@ export const nextTick = (function () {
     callbacks.push(() => {
       if (cb) {
         try {
-          cb.call(ctx)
+          cb.call(ctx)// 1.将回调函数存入到callbacks中
         } catch (e) {
           handleError(e, ctx, 'nextTick')
         }
@@ -133,10 +133,10 @@ export const nextTick = (function () {
     })
     if (!pending) {
       pending = true
-      timerFunc()
+      timerFunc()// 2.异步刷新队列
     }
     // $flow-disable-line
-    if (!cb && typeof Promise !== 'undefined') {
+    if (!cb && typeof Promise !== 'undefined') {// 3.支持promise写法
       return new Promise((resolve, reject) => {
         _resolve = resolve
       })

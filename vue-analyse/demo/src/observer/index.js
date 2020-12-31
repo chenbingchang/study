@@ -58,6 +58,9 @@ function definedReactive(data, key, value) {
         dep.depend() // 让watcher保存dep，并且让dep 保存watcher
         if(childOb) {
           childOb.dep.depend() // 收集数组依赖
+          if(Array.isArray(value)) { // 如果内部还是数组
+            depandArray(value) // 不停的进行依赖收集
+          }
         }
       }
 
@@ -74,6 +77,17 @@ function definedReactive(data, key, value) {
       dep.notify() // 通知渲染watcher去更新
     }
   })
+}
+
+function depandArray(value) {
+  for(let i = 0, len = value.length; i < len; i++) {
+    let current = value[i]
+
+    current.__ob__ &&　current.__ob__.dep.depend()
+    if(Array.isArray(current)) {
+      depandArray(current)
+    }
+  }
 }
 
 export function observe(data) {

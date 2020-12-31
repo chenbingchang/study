@@ -191,16 +191,21 @@ export function defineReactive (
  * already exist.
  */
 export function set (target: Array<any> | Object, key: any, val: any): any {
+  // 数组，直接换成调用重写的splice方法即可
   if (Array.isArray(target) && isValidArrayIndex(key)) {
     target.length = Math.max(target.length, key)
     target.splice(key, 1, val)
     return val
   }
+
+  // 对象，如果是本来就存在的属性直接设置值
   if (hasOwn(target, key)) {
     target[key] = val
     return val
   }
+
   const ob = (target: any).__ob__
+  // 不能在Vue实例上设置，__ob__是Vue实例上的一个属性指向Vue实例本身
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid adding reactive properties to a Vue instance or its root $data ' +
@@ -208,12 +213,16 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
     )
     return val
   }
+
+  // 5.如果不是响应式的也不需要将其定义成响应式属性
   if (!ob) {
     target[key] = val
     return val
   }
+
+  // 6.将属性定义成响应式的(疑问：不知什么情况下才会轮着这里？)
   defineReactive(ob.value, key, val)
-  ob.dep.notify()
+  ob.dep.notify()// 7.通知视图更新
   return val
 }
 
@@ -221,10 +230,12 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
  * Delete a property and trigger change if necessary.
  */
 export function del (target: Array<any> | Object, key: any) {
+  // 1.如果是数组依旧调用splice方法
   if (Array.isArray(target) && isValidArrayIndex(key)) {
     target.splice(key, 1)
     return
   }
+
   const ob = (target: any).__ob__
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
@@ -233,13 +244,16 @@ export function del (target: Array<any> | Object, key: any) {
     )
     return
   }
+  // 2.如果本身就没有这个属性什么都不做
   if (!hasOwn(target, key)) {
     return
   }
+  // 3.删除这个属性
   delete target[key]
   if (!ob) {
     return
   }
+  // 4.通知更新，到了这里ob要存在，并且target不是数组，对象存在这个key属性，(target._isVue || (ob && ob.vmCount))不成立
   ob.dep.notify()
 }
 

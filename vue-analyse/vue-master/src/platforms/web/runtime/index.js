@@ -20,15 +20,15 @@ import platformDirectives from './directives/index'
 import platformComponents from './components/index'
 
 // install platform specific utils
-Vue.config.mustUseProp = mustUseProp
+Vue.config.mustUseProp = mustUseProp // Vue.config的全局配置，在创建Vue之前修改
 Vue.config.isReservedTag = isReservedTag
 Vue.config.isReservedAttr = isReservedAttr
 Vue.config.getTagNamespace = getTagNamespace
 Vue.config.isUnknownElement = isUnknownElement
 
 // install platform runtime directives & components
-extend(Vue.options.directives, platformDirectives)
-extend(Vue.options.components, platformComponents)
+extend(Vue.options.directives, platformDirectives) // 添加平台的指令，model/show
+extend(Vue.options.components, platformComponents) // 添加平台的组件, transition/transitionGroup
 
 // install platform patch function
 Vue.prototype.__patch__ = inBrowser ? patch : noop

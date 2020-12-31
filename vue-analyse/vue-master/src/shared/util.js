@@ -188,6 +188,7 @@ export function bind (fn: Function, ctx: Object): Function {
 
 /**
  * Convert an Array-like object to a real Array.
+ * 将类似数组的对象转换为真正的数组
  */
 export function toArray (list: any, start?: number): Array<any> {
   start = start || 0
