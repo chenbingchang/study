@@ -35,6 +35,10 @@ const sharedPropertyDefinition = {
   set: noop
 }
 
+/*
+代理
+把 target.key 代理到 target.sourceKey.key
+ */
 export function proxy (target: Object, sourceKey: string, key: string) {
   sharedPropertyDefinition.get = function proxyGetter () {
     return this[sourceKey][key]
@@ -135,7 +139,7 @@ function initData (vm: Component) {
         )
       }
     }
-    if (props && hasOwn(props, key)) {
+    if (props && hasOwn(props, key)) { // 如果data属性已经在props中存在则报错
       process.env.NODE_ENV !== 'production' && warn(
         `The data property "${key}" is already declared as a prop. ` +
         `Use prop default value instead.`,

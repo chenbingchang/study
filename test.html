@@ -15,114 +15,38 @@
         width: 100%;
         height: 100%;
       }
-
-      table {
-        border: 1px solid #333;
-        border-collapse: collapse;
-      }
-
-      caption {
-        font-size: 16px;
-        line-height: 20px;
-        font-weight: 700;
-      }
-
-      thead {
-      }
-
-      th {
-        padding: 4px;
-        border: 1px solid #333;
-        text-align: center;
-        font-size: 14px;
-        line-height: 1;
-      }
-
-      tbody {
-      }
-
-      tr {
-      }
-
-      td {
-        padding: 4px;
-        border: 1px solid #333;
-        text-align: center;
-        font-size: 14px;
-        line-height: 1;
-      }
     </style>
   </head>
   <body>
-    <table>
-      <caption>修改快讯占比(2020-12-15)</caption>
-      <thead>
-        <tr>
-          <th>名称</th>
-          <th>修改占比</th>
-          <th>组长更正数</th>
-          <th>自行修改数</th>
-          <th>已翻译快讯数</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>张三</td>
-          <td>20%</td>
-          <td>21</td>
-          <td>2</td>
-          <td>357</td>
-        </tr>
-        <tr>
-          <td>李四</td>
-          <td>35%</td>
-          <td>231</td>
-          <td>2</td>
-          <td>737</td>
-        </tr>
-      </tbody>
-    </table>
+    <button id="btn">发送请求</button>
+    <br>
+    结果：
+    <div id="result"></div>
 
     <script>
-      function formatter(params) {
-        const length = params.length
-        const tableStyle = 'border-collapse: collapse;'
-        const captionStyle = 'text-align: center; color: #fff; font-size: 16px; line-height: 20px; '
-        const thStyle = 'padding: 4px; border: 1px solid #ddd; text-align: center; font-size: 14px; line-height: 1;'
-        const thead = `<thead>
-            <tr>
-              <th style="${thStyle}">名称</th>
-              <th style="${thStyle}">修改占比</th>
-              <th style="${thStyle}">组长更正数</th>
-              <th style="${thStyle}">自行修改数</th>
-              <th style="${thStyle}">已翻译快讯数</th>
-            </tr>
-          </thead>`
-        let result = ''
-        let xName = ''
+      const btnEl = document.querySelector('#btn')
+      const resultEl = document.querySelector('#result')
 
-        for (let i = 0; i < length; i++) {
-          const param = params[i]
+      btnEl.onclick = function() {
+        const xhr = new XMLHttpRequest()
+        const url = 'http://47.91.220.207:31700/fastbull-news-service/api/manager/findManagerQuotesNewsPage'
 
-          result += `
-          <tr>
-            <td style="${thStyle}">${param.marker}${param.seriesName}</td>
-            <td style="${thStyle}">${param.value}</td>
-            <td style="${thStyle}">${param.data.normal}</td>
-            <td style="${thStyle}">${param.data.danger}</td>
-            <td style="${thStyle}">${param.data.danger}</td>
-          </tr>
-          `
-          xName = param.name
+        xhr.open('POST', url)
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
+        xhr.setRequestHeader('langid', 2)
+        xhr.setRequestHeader('token', '1cfeb9155dc1436bb5e67859a439fe5e')
+        xhr.responseType = 'json'
+        xhr.send({
+          pageIndex: 1,
+          pageSize: 12
+        })
+
+        xhr.onreadystatechange = function(response) {
+          if(xhr.readyState === XMLHttpRequest.DONE) {
+            console.log(xhr.response)
+            resultEl.innerText = xhr.response
+          }
         }
-
-        return `<table style="${tableStyle}">
-          <caption style="${captionStyle}">修改快讯占比(${xName})</caption>
-          ${thead}
-          <tbody>
-            ${result}
-          </tbody>
-        </table>`
       }
     </script>
   </body>

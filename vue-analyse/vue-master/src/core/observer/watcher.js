@@ -22,7 +22,7 @@ let uid = 0
  * This is used for both the $watch() api and directives.
  */
 export default class Watcher {
-  vm: Component;
+  vm: Component; // 关联的组件
   expression: string;
   cb: Function;
   id: number;
@@ -36,7 +36,7 @@ export default class Watcher {
   newDeps: Array<Dep>;
   depIds: ISet;
   newDepIds: ISet;
-  getter: Function;
+  getter: Function; // 更新组件视图的方法，一般是updateComponent方法，在(instance/lifecycle.js)
   value: any;
 
   constructor (
@@ -46,7 +46,7 @@ export default class Watcher {
     options?: Object
   ) {
     this.vm = vm
-    vm._watchers.push(this)
+    vm._watchers.push(this) // 一个vm可以有多个Watcher
     // options
     if (options) {
       this.deep = !!options.deep
@@ -69,7 +69,7 @@ export default class Watcher {
       : ''
     // parse expression for getter
     if (typeof expOrFn === 'function') {
-      this.getter = expOrFn
+      this.getter = expOrFn // 
     } else {
       this.getter = parsePath(expOrFn)
       if (!this.getter) {
@@ -89,13 +89,14 @@ export default class Watcher {
 
   /**
    * Evaluate the getter, and re-collect dependencies.
+   * 对getter进行依赖收集
    */
   get () {
     pushTarget(this)
     let value
     const vm = this.vm
     try {
-      value = this.getter.call(vm, vm)
+      value = this.getter.call(vm, vm) // 更新视图，在更新视图中会调用绑定的data数据，通过data的属性劫持从而收集依赖
     } catch (e) {
       if (this.user) {
         handleError(e, vm, `getter for watcher "${this.expression}"`)
@@ -121,9 +122,9 @@ export default class Watcher {
     const id = dep.id
     if (!this.newDepIds.has(id)) {
       this.newDepIds.add(id)
-      this.newDeps.push(dep)
+      this.newDeps.push(dep) // 当前Watcher收集Dep
       if (!this.depIds.has(id)) {
-        dep.addSub(this)
+        dep.addSub(this) // Dep收集Watcher
       }
     }
   }

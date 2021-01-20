@@ -47,20 +47,21 @@ export function initLifecycle (vm: Component) {
 }
 
 export function lifecycleMixin (Vue: Class<Component>) {
+  // _update是更新视图，渲染虚拟dom
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
     const vm: Component = this
     if (vm._isMounted) {
       callHook(vm, 'beforeUpdate')
     }
     const prevEl = vm.$el
-    const prevVnode = vm._vnode
+    const prevVnode = vm._vnode // 当前的vnode
     const prevActiveInstance = activeInstance
     activeInstance = vm
     vm._vnode = vnode
     // Vue.prototype.__patch__ is injected in entry points
     // based on the rendering backend used.
     if (!prevVnode) {
-      // initial render
+      // initial render   初始渲染
       vm.$el = vm.__patch__(
         vm.$el, vnode, hydrating, false /* removeOnly */,
         vm.$options._parentElm,
@@ -70,8 +71,8 @@ export function lifecycleMixin (Vue: Class<Component>) {
       // this prevents keeping a detached DOM tree in memory (#5851)
       vm.$options._parentElm = vm.$options._refElm = null
     } else {
-      // updates
-      vm.$el = vm.__patch__(prevVnode, vnode)
+      // updates    更新
+      vm.$el = vm.__patch__(prevVnode, vnode) // __patch__就是diff算法，比较前、后两个虚拟dom的差异然后更新dom
     }
     activeInstance = prevActiveInstance
     // update __vue__ reference
@@ -140,6 +141,7 @@ export function lifecycleMixin (Vue: Class<Component>) {
   }
 }
 
+// 渲染组件
 export function mountComponent (
   vm: Component,
   el: ?Element,
@@ -166,9 +168,9 @@ export function mountComponent (
       }
     }
   }
-  callHook(vm, 'beforeMount')
+  callHook(vm, 'beforeMount') // 生命周期beforeMount
 
-  let updateComponent
+  let updateComponent // 更新组件视图的方法
   /* istanbul ignore if */
   if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
     updateComponent = () => {
@@ -193,14 +195,15 @@ export function mountComponent (
     }
   }
 
+  // 创建组件的Watcher，在data数据改变时通过关联的Dep调用Watcher更新视图
   vm._watcher = new Watcher(vm, updateComponent, noop)
   hydrating = false
 
   // manually mounted instance, call mounted on self
   // mounted is called for render-created child components in its inserted hook
   if (vm.$vnode == null) {
-    vm._isMounted = true
-    callHook(vm, 'mounted')
+    vm._isMounted = true // 渲染完成标识
+    callHook(vm, 'mounted') // 生命周期mounted
   }
   return vm
 }

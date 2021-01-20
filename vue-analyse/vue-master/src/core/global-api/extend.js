@@ -39,14 +39,15 @@ export function initExtend (Vue: GlobalAPI) {
     const Sub = function VueComponent (options) {
       this._init(options)
     }
-    Sub.prototype = Object.create(Super.prototype)
+    Sub.prototype = Object.create(Super.prototype) // 子类原型对象的__proto__指向父类原型对象
     Sub.prototype.constructor = Sub
     Sub.cid = cid++
+    // 合并子类选项和父类选项
     Sub.options = mergeOptions(
       Super.options,
       extendOptions
     )
-    Sub['super'] = Super
+    Sub['super'] = Super // 指向父类的属性
 
     // For props and computed properties, we define the proxy getters on
     // the Vue instances at extension time, on the extended prototype. This
@@ -70,18 +71,18 @@ export function initExtend (Vue: GlobalAPI) {
     })
     // enable recursive self-lookup
     if (name) {
-      Sub.options.components[name] = Sub
+      Sub.options.components[name] = Sub // 当前子类当成一个组件，记录下来
     }
 
     // keep a reference to the super options at extension time.
     // later at instantiation we can check if Super's options have
     // been updated.
-    Sub.superOptions = Super.options
-    Sub.extendOptions = extendOptions
-    Sub.sealedOptions = extend({}, Sub.options)
+    Sub.superOptions = Super.options // 指向父类选项
+    Sub.extendOptions = extendOptions // 保存初始的选项
+    Sub.sealedOptions = extend({}, Sub.options) // 
 
     // cache constructor
-    cachedCtors[SuperId] = Sub
+    cachedCtors[SuperId] = Sub // 缓存构造函数
     return Sub
   }
 }

@@ -53,9 +53,9 @@ function mergeData (to: Object, from: ?Object): Object {
     key = keys[i]
     toVal = to[key]
     fromVal = from[key]
-    if (!hasOwn(to, key)) {
+    if (!hasOwn(to, key)) { // 如果to上没有这个属性，直接设置
       set(to, key, fromVal)
-    } else if (isPlainObject(toVal) && isPlainObject(fromVal)) {
+    } else if (isPlainObject(toVal) && isPlainObject(fromVal)) { // 两个都是对象，需要递归
       mergeData(toVal, fromVal)
     }
   }
@@ -70,7 +70,7 @@ export function mergeDataOrFn (
   childVal: any,
   vm?: Component
 ): ?Function {
-  if (!vm) {
+  if (!vm) {// 不是Vue实例，也就是说是全局的
     // in a Vue.extend merge, both should be functions
     if (!childVal) {
       return parentVal
@@ -107,6 +107,7 @@ export function mergeDataOrFn (
   }
 }
 
+// data合并策略
 strats.data = function (
   parentVal: any,
   childVal: any,
@@ -131,6 +132,7 @@ strats.data = function (
 
 /**
  * Hooks and props are merged as arrays.
+ * 合并生命周期钩子
  */
 function mergeHook (
   parentVal: ?Array<Function>,
@@ -171,6 +173,7 @@ function mergeAssets (
   }
 }
 
+// 资源的合并策略
 ASSET_TYPES.forEach(function (type) {
   strats[type + 's'] = mergeAssets
 })
@@ -187,7 +190,7 @@ strats.watch = function (
   vm?: Component,
   key: string
 ): ?Object {
-  // work around Firefox's Object.prototype.watch...
+  // work around Firefox's Object.prototype.watch...   解决Firefox浏览器自带的Object.prototype.watch方法
   if (parentVal === nativeWatch) parentVal = undefined
   if (childVal === nativeWatch) childVal = undefined
   /* istanbul ignore if */
@@ -196,13 +199,13 @@ strats.watch = function (
     assertObjectType(key, childVal, vm)
   }
   if (!parentVal) return childVal
-  const ret = {}
-  extend(ret, parentVal)
+  const ret = {} // 最终的watch
+  extend(ret, parentVal) // 把父的watch放到ret里面
   for (const key in childVal) {
     let parent = ret[key]
     const child = childVal[key]
     if (parent && !Array.isArray(parent)) {
-      parent = [parent]
+      parent = [parent] // 变成数组
     }
     ret[key] = parent
       ? parent.concat(child)
@@ -229,9 +232,11 @@ strats.computed = function (
   if (!parentVal) return childVal
   const ret = Object.create(null)
   extend(ret, parentVal)
+  // 子选项覆盖父选项
   if (childVal) extend(ret, childVal)
   return ret
 }
+// provide和data一样
 strats.provide = mergeDataOrFn
 
 /**
@@ -262,7 +267,7 @@ function checkComponents (options: Object) {
  * Ensure all props option syntax are normalized into the
  * Object-based format.
  */
-function normalizeProps (options: Object, vm: ?Component) {
+function normalizeProps (options: Object, vm: ?Component) { // 标准化props
   const props = options.props
   if (!props) return
   const res = {}
@@ -299,7 +304,7 @@ function normalizeProps (options: Object, vm: ?Component) {
 /**
  * Normalize all injections into Object-based format
  */
-function normalizeInject (options: Object, vm: ?Component) {
+function normalizeInject (options: Object, vm: ?Component) { // 标准化inject
   const inject = options.inject
   const normalized = options.inject = {}
   if (Array.isArray(inject)) {
@@ -325,7 +330,7 @@ function normalizeInject (options: Object, vm: ?Component) {
 /**
  * Normalize raw function directives into object format.
  */
-function normalizeDirectives (options: Object) {
+function normalizeDirectives (options: Object) { // 标准化directives
   const dirs = options.directives
   if (dirs) {
     for (const key in dirs) {
@@ -364,10 +369,12 @@ export function mergeOptions (
     child = child.options
   }
 
+  // 把props/inject/directives进行标准化处理
   normalizeProps(child, vm)
   normalizeInject(child, vm)
   normalizeDirectives(child)
   const extendsFrom = child.extends
+  // 1.组件先将自己的extends和mixin与父属性合并
   if (extendsFrom) {
     parent = mergeOptions(parent, extendsFrom, vm)
   }
@@ -376,6 +383,7 @@ export function mergeOptions (
       parent = mergeOptions(parent, child.mixins[i], vm)
     }
   }
+  // 2.之前合并后的结果，与自身的属性进行合并
   const options = {}
   let key
   for (key in parent) {
@@ -387,7 +395,7 @@ export function mergeOptions (
     }
   }
   function mergeField (key) {
-    const strat = strats[key] || defaultStrat
+    const strat = strats[key] || defaultStrat // 3.根据key查找不同的合并策略方法，然后执行
     options[key] = strat(parent[key], child[key], vm, key)
   }
   return options

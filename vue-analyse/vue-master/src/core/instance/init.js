@@ -16,7 +16,7 @@ export function initMixin (Vue: Class<Component>) {
   Vue.prototype._init = function (options?: Object) {
     const vm: Component = this
     // a uid
-    vm._uid = uid++
+    vm._uid = uid++// 1.每个vue的实例上都有一个唯一的属性_uid
 
     let startTag, endTag
     /* istanbul ignore if */
@@ -27,7 +27,7 @@ export function initMixin (Vue: Class<Component>) {
     }
 
     // a flag to avoid this being observed
-    vm._isVue = true
+    vm._isVue = true// 2.表示是Vue的实例
     // merge options
     if (options && options._isComponent) {
       // optimize internal component instantiation
@@ -48,7 +48,7 @@ export function initMixin (Vue: Class<Component>) {
       vm._renderProxy = vm
     }
     // expose real self
-    vm._self = vm
+    vm._self = vm // 指向自己的属性
     initLifecycle(vm)
     initEvents(vm)
     initRender(vm)
@@ -66,11 +66,13 @@ export function initMixin (Vue: Class<Component>) {
     }
 
     if (vm.$options.el) {
+      // $mount方法是在后面（web/runtime/index.js）的时候声明的，但是由于new Vue是在更之后，所以没问题
       vm.$mount(vm.$options.el)
     }
   }
 }
 
+// 初始化内部组件
 function initInternalComponent (vm: Component, options: InternalComponentOptions) {
   const opts = vm.$options = Object.create(vm.constructor.options)
   // doing this because it's faster than dynamic enumeration.
@@ -88,15 +90,16 @@ function initInternalComponent (vm: Component, options: InternalComponentOptions
   }
 }
 
+// 解析构造函数选项
 export function resolveConstructorOptions (Ctor: Class<Component>) {
   let options = Ctor.options
-  if (Ctor.super) {
+  if (Ctor.super) { // 如果存在父级，则递归调用
     const superOptions = resolveConstructorOptions(Ctor.super)
     const cachedSuperOptions = Ctor.superOptions
-    if (superOptions !== cachedSuperOptions) {
+    if (superOptions !== cachedSuperOptions) { // 两个取的父级选项不一样
       // super option changed,
       // need to resolve new options.
-      Ctor.superOptions = superOptions
+      Ctor.superOptions = superOptions // 保存新的父级选项
       // check if there are any late-modified/attached options (#4976)
       const modifiedOptions = resolveModifiedOptions(Ctor)
       // update base extend options

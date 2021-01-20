@@ -3,7 +3,7 @@
 
 import { handleError } from './error'
 
-// can we use __proto__?
+// can we use __proto__?   是否能用__proto__，__proto__这个属性以前不是标准
 export const hasProto = '__proto__' in {}
 
 // Browser environment sniffing
@@ -17,7 +17,7 @@ export const isIOS = UA && /iphone|ipad|ipod|ios/.test(UA)
 export const isChrome = UA && /chrome\/\d+/.test(UA) && !isEdge
 
 // Firefox has a "watch" function on Object.prototype...
-export const nativeWatch = ({}).watch
+export const nativeWatch = ({}).watch // Firefox在Object的原型对象上有watch方法
 
 export let supportsPassive = false
 if (inBrowser) {

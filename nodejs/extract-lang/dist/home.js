@@ -1,0 +1,22 @@
+export default {
+  tip: {
+    isValidInInp: "Is it valid in the input box",
+    noWithWin: "Shortcut keys cannot bring WIN",
+    saveS: "Saved successfully!",
+    restoreSetS: "Restore default settings!",
+  },
+  opereate: { restoreSet: "Restore default settings" },
+  universal: "Universal",
+  beep: "Beep",
+  beepInterval: "Prompt tone interval in milliseconds",
+  newPushRestore: "New push reset tone interval",
+  hotKey: "hot key",
+  button: "button",
+  passNews: "pass news",
+  setHotKey: "Set shortcut keys",
+  rejectNews: "reject news",
+  preScreenNews: "Previous filter alert",
+  nextScreenNews: "Next Screening Alert",
+  publishNews: "Release newsletter",
+  uNewsInpBr: "Edit alert input box to wrap",
+}

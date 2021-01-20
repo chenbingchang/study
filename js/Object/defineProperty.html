@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Object.defineProperty</title>
+</head>
+<body>
+  <script>
+    /*
+    configurable MDN描述： 当且仅当该属性的 configurable 为 true 时，该属性描述符才能够被改变，同时该属性也能从对应的对象上被删除。默认为 false。
+    控制属性是否可用被删除、并且控制属性描述符是否能改变
+    configurable特性表示对象的属性是否可以被删除，以及除value和writable特性外的其他特性是否可以被修改。
+    */
+    let obj = {}
+
+    Object.defineProperty(obj, 'name', {
+      value: 'my name',
+      enumerable: false,
+      configurable: false,
+      writable: true
+    })
+    console.log(obj.name)
+
+    Object.defineProperty(obj, 'name', {
+      value: 'my name22222',
+      enumerable: false,
+      configurable: false,
+      writable: false
+    })
+    console.log(obj.name)
+
+    Object.defineProperty(obj, 'name', {
+      value: 'my name3333',
+      enumerable: false,
+      configurable: false,
+      writable: true
+    }) // TypeError , writable只能单向从true改为false，反向会报错
+    console.log(obj.name)
+
+  </script>
+</body>
+</html>

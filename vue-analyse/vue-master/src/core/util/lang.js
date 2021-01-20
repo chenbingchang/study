@@ -4,6 +4,7 @@ export const emptyObject = Object.freeze({})
 
 /**
  * Check if a string starts with $ or _
+ * 检查是否义'$'或者'_'开头
  */
 export function isReserved (str: string): boolean {
   const c = (str + '').charCodeAt(0)
@@ -11,7 +12,7 @@ export function isReserved (str: string): boolean {
 }
 
 /**
- * Define a property.
+ * Define a property.  定义属性
  */
 export function def (obj: Object, key: string, val: any, enumerable?: boolean) {
   Object.defineProperty(obj, key, {

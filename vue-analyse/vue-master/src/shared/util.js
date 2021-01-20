@@ -202,6 +202,7 @@ export function toArray (list: any, start?: number): Array<any> {
 
 /**
  * Mix properties into target object.
+ * 把_form的属性合并（覆盖）到to中去
  */
 export function extend (to: Object, _from: ?Object): Object {
   for (const key in _from) {

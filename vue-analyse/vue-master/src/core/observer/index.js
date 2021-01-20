@@ -43,12 +43,16 @@ export class Observer {
     this.vmCount = 0
     def(value, '__ob__', this)
     if (Array.isArray(value)) {
+      // 数组
       const augment = hasProto
         ? protoAugment
         : copyAugment
+      // 1.数组的话重写数组原型方法 
       augment(value, arrayMethods, arrayKeys)
+      // 2.观测数组中是对象类型的数据
       this.observeArray(value)
     } else {
+      // 3.对象的话使用defineProperty重新定义属性
       this.walk(value)
     }
   }
@@ -61,12 +65,13 @@ export class Observer {
   walk (obj: Object) {
     const keys = Object.keys(obj)
     for (let i = 0; i < keys.length; i++) {
+      // 遍历属性，分别定义响应式
       defineReactive(obj, keys[i], obj[keys[i]])
     }
   }
 
   /**
-   * Observe a list of Array items.
+   * Observe a list of Array items.  监听数组每一项
    */
   observeArray (items: Array<any>) {
     for (let i = 0, l = items.length; i < l; i++) {
@@ -83,7 +88,7 @@ export class Observer {
  */
 function protoAugment (target, src: Object, keys: any) {
   /* eslint-disable no-proto */
-  target.__proto__ = src
+  target.__proto__ = src // 有__proto__就通过__proto__，没有就通过copyAugment直接在对象上添加属性
   /* eslint-enable no-proto */
 }
 
@@ -105,10 +110,12 @@ function copyAugment (target: Object, src: Object, keys: Array<string>) {
  * or the existing observer if the value already has one.
  */
 export function observe (value: any, asRootData: ?boolean): Observer | void {
+  // 不是对象、或者是VNode实例，直接返回
   if (!isObject(value) || value instanceof VNode) {
     return
   }
   let ob: Observer | void
+  // 判断是否已经被监听过
   if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
     ob = value.__ob__
   } else if (
@@ -128,6 +135,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
 
 /**
  * Define a reactive property on an Object.
+ * 把对象的属性定义成响应式
  */
 export function defineReactive (
   obj: Object,
@@ -139,15 +147,16 @@ export function defineReactive (
   const dep = new Dep()
 
   const property = Object.getOwnPropertyDescriptor(obj, key)
-  if (property && property.configurable === false) {
+  if (property && property.configurable === false) {// 对象不可配置，无法重新定义存取器，直接返回
     return
   }
 
   // cater for pre-defined getter/setters
-  const getter = property && property.get
-  const setter = property && property.set
+  const getter = property && property.get// 保存原有的存取器
+  const setter = property && property.set// 保存原有的存取器
 
   let childOb = !shallow && observe(val)
+  // 3.重新定义set和get方法
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
@@ -179,7 +188,7 @@ export function defineReactive (
       } else {
         val = newVal
       }
-      childOb = !shallow && observe(newVal)
+      childOb = !shallow && observe(newVal) // 如果设置值是对象
       dep.notify()
     }
   })

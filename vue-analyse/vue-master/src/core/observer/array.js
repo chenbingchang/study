@@ -21,7 +21,7 @@ export const arrayMethods = Object.create(arrayProto)
   'reverse'
 ]
 .forEach(function (method) {
-  // cache original method
+  // cache original method 保存原来的数组方法
   const original = arrayProto[method]
   def(arrayMethods, method, function mutator (...args) {
     const result = original.apply(this, args)
@@ -36,8 +36,9 @@ export const arrayMethods = Object.create(arrayProto)
         inserted = args.slice(2)
         break
     }
+    // 如果是新增，把新增的元素进行监听
     if (inserted) ob.observeArray(inserted)
-    // notify change
+    // notify change 通知更改
     ob.dep.notify()
     return result
   })
