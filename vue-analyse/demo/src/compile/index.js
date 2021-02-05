@@ -15,6 +15,7 @@ let stack = []
 const ELEMENT_TYPE = 1
 const TEXT_TYPE = 3
 
+// 创建虚拟dom，即vnode
 function createASTElement(tagName, attrs) {
   return {
     tag: tagName,
@@ -199,6 +200,7 @@ function getProps(attrs) {// 生成属性
   return `{${str.slice(0, -1)}}`
 }
 
+// 把vnode变成渲染函数
 function generate(el) {
   let children = getChildren(el)
   // 生成渲染函数代码字符串

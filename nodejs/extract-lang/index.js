@@ -1,9 +1,17 @@
+/**
+ * 把命名好的原文*.js文件里面每个key的value   和    翻译好原文译文的excel对应起来，
+ * 最终生成译文的*.js文件
+ * @date: 2021-01-20
+ */
+
 const fs = require("fs")
 const XLSX = require('xlsx')
-const dataObj  = require('./assets/home');
+const dataObj  = require('./assets/origin'); // 原文的i18n文件
 
-const excelPath = './assets/translate.xlsx'
-const outputPath = './dist/home.js'
+const excelPath = './assets/translate.xlsx' // 原文、译文映射excel
+const outputPath = './dist/translate.js' // 译文的i18n文件
+const ORIGIN_COL_HEAD = '原文' // excel原文列第一行的内容
+const TRANSLATE_COL_HEAD = '译文' // excel译文列第一行的内容
 
 // 读取excel内容
 const workbook = XLSX.readFile(excelPath)
@@ -26,10 +34,10 @@ function forEachObject(obj) {
       // 如果是对象，递归
       forEachObject(value)
     } else {
-      const index = list.findIndex(item => item['原文'] && item['原文'].trim() === value.trim())
+      const index = list.findIndex(item => item[ORIGIN_COL_HEAD] && item[ORIGIN_COL_HEAD].trim() === value.trim())
 
       if(index !== -1) {
-        obj[key] = list[index]['译文'] // 修改对象的值
+        obj[key] = list[index][TRANSLATE_COL_HEAD] // 修改对象的值
         list.splice(index, 1) // 已经匹配过的译文则删除，减少后续的循环次数
       }
     }

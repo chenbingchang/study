@@ -388,9 +388,11 @@ export function createPatchFunction (backend) {
     // to ensure removed elements stay in correct relative positions
     // during leaving transitions
     const canMove = !removeOnly
-
+    
+    // 以"新前"、"新后"、"旧前"、"旧后"的方式开始比对节点
     while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
       if (isUndef(oldStartVnode)) {
+        /* 旧节点为什么会有空的，因为下面循环查找新节点对应旧节点时，如果找到了对应的旧节点，就会把对应的位置置空导致的 */
         oldStartVnode = oldCh[++oldStartIdx] // Vnode has been moved left
       } else if (isUndef(oldEndVnode)) {
         oldEndVnode = oldCh[--oldEndIdx]
@@ -430,6 +432,7 @@ export function createPatchFunction (backend) {
           }
           if (sameVnode(vnodeToMove, newStartVnode)) {
             patchVnode(vnodeToMove, newStartVnode, insertedVnodeQueue)
+            // 旧节点置空
             oldCh[idxInOld] = undefined
             canMove && nodeOps.insertBefore(parentElm, vnodeToMove.elm, oldStartVnode.elm)
           } else {

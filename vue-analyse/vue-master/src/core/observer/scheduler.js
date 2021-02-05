@@ -12,13 +12,13 @@ import {
 
 export const MAX_UPDATE_COUNT = 100
 
-const queue: Array<Watcher> = []
+const queue: Array<Watcher> = [] // 队列
 const activatedChildren: Array<Component> = []
-let has: { [key: number]: ?true } = {}
+let has: { [key: number]: ?true } = {} // 记录已经存在的Watcher的id
 let circular: { [key: number]: number } = {}
-let waiting = false
-let flushing = false
-let index = 0
+let waiting = false // 是否在等待js线程
+let flushing = false // 是否开始清空队列
+let index = 0 // 当前执行的队列下标
 
 /**
  * Reset the scheduler's state.
@@ -126,23 +126,30 @@ function callActivatedHooks (queue) {
  */
 export function queueWatcher (watcher: Watcher) {
   const id = watcher.id
+  // 根据id来判断是否已经存在
   if (has[id] == null) {
+    // 不存在
     has[id] = true
     if (!flushing) {
+      // 没有清空
+      // 直接放到队列
       queue.push(watcher)
     } else {
+      // 已经开始清空队列，则根据id来插入队列
       // if already flushing, splice the watcher based on its id
       // if already past its id, it will be run next immediately.
       let i = queue.length - 1
+      // 当前下标大于当前执行的队列下标，并且要插入的id小于当前下标对应项的id
       while (i > index && queue[i].id > watcher.id) {
         i--
       }
+      // 插入队列
       queue.splice(i + 1, 0, watcher)
     }
     // queue the flush
     if (!waiting) {
       waiting = true
-      nextTick(flushSchedulerQueue)
+      nextTick(flushSchedulerQueue) // 下一轮询清空队列
     }
   }
 }
