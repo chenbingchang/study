@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    let str = "a1bcd33efg5hi5jkl8"
+
+    let replace1 = str.replace('a', '^')
+    console.log("replace1:", replace1)
+
+    let replace2 = str.replace(/\d+/g, '#')
+    console.log("replace2:", replace2)
+
+    let str2 = "<div></div>"
+
+    // 特殊遍历  $&   $$   $`   $$'   $n 
+    let replace3 = str2.replace('div', '$&-2')
+    console.log("replace3:", replace3)
+
+    let replace4 = str2.replace(/(di)v/g, '$1-2')
+    console.log("replace4:", replace4)
+
+    let replace5 = str2.replace('div', function(match, offset, string) {
+      console.log('####3')
+      if(match === 'div') {
+        return 'span'
+      } else {
+        return 'p'
+      }
+    })
+    console.log("replace5:", replace5)
+
+    /* 第一个参数是正则表达式，则替换方法参数里面会多了  括号匹配的字符串   和   命名捕获组匹配的对象*/
+    let replace6 = 'class="add-user is-active" id="app"'.replace(/\s?([a-zA-Z_]+)="([^"]*)"/g, function(match, p1, p2, offset, string, NamedCaptureGroup) {
+      console.log('####5')
+      return ' property'
+    })
+    console.log("replace6:", replace6)
+  </script>
+</body>
+</html>
