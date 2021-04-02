@@ -73,6 +73,7 @@ function genHandler (
   const isFunctionExpression = fnExpRE.test(handler.value)
 
   if (!handler.modifiers) {
+    // 没有修饰符
     return isMethodPath || isFunctionExpression
       ? handler.value
       : `function($event){${handler.value}}` // inline statement

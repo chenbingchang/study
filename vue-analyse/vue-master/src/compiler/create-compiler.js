@@ -16,7 +16,8 @@ export function createCompilerCreator (baseCompile: Function): Function {
       finalOptions.warn = (msg, tip) => {
         (tip ? tips : errors).push(msg)
       }
-
+      
+      // 合并配置
       if (options) {
         // merge custom modules
         if (options.modules) {

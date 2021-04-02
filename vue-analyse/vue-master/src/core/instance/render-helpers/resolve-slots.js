@@ -12,9 +12,11 @@ export function resolveSlots (
     return slots
   }
   const defaultSlot = []
+  // 遍历子级
   for (let i = 0, l = children.length; i < l; i++) {
     const child = children[i]
     const data = child.data
+    // 移除节点上的slot属性
     // remove slot attribute if the node is resolved as a Vue slot node
     if (data && data.attrs && data.attrs.slot) {
       delete data.attrs.slot
@@ -26,12 +28,14 @@ export function resolveSlots (
     ) {
       const name = child.data.slot
       const slot = (slots[name] || (slots[name] = []))
+      // template标签则保存子节点，否则就是节点本身
       if (child.tag === 'template') {
         slot.push.apply(slot, child.children)
       } else {
         slot.push(child)
       }
     } else {
+      // 没有写slot名称，则是默认插槽
       defaultSlot.push(child)
     }
   }

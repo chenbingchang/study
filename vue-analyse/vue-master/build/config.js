@@ -24,6 +24,7 @@ const weexFactoryPlugin = {
   }
 }
 
+// 引入文件路径别名，拼接绝对路径
 const aliases = require('./alias')
 const resolve = p => {
   const base = p.split('/')[0]
@@ -34,10 +35,17 @@ const resolve = p => {
   }
 }
 
+
+/* 
+不同打包方式，的入口、出口不一样
+web / weex 不同的平台
+Runtime only / Runtime + compiler 是否带编译模块
+CommonJS / es / umd 打包出不同模块规范
+*/
 const builds = {
   // Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
   'web-runtime-cjs': {
-    entry: resolve('web/entry-runtime.js'),
+    entry: resolve('web/entry-runtime.js'), // 这里的入口路劲，都使用到了别名
     dest: resolve('dist/vue.runtime.common.js'),
     format: 'cjs',
     banner

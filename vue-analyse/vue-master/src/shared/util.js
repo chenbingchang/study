@@ -107,6 +107,9 @@ export function makeMap (
 
 /**
  * Check if a tag is a built-in tag.
+ * 检查标签是否为内置标签。
+ * slot是插槽
+ * components的动态组件
  */
 export const isBuiltInTag = makeMap('slot,component', true)
 
@@ -137,6 +140,7 @@ export function hasOwn (obj: Object | Array<*>, key: string): boolean {
 
 /**
  * Create a cached version of a pure function.
+ * 缓存函数每个参数对应最终的结果，只能是那种只有一个参数的函数
  */
 export function cached<F: Function> (fn: F): F {
   const cache = Object.create(null)

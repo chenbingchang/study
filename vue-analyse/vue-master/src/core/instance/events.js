@@ -9,6 +9,7 @@ import {
 } from '../util/index'
 import { updateListeners } from '../vdom/helpers/index'
 
+// 初始化事件
 export function initEvents (vm: Component) {
   vm._events = Object.create(null)
   vm._hasHookEvent = false
@@ -21,6 +22,7 @@ export function initEvents (vm: Component) {
 
 let target: Component
 
+// 添加事件监听
 function add (event, fn, once) {
   if (once) {
     target.$once(event, fn)
@@ -29,10 +31,12 @@ function add (event, fn, once) {
   }
 }
 
+// 移除事件监听
 function remove (event, fn) {
   target.$off(event, fn)
 }
 
+// 更新组件监听器
 export function updateComponentListeners (
   vm: Component,
   listeners: Object,
@@ -42,8 +46,10 @@ export function updateComponentListeners (
   updateListeners(listeners, oldListeners || {}, add, remove, vm)
 }
 
+// 添加全局订阅发布模式
 export function eventsMixin (Vue: Class<Component>) {
   const hookRE = /^hook:/
+  // 添加监听
   Vue.prototype.$on = function (event: string | Array<string>, fn: Function): Component {
     const vm: Component = this
     if (Array.isArray(event)) {
@@ -61,6 +67,7 @@ export function eventsMixin (Vue: Class<Component>) {
     return vm
   }
 
+  // 一次性监听
   Vue.prototype.$once = function (event: string, fn: Function): Component {
     const vm: Component = this
     function on () {
@@ -72,15 +79,17 @@ export function eventsMixin (Vue: Class<Component>) {
     return vm
   }
 
+  // 移除监听
   Vue.prototype.$off = function (event?: string | Array<string>, fn?: Function): Component {
     const vm: Component = this
-    // all
+    // all  没有任何参数则全部移除
     if (!arguments.length) {
       vm._events = Object.create(null)
       return vm
     }
     // array of events
     if (Array.isArray(event)) {
+      // event是数组，遍历移除监听
       for (let i = 0, l = event.length; i < l; i++) {
         this.$off(event[i], fn)
       }
@@ -88,9 +97,11 @@ export function eventsMixin (Vue: Class<Component>) {
     }
     // specific event
     const cbs = vm._events[event]
+    // 判断是否存在回调
     if (!cbs) {
       return vm
     }
+    // 只有event，移除该事件所有的监听
     if (arguments.length === 1) {
       vm._events[event] = null
       return vm
@@ -101,6 +112,7 @@ export function eventsMixin (Vue: Class<Component>) {
       let i = cbs.length
       while (i--) {
         cb = cbs[i]
+        // 找到函数相等的，然后删除
         if (cb === fn || cb.fn === fn) {
           cbs.splice(i, 1)
           break
@@ -110,6 +122,7 @@ export function eventsMixin (Vue: Class<Component>) {
     return vm
   }
 
+  // 触发事件
   Vue.prototype.$emit = function (event: string): Component {
     const vm: Component = this
     if (process.env.NODE_ENV !== 'production') {
@@ -124,10 +137,13 @@ export function eventsMixin (Vue: Class<Component>) {
         )
       }
     }
+    // 事件对于的回调函数
     let cbs = vm._events[event]
     if (cbs) {
       cbs = cbs.length > 1 ? toArray(cbs) : cbs
+      // 去掉第一个参数（事件名），剩余的就是回调函数的参数
       const args = toArray(arguments, 1)
+      // 遍历调用回调函数
       for (let i = 0, l = cbs.length; i < l; i++) {
         try {
           cbs[i].apply(vm, args)

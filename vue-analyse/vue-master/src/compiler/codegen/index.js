@@ -44,7 +44,7 @@ export function generate (
   const state = new CodegenState(options)
   const code = ast ? genElement(ast, state) : '_c("div")'
   return {
-    render: `with(this){return ${code}}`,
+    render: `with(this){return ${code}}`, // render函数的字符串
     staticRenderFns: state.staticRenderFns
   }
 }
@@ -68,6 +68,7 @@ export function genElement (el: ASTElement, state: CodegenState): string {
     if (el.component) {
       code = genComponent(el.component, el, state)
     } else {
+      // el.plain标记节点是否有属性，true表示没有任何属性
       const data = el.plain ? undefined : genData(el, state)
 
       const children = el.inlineTemplate ? null : genChildren(el, state, true)

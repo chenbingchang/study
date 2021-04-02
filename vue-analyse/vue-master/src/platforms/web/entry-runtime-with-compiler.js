@@ -4,7 +4,7 @@ import config from 'core/config'
 import { warn, cached } from 'core/util/index'
 import { mark, measure } from 'core/util/perf'
 
-import Vue from './runtime/index'
+import Vue from './runtime/index' //    1.引入运行时代码
 import { query } from './util/index'
 import { shouldDecodeNewlines } from './util/compat'
 import { compileToFunctions } from './compiler/index'
@@ -14,9 +14,9 @@ const idToTemplate = cached(id => {
   return el && el.innerHTML
 })
 
-const mount = Vue.prototype.$mount
+const mount = Vue.prototype.$mount //  2.获取runtime中的$mount方法
 // 重写$mount方法，增加把template变成render方法的代码
-Vue.prototype.$mount = function (
+Vue.prototype.$mount = function ( // 3. 重写$mount方法
   el?: string | Element,
   hydrating?: boolean
 ): Component {
@@ -32,9 +32,9 @@ Vue.prototype.$mount = function (
 
   const options = this.$options
   // resolve template/el and convert to render function
-  if (!options.render) {
+  if (!options.render) { // 4.没有render方法就进行编译操作
     let template = options.template
-    if (template) {
+    if (template) {  // 5.将模板编译成函数
       if (typeof template === 'string') {
         if (template.charAt(0) === '#') {// 模板是#开头，表示是一个id选择器
           template = idToTemplate(template) // 通过id查到对应的元素的模板
@@ -69,7 +69,7 @@ Vue.prototype.$mount = function (
         delimiters: options.delimiters,
         comments: options.comments
       }, this)
-      options.render = render
+      options.render = render // 6.将render函数放到options中
       options.staticRenderFns = staticRenderFns
 
       /* istanbul ignore if */
@@ -80,7 +80,7 @@ Vue.prototype.$mount = function (
     }
   }
 
-  return mount.call(this, el, hydrating) // 调用回原来的mount方法
+  return mount.call(this, el, hydrating) // 7、调用回原来的mount方法，进行挂载操作
 }
 
 /**

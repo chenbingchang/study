@@ -53,35 +53,43 @@ export function addHandler (
       'Passive handler can\'t prevent default event.'
     )
   }
-  // check capture modifier
+  // check capture modifier   捕获修饰符
   if (modifiers && modifiers.capture) {
     delete modifiers.capture
-    name = '!' + name // mark the event as captured
+    name = '!' + name // mark the event as captured   给事件名前加'!'用以标记capture修饰符
   }
+  // 一次性修饰符
   if (modifiers && modifiers.once) {
     delete modifiers.once
-    name = '~' + name // mark the event as once
+    name = '~' + name // mark the event as once   给事件名前加'~'用以标记once修饰符
   }
+  // passive修饰符
   /* istanbul ignore if */
   if (modifiers && modifiers.passive) {
     delete modifiers.passive
-    name = '&' + name // mark the event as passive
+    name = '&' + name // mark the event as passive    给事件名前加'&'用以标记passive修饰符
   }
   let events
+  // 判断是否是原生事件，原生事件和非原生事件分开存放
   if (modifiers && modifiers.native) {
     delete modifiers.native
     events = el.nativeEvents || (el.nativeEvents = {})
   } else {
     events = el.events || (el.events = {})
   }
+  // 新的处理对象
   const newHandler = { value, modifiers }
+  // 原本的处理对象
   const handlers = events[name]
   /* istanbul ignore if */
   if (Array.isArray(handlers)) {
+    // 数组，则根据重要性来放到头部或者尾部
     important ? handlers.unshift(newHandler) : handlers.push(newHandler)
   } else if (handlers) {
+    // 不是数组，则改成数组
     events[name] = important ? [newHandler, handlers] : [handlers, newHandler]
   } else {
+    // 原来没有该事件，直接赋值
     events[name] = newHandler
   }
 }

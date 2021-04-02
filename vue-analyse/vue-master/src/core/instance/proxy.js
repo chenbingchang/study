@@ -24,6 +24,7 @@ if (process.env.NODE_ENV !== 'production') {
     )
   }
 
+  // 判断浏览器是否支持Proxy
   const hasProxy =
     typeof Proxy !== 'undefined' &&
     Proxy.toString().match(/native code/)
@@ -45,7 +46,9 @@ if (process.env.NODE_ENV !== 'production') {
 
   const hasHandler = {
     has (target, key) {
+      // 标记是否有该属性
       const has = key in target
+      // 标记是否是全局属性
       const isAllowed = allowedGlobals(key) || key.charAt(0) === '_'
       if (!has && !isAllowed) {
         warnNonPresent(target, key)
@@ -56,6 +59,7 @@ if (process.env.NODE_ENV !== 'production') {
 
   const getHandler = {
     get (target, key) {
+      // 如果对象中没有该属性，发出警告
       if (typeof key === 'string' && !(key in target)) {
         warnNonPresent(target, key)
       }

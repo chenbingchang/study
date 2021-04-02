@@ -8,8 +8,10 @@ if (!fs.existsSync('dist')) {
   fs.mkdirSync('dist')
 }
 
+// 1.获取不同的打包的配置 
 let builds = require('./config').getAllBuilds()
 
+// 2.根据执行打包时的参数进行过滤
 // filter builds via command line arg
 if (process.argv[2]) {
   const filters = process.argv[2].split(',')
@@ -17,12 +19,14 @@ if (process.argv[2]) {
     return filters.some(f => b.output.file.indexOf(f) > -1 || b._name.indexOf(f) > -1)
   })
 } else {
+  // 默认不打包weex相关代码
   // filter out weex builds by default
   builds = builds.filter(b => {
     return b.output.file.indexOf('weex') === -1
   })
 }
 
+// 3.进行打包
 build(builds)
 
 function build (builds) {

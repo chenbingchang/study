@@ -25,13 +25,16 @@ export function initLifecycle (vm: Component) {
 
   // locate first non-abstract parent
   let parent = options.parent
+  // abstract是个隐藏属性，表示是否是抽象组件（比如: keep-alive/transtion）
   if (parent && !options.abstract) {
+    // 找到父级是非抽象的父级
     while (parent.$options.abstract && parent.$parent) {
       parent = parent.$parent
     }
     parent.$children.push(vm)
   }
 
+  // '$'开头都是实例的属性，而'_'开头的都是内容的属性
   vm.$parent = parent
   vm.$root = parent ? parent.$root : vm
 
@@ -314,9 +317,11 @@ export function deactivateChildComponent (vm: Component, direct?: boolean) {
   }
 }
 
+// 触发生命周期钩子
 export function callHook (vm: Component, hook: string) {
-  const handlers = vm.$options[hook]
+  const handlers = vm.$options[hook] // 对应生命周期的函数列表
   if (handlers) {
+    // 遍历执行相应的函数
     for (let i = 0, j = handlers.length; i < j; i++) {
       try {
         handlers[i].call(vm)

@@ -24,9 +24,9 @@ export const dirRE = /^v-|^@|^:/
 export const forAliasRE = /(.*?)\s+(?:in|of)\s+(.*)/
 export const forIteratorRE = /\((\{[^}]*\}|[^,]*),([^,]*)(?:,([^,]*))?\)/
 
-const argRE = /:(.*)$/
-const bindRE = /^:|^v-bind:/
-const modifierRE = /\.[^.]+/g
+const argRE = /:(.*)$/ // 参数正则
+const bindRE = /^:|^v-bind:/ // bind正则
+const modifierRE = /\.[^.]+/g // 修饰符正则
 
 const decodeHTMLCached = cached(he.decode)
 
@@ -108,6 +108,7 @@ export function parse (
     canBeLeftOpenTag: options.canBeLeftOpenTag,
     shouldDecodeNewlines: options.shouldDecodeNewlines,
     shouldKeepComment: options.comments,
+    // 开始标签
     start (tag, attrs, unary) {
       // check namespace.
       // inherit parent ns if there is one
@@ -218,7 +219,7 @@ export function parse (
         postTransforms[i](element, options)
       }
     },
-
+    // 结束标签
     end () {
       // remove trailing whitespace
       const element = stack[stack.length - 1]
@@ -231,7 +232,7 @@ export function parse (
       currentParent = stack[stack.length - 1]
       endPre(element)
     },
-
+    // 当解析到标签的文本时，触发chars
     chars (text: string) {
       if (!currentParent) {
         if (process.env.NODE_ENV !== 'production') {
@@ -276,6 +277,7 @@ export function parse (
         }
       }
     },
+    // 注释节点
     comment (text: string) {
       currentParent.children.push({
         type: 3,
@@ -483,19 +485,22 @@ function processComponent (el) {
   }
 }
 
+// 处理属性数组
 function processAttrs (el) {
   const list = el.attrsList
   let i, l, name, rawName, value, modifiers, isProp
   for (i = 0, l = list.length; i < l; i++) {
     name = rawName = list[i].name
     value = list[i].value
+    // 判断属性是否是指令
     if (dirRE.test(name)) {
-      // mark element as dynamic
+      // 指令属性
+      // mark element as dynamic  将元素标记为动态
       el.hasBindings = true
       // modifiers
       modifiers = parseModifiers(name)
       if (modifiers) {
-        name = name.replace(modifierRE, '')
+        name = name.replace(modifierRE, '') // 去掉修饰符
       }
       if (bindRE.test(name)) { // v-bind
         name = name.replace(bindRE, '')
@@ -570,10 +575,13 @@ function checkInFor (el: ASTElement): boolean {
   return false
 }
 
+// 解析修饰符
 function parseModifiers (name: string): Object | void {
+  // 匹配所有修饰符
   const match = name.match(modifierRE)
   if (match) {
     const ret = {}
+    // 处理匹配的修饰符，去掉前面的"."
     match.forEach(m => { ret[m.slice(1)] = true })
     return ret
   }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,39 +15,87 @@
         width: 100%;
         height: 100%;
       }
+
+      html:lang(ar) {
+        direction: rtl;
+      }
+      
+      .img1 {
+        transform: scale(1);
+      }
+
+      .img2 {
+        margin-left: -60px;
+      }
+
+      .wrap {
+        transform: scale(1);
+        width: 1000px;
+        height: 80px;
+        background-color: greenyellow;
+      }
+
+      .to-top {
+        position: fixed;
+        right: 40px;
+        top: 80px;
+        padding: 10px 20px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #fff;
+      }
+
+      .list {
+      }
+
+      .list > li {
+        height: 150px;
+        border: 1px solid gold;
+        margin-bottom: 50px;
+      }
     </style>
   </head>
   <body>
-    <button id="btn">发送请求</button>
-    <br>
-    结果：
-    <div id="result"></div>
+    <input type="text">
+    <div>
+      <img class="img1" src="./imgs/540-349.jpg" alt="" />
+      <img class="img2" src="./imgs/yasuo.jpg" alt="" />
+    </div>
+    <div class="wrap">
+      <div class="to-top">Top</div>
+    </div>
 
-    <script>
-      const btnEl = document.querySelector('#btn')
-      const resultEl = document.querySelector('#result')
+    <p style="width:96px; height:96px; border:2px solid #beceeb; overflow:hidden;">
+      <img src="./imgs/yasuo.jpg" style="position:absolute; width: 200px; height: 96px;" />
+    </p>
 
-      btnEl.onclick = function() {
-        const xhr = new XMLHttpRequest()
-        const url = 'http://47.91.220.207:31700/fastbull-news-service/api/manager/findManagerQuotesNewsPage'
-
-        xhr.open('POST', url)
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
-        xhr.setRequestHeader('langid', 2)
-        xhr.setRequestHeader('token', '1cfeb9155dc1436bb5e67859a439fe5e')
-        xhr.responseType = 'json'
-        xhr.send({
-          pageIndex: 1,
-          pageSize: 12
-        })
-
-        xhr.onreadystatechange = function(response) {
-          if(xhr.readyState === XMLHttpRequest.DONE) {
-            console.log(xhr.response)
-            resultEl.innerText = xhr.response
-          }
-        }
-      }
-    </script>
+    <ul class="list">
+      <li>占位内容</li>
+      <li>占位内容</li>
+      <li>占位内容</li>
+      <li>占位内容</li>
+      <li>占位内容</li>
+      <li>占位内容</li>
+      <li>占位内容</li>
+      <li>占位内容</li>
+    </ul>
   </body>
+
+  <script>
+    function Vue(desc) {
+      // this.desc = desc
+    }
+
+    Vue.prototype = {
+      desc: '原型对象里面的描述',
+      say() {
+        console.log(this)
+        console.log(`值：${this.desc}`)
+      }
+    }
+
+    const v1 = new Vue('实例')
+    v1.say()
+    console.log('################')
+    v1.__proto__.say()
+  </script>
 </html>

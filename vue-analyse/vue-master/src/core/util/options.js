@@ -147,6 +147,7 @@ function mergeHook (
     : parentVal
 }
 
+// 各个生命周期的钩子合并策略
 LIFECYCLE_HOOKS.forEach(hook => {
   strats[hook] = mergeHook
 })
@@ -250,10 +251,12 @@ const defaultStrat = function (parentVal: any, childVal: any): any {
 
 /**
  * Validate component names
+ * 校验组件名字
  */
 function checkComponents (options: Object) {
   for (const key in options.components) {
     const lower = key.toLowerCase()
+    // 如果组件名称是内置标签或者是保留标签，发出警告
     if (isBuiltInTag(lower) || config.isReservedTag(lower)) {
       warn(
         'Do not use built-in or reserved HTML elements as component ' +
@@ -355,6 +358,7 @@ function assertObjectType (name: string, value: any, vm: ?Component) {
 /**
  * Merge two option objects into a new one.
  * Core utility used in both instantiation and inheritance.
+ * 合并选项
  */
 export function mergeOptions (
   parent: Object,
@@ -373,6 +377,7 @@ export function mergeOptions (
   normalizeProps(child, vm)
   normalizeInject(child, vm)
   normalizeDirectives(child)
+  // 如果子级有继承
   const extendsFrom = child.extends
   // 1.组件先将自己的extends和mixin与父属性合并
   if (extendsFrom) {
@@ -394,6 +399,8 @@ export function mergeOptions (
       mergeField(key)
     }
   }
+
+  // 合并字段，不同字段有不同策略
   function mergeField (key) {
     const strat = strats[key] || defaultStrat // 3.根据key查找不同的合并策略方法，然后执行
     options[key] = strat(parent[key], child[key], vm, key)
