@@ -57,9 +57,9 @@ export function initMixin (Vue: Class<Component>) {
     initEvents(vm) // 初始化事件
     initRender(vm) // 初始化渲染
     callHook(vm, 'beforeCreate') // 调用生命周期钩子函数
-    initInjections(vm) // resolve injections before data/props  初始化injections
+    initInjections(vm) // resolve injections before data/props  初始化injections，由于data/props等可能依赖inject所以需要先于initState初始化
     initState(vm) // 初始化props,methods,data,computed,watch
-    initProvide(vm) // resolve provide after data/props   初始化 provide
+    initProvide(vm) // resolve provide after data/props   初始化 provide，由于provide可能依赖data/props等，所以要在initState之后初始化
     callHook(vm, 'created') // 调用生命周期钩子函数
 
     /* istanbul ignore if */

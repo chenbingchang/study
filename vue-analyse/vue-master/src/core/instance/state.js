@@ -37,7 +37,9 @@ const sharedPropertyDefinition = {
 
 /*
 代理
-把 target.key 代理到 target.sourceKey.key
+用 target.key 代理 target.sourceKey.key
+这样props里面的属性即vm._props，就可以直接在vm上使用
+比如vm._props.xxx，可以直接用vm.xxx就可以了，这也是为什么props/data/computed/methods可以直接this.xxx的形式访问
  */
 export function proxy (target: Object, sourceKey: string, key: string) {
   sharedPropertyDefinition.get = function proxyGetter () {
@@ -49,9 +51,11 @@ export function proxy (target: Object, sourceKey: string, key: string) {
   Object.defineProperty(target, key, sharedPropertyDefinition)
 }
 
+// 初始化状态
 export function initState (vm: Component) {
   vm._watchers = []
   const opts = vm.$options
+  // 如果存在某选项就初始化它
   if (opts.props) initProps(vm, opts.props)
   if (opts.methods) initMethods(vm, opts.methods)
   if (opts.data) {
@@ -65,21 +69,29 @@ export function initState (vm: Component) {
   }
 }
 
+// 初始化props
 function initProps (vm: Component, propsOptions: Object) {
+  // 父组件传入的真实props数据。
   const propsData = vm.$options.propsData || {}
+  // 指向vm._props的指针，所有设置到props变量中的属性都会保存到vm._props中。
   const props = vm._props = {}
+  // 缓存props对象中的key，将来更新props时只需遍历vm.$options._propKeys数组即可得到所有props的key
   // cache prop keys so that future props updates can iterate using Array
   // instead of dynamic object key enumeration.
   const keys = vm.$options._propKeys = []
+  // 当前组件是否为根组件。
   const isRoot = !vm.$parent
-  // root instance props should be converted
+  // root instance props should be converted    根实例props是响应式的
   observerState.shouldConvert = isRoot
+  // 遍历props
   for (const key in propsOptions) {
     keys.push(key)
+    // 校验prop的值，并返回最终的值
     const value = validateProp(key, propsOptions, propsData, vm)
     /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
       const hyphenatedKey = hyphenate(key)
+      // 判断是否是保留的属性
       if (isReservedAttribute(hyphenatedKey) ||
           config.isReservedAttr(hyphenatedKey)) {
         warn(
@@ -99,6 +111,7 @@ function initProps (vm: Component, propsOptions: Object) {
         }
       })
     } else {
+      // 将每个prop都放到vm._props中做响应式
       defineReactive(props, key, value)
     }
     // static props are already proxied on the component's prototype
@@ -111,11 +124,14 @@ function initProps (vm: Component, propsOptions: Object) {
   observerState.shouldConvert = true
 }
 
+// 初始化data
 function initData (vm: Component) {
   let data = vm.$options.data
+  // 如果是方法，执行方法
   data = vm._data = typeof data === 'function'
     ? getData(data, vm)
     : data || {}
+    // data值不是对象，发出警告
   if (!isPlainObject(data)) {
     data = {}
     process.env.NODE_ENV !== 'production' && warn(
@@ -125,13 +141,14 @@ function initData (vm: Component) {
     )
   }
   // proxy data on instance
-  const keys = Object.keys(data)
+  const keys = Object.keys(data) // data所有键数组
   const props = vm.$options.props
   const methods = vm.$options.methods
   let i = keys.length
   while (i--) {
-    const key = keys[i]
+    const key = keys[i] // 键
     if (process.env.NODE_ENV !== 'production') {
+      // 如果methods中存在相同的键，则警告
       if (methods && hasOwn(methods, key)) {
         warn(
           `Method "${key}" has already been defined as a data property.`,
@@ -146,10 +163,11 @@ function initData (vm: Component) {
         vm
       )
     } else if (!isReserved(key)) {
+      // 非保留属性，则挂载到实例上
       proxy(vm, `_data`, key)
     }
   }
-  // observe data
+  // observe data   响应式数据
   observe(data, true /* asRootData */)
 }
 
@@ -162,17 +180,24 @@ function getData (data: Function, vm: Component): any {
   }
 }
 
+// 懒加载
 const computedWatcherOptions = { lazy: true }
 
+// 初始化computed
 function initComputed (vm: Component, computed: Object) {
+  // computed属性的watchers，存放对应的watcher
   const watchers = vm._computedWatchers = Object.create(null)
   // computed properties are just getters during SSR
   const isSSR = isServerRendering()
 
+  // 遍历所有属性
   for (const key in computed) {
+    // 用户的配置
     const userDef = computed[key]
+    // 之前computed选择已经统一标准化处理过
     const getter = typeof userDef === 'function' ? userDef : userDef.get
     if (process.env.NODE_ENV !== 'production' && getter == null) {
+      // getter为Null警告
       warn(
         `Getter is missing for computed property "${key}".`,
         vm
@@ -180,6 +205,7 @@ function initComputed (vm: Component, computed: Object) {
     }
 
     if (!isSSR) {
+      // 不是服务端渲染
       // create internal watcher for the computed property.
       watchers[key] = new Watcher(
         vm,
@@ -252,8 +278,10 @@ function createComputedGetter (key) {
   }
 }
 
+// 初始化methods选项
 function initMethods (vm: Component, methods: Object) {
   const props = vm.$options.props
+  // 遍历methods里面的键值
   for (const key in methods) {
     if (process.env.NODE_ENV !== 'production') {
       if (methods[key] == null) {
@@ -276,6 +304,7 @@ function initMethods (vm: Component, methods: Object) {
         )
       }
     }
+    // 把方法的this指向vm实例上，再加到实例中
     vm[key] = methods[key] == null ? noop : bind(methods[key], vm)
   }
 }

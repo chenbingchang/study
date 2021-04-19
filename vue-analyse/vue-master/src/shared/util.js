@@ -114,6 +114,7 @@ export function makeMap (
 export const isBuiltInTag = makeMap('slot,component', true)
 
 /**
+ * 检查是否是保留属性
  * Check if a attribute is a reserved attribute.
  */
 export const isReservedAttribute = makeMap('key,ref,slot,slot-scope,is')
@@ -151,6 +152,7 @@ export function cached<F: Function> (fn: F): F {
 }
 
 /**
+ * "-"风格转成驼峰方式
  * Camelize a hyphen-delimited string.
  */
 const camelizeRE = /-(\w)/g
@@ -166,6 +168,7 @@ export const capitalize = cached((str: string): string => {
 })
 
 /**
+ * 把驼峰命名改成连接符命名   这里改成用'-'连接
  * Hyphenate a camelCase string.
  */
 const hyphenateRE = /\B([A-Z])/g

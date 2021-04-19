@@ -40,10 +40,10 @@ export default class Watcher {
   value: any;
 
   constructor (
-    vm: Component,
-    expOrFn: string | Function,
+    vm: Component, // 组件实例
+    expOrFn: string | Function, // 响应时要执行的方法
     cb: Function,
-    options?: Object
+    options?: Object // 配置
   ) {
     this.vm = vm
     vm._watchers.push(this) // 一个vm可以有多个Watcher
@@ -60,7 +60,7 @@ export default class Watcher {
     this.id = ++uid // uid for batching
     this.active = true
     this.dirty = this.lazy // for lazy watchers
-    this.deps = []
+    this.deps = [] // 依赖数组
     this.newDeps = []
     this.depIds = new Set()
     this.newDepIds = new Set()

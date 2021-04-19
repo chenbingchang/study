@@ -39,9 +39,9 @@ export class Observer {
 
   constructor (value: any) {
     this.value = value
-    this.dep = new Dep()
+    this.dep = new Dep() // 依赖收集
     this.vmCount = 0
-    def(value, '__ob__', this)
+    def(value, '__ob__', this) // 添加"__ob__"属性
     if (Array.isArray(value)) {
       // 数组
       const augment = hasProto
@@ -145,7 +145,7 @@ export function defineReactive (
   shallow?: boolean
 ) {
   const dep = new Dep()
-
+  // 对象键的描述
   const property = Object.getOwnPropertyDescriptor(obj, key)
   if (property && property.configurable === false) {// 对象不可配置，无法重新定义存取器，直接返回
     return

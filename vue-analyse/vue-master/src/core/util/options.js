@@ -273,23 +273,25 @@ function checkComponents (options: Object) {
 function normalizeProps (options: Object, vm: ?Component) { // 标准化props
   const props = options.props
   if (!props) return
-  const res = {}
+  const res = {} // 最终结果
   let i, val, name
   if (Array.isArray(props)) {
+    // 数组
     i = props.length
     while (i--) {
       val = props[i]
       if (typeof val === 'string') {
-        name = camelize(val)
+        name = camelize(val) // 转成驼峰命名方式
         res[name] = { type: null }
       } else if (process.env.NODE_ENV !== 'production') {
         warn('props must be strings when using array syntax.')
       }
     }
   } else if (isPlainObject(props)) {
+    // 对象
     for (const key in props) {
       val = props[key]
-      name = camelize(key)
+      name = camelize(key) // 转成驼峰命名方式
       res[name] = isPlainObject(val)
         ? val
         : { type: val }
@@ -308,6 +310,9 @@ function normalizeProps (options: Object, vm: ?Component) { // 标准化props
  * Normalize all injections into Object-based format
  */
 function normalizeInject (options: Object, vm: ?Component) { // 标准化inject
+  /* 
+  把Array<string> | { [key: string]: string | Symbol | Object}的inject选项，统一变成{[key: string]: Object}
+  */
   const inject = options.inject
   const normalized = options.inject = {}
   if (Array.isArray(inject)) {
@@ -318,7 +323,7 @@ function normalizeInject (options: Object, vm: ?Component) { // 标准化inject
     for (const key in inject) {
       const val = inject[key]
       normalized[key] = isPlainObject(val)
-        ? extend({ from: key }, val)
+        ? extend({ from: key }, val) // 对象的话，通过继承去覆盖属性
         : { from: val }
     }
   } else if (process.env.NODE_ENV !== 'production' && inject) {
