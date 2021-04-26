@@ -29,8 +29,8 @@ import {
 } from '../util/index'
 
 const sharedPropertyDefinition = {
-  enumerable: true,
-  configurable: true,
+  enumerable: true, // 可枚举
+  configurable: true, // 可配置
   get: noop,
   set: noop
 }
@@ -205,7 +205,10 @@ function initComputed (vm: Component, computed: Object) {
     }
 
     if (!isSSR) {
-      // 不是服务端渲染
+      /* 
+      不是服务端渲染，创建watcher。
+      为了后面的computed属性缓存做准备，依赖改变时才重新计算，否则使用上一次的值
+       */
       // create internal watcher for the computed property.
       watchers[key] = new Watcher(
         vm,
@@ -235,22 +238,27 @@ export function defineComputed (
   key: string,
   userDef: Object | Function
 ) {
+  // 非服务端渲染才缓存
   const shouldCache = !isServerRendering()
   if (typeof userDef === 'function') {
+    // userDef是方法
+    // 设置get/set
     sharedPropertyDefinition.get = shouldCache
       ? createComputedGetter(key)
       : userDef
     sharedPropertyDefinition.set = noop
   } else {
+    // userDef是对象
     sharedPropertyDefinition.get = userDef.get
       ? shouldCache && userDef.cache !== false
-        ? createComputedGetter(key)
-        : userDef.get
+        ? createComputedGetter(key) // 有缓存
+        : userDef.get // 没有缓存
       : noop
     sharedPropertyDefinition.set = userDef.set
       ? userDef.set
       : noop
   }
+  // 如果非生产，并且set没有，则个set设置是警告的函数
   if (process.env.NODE_ENV !== 'production' &&
       sharedPropertyDefinition.set === noop) {
     sharedPropertyDefinition.set = function () {
@@ -260,19 +268,26 @@ export function defineComputed (
       )
     }
   }
+  // 给目标对象定义属性
   Object.defineProperty(target, key, sharedPropertyDefinition)
 }
 
+// 创建computed的get，具有缓存功能的get
 function createComputedGetter (key) {
+  // computed的get
   return function computedGetter () {
+    // 拿到key对应的watcher
     const watcher = this._computedWatchers && this._computedWatchers[key]
     if (watcher) {
+      // 脏数据，马上更新数据
       if (watcher.dirty) {
         watcher.evaluate()
       }
+      // 如果该computed有被别的watcher调用，则要对该watcher进行依赖收集
       if (Dep.target) {
         watcher.depend()
       }
+      // 返回computed的最新值
       return watcher.value
     }
   }
@@ -309,10 +324,14 @@ function initMethods (vm: Component, methods: Object) {
   }
 }
 
+// 初始化watch
 function initWatch (vm: Component, watch: Object) {
+  // 遍历
   for (const key in watch) {
+    // 配置项
     const handler = watch[key]
     if (Array.isArray(handler)) {
+      // 数组，要触发多个方法
       for (let i = 0; i < handler.length; i++) {
         createWatcher(vm, key, handler[i])
       }
@@ -322,23 +341,28 @@ function initWatch (vm: Component, watch: Object) {
   }
 }
 
+// 创建watcher
 function createWatcher (
   vm: Component,
   keyOrFn: string | Function,
   handler: any,
   options?: Object
 ) {
+  // 对象，则对象中handler是处理函数
   if (isPlainObject(handler)) {
     options = handler
     handler = handler.handler
   }
+  // 字符串，是组件中methods中的函数
   if (typeof handler === 'string') {
     handler = vm[handler]
   }
+  // 在后面stateMixin中声明
   return vm.$watch(keyOrFn, handler, options)
 }
 
 export function stateMixin (Vue: Class<Component>) {
+  // 声明实例的属性别名、公共方法
   // flow somehow has problems with directly declared definition object
   // when using Object.defineProperty, so we have to procedurally build up
   // the object here.
@@ -358,11 +382,11 @@ export function stateMixin (Vue: Class<Component>) {
       warn(`$props is readonly.`, this)
     }
   }
-  Object.defineProperty(Vue.prototype, '$data', dataDef)
-  Object.defineProperty(Vue.prototype, '$props', propsDef)
+  Object.defineProperty(Vue.prototype, '$data', dataDef) // _data的别名
+  Object.defineProperty(Vue.prototype, '$props', propsDef) // _props的别名
 
-  Vue.prototype.$set = set
-  Vue.prototype.$delete = del
+  Vue.prototype.$set = set // 响应式的set别名
+  Vue.prototype.$delete = del // 响应式的del别名
 
   Vue.prototype.$watch = function (
     expOrFn: string | Function,

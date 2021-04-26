@@ -20,8 +20,10 @@ Vue.prototype.$mount = function ( // 3. 重写$mount方法
   el?: string | Element,
   hydrating?: boolean
 ): Component {
+  // 查询元素
   el = el && query(el)
 
+  // 不能是body或者html
   /* istanbul ignore if */
   if (el === document.body || el === document.documentElement) {
     process.env.NODE_ENV !== 'production' && warn(
@@ -55,6 +57,7 @@ Vue.prototype.$mount = function ( // 3. 重写$mount方法
         return this
       }
     } else if (el) {
+      // 没有模板，取元素的outerHTML当模板
       template = getOuterHTML(el)
     }
 
@@ -63,10 +66,11 @@ Vue.prototype.$mount = function ( // 3. 重写$mount方法
       if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
         mark('compile')
       }
-
+      
+      // 编译模板
       const { render, staticRenderFns } = compileToFunctions(template, {
         shouldDecodeNewlines,
-        delimiters: options.delimiters,
+        delimiters: options.delimiters, // 变量的嵌套字符
         comments: options.comments
       }, this)
       options.render = render // 6.将render函数放到options中

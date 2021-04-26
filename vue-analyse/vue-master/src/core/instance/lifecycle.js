@@ -20,6 +20,7 @@ import {
 export let activeInstance: any = null
 export let isUpdatingChildComponent: boolean = false
 
+// 初始化生命周期
 export function initLifecycle (vm: Component) {
   const options = vm.$options
 
@@ -44,11 +45,12 @@ export function initLifecycle (vm: Component) {
   vm._watcher = null
   vm._inactive = null
   vm._directInactive = false
-  vm._isMounted = false
-  vm._isDestroyed = false
-  vm._isBeingDestroyed = false
+  vm._isMounted = false // 挂载标记
+  vm._isDestroyed = false // 销毁标记
+  vm._isBeingDestroyed = false // 销毁中标记
 }
 
+// 全局生命周期混入
 export function lifecycleMixin (Vue: Class<Component>) {
   // _update是更新视图，渲染虚拟dom
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
@@ -102,35 +104,43 @@ export function lifecycleMixin (Vue: Class<Component>) {
 
   Vue.prototype.$destroy = function () {
     const vm: Component = this
+    // 销毁中，直接返回
     if (vm._isBeingDestroyed) {
       return
     }
-    callHook(vm, 'beforeDestroy')
-    vm._isBeingDestroyed = true
+    callHook(vm, 'beforeDestroy') // 调用生命周期钩子
+    vm._isBeingDestroyed = true // 标记销毁中
+    // 从父级中删除自己
     // remove self from parent
     const parent = vm.$parent
     if (parent && !parent._isBeingDestroyed && !vm.$options.abstract) {
       remove(parent.$children, vm)
     }
+    // 卸载watcher
     // teardown watchers
     if (vm._watcher) {
-      vm._watcher.teardown()
+      vm._watcher.teardown() // 将实例自身从其他数据的依赖列表中删除
     }
     let i = vm._watchers.length
     while (i--) {
-      vm._watchers[i].teardown()
+      vm._watchers[i].teardown() // 移除实例内数据对其他数据的依赖，如computed/watch
     }
+    // 移除实例内响应式数据的引用
     // remove reference from data ob
     // frozen object may not have observer.
     if (vm._data.__ob__) {
       vm._data.__ob__.vmCount--
     }
+    // 标记已经销毁
     // call the last hook...
     vm._isDestroyed = true
+    // patch删除所有dom
     // invoke destroy hooks on current rendered tree
     vm.__patch__(vm._vnode, null)
+    // 触发该组件destroyed钩子
     // fire destroyed hook
     callHook(vm, 'destroyed')
+    // 移除所有事件监听
     // turn off all instance listeners.
     vm.$off()
     // remove __vue__ reference
@@ -144,7 +154,7 @@ export function lifecycleMixin (Vue: Class<Component>) {
   }
 }
 
-// 渲染组件
+// 挂载组件
 export function mountComponent (
   vm: Component,
   el: ?Element,
@@ -152,6 +162,7 @@ export function mountComponent (
 ): Component {
   vm.$el = el
   if (!vm.$options.render) {
+    // 没有render函数，则赋值空的渲染函数
     vm.$options.render = createEmptyVNode
     if (process.env.NODE_ENV !== 'production') {
       /* istanbul ignore if */
@@ -177,18 +188,18 @@ export function mountComponent (
   /* istanbul ignore if */
   if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
     updateComponent = () => {
-      const name = vm._name
-      const id = vm._uid
-      const startTag = `vue-perf-start:${id}`
-      const endTag = `vue-perf-end:${id}`
+      const name = vm._name // 组件name
+      const id = vm._uid // 组件id
+      const startTag = `vue-perf-start:${id}` // 性能测试的开始标记
+      const endTag = `vue-perf-end:${id}` // 性能测试的结束标记
+
+      mark(startTag) // 标记开始标记
+      const vnode = vm._render() // 执行渲染函数，得到虚拟dom即vnode
+      mark(endTag) // 标记结束标记
+      measure(`vue ${name} render`, startTag, endTag) // 保存渲染函数的性能
 
       mark(startTag)
-      const vnode = vm._render()
-      mark(endTag)
-      measure(`vue ${name} render`, startTag, endTag)
-
-      mark(startTag)
-      vm._update(vnode, hydrating)
+      vm._update(vnode, hydrating) // 更新视图，用vnode去path，来更新视图
       mark(endTag)
       measure(`vue ${name} patch`, startTag, endTag)
     }
@@ -198,7 +209,11 @@ export function mountComponent (
     }
   }
 
-  // 创建组件的Watcher，在data数据改变时通过关联的Dep调用Watcher更新视图
+  /* 
+  创建组件的Watcher，在data数据改变时通过关联的Dep调用Watcher更新视图
+  vm._watcher  是组件视图依赖数据的watcher
+  vm._watchers 是组件computed和watch依赖别的数据的watcher数组
+  */
   vm._watcher = new Watcher(vm, updateComponent, noop)
   hydrating = false
 

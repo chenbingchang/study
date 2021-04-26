@@ -120,6 +120,7 @@ export const isBuiltInTag = makeMap('slot,component', true)
 export const isReservedAttribute = makeMap('key,ref,slot,slot-scope,is')
 
 /**
+ * 从数组中删除元素
  * Remove an item from an array
  */
 export function remove (arr: Array<any>, item: any): Array<any> | void {

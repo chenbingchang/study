@@ -45,8 +45,13 @@ export default class Watcher {
     cb: Function,
     options?: Object // 配置
   ) {
-    this.vm = vm
-    vm._watchers.push(this) // 一个vm可以有多个Watcher
+    this.vm = vm // 组件的引用
+    /* 
+    一个vm可以有多个Watcher，
+    vm._watchers 是组件computed和watch依赖别的数据的watcher数组
+    比如：1、computed属性，依赖prop/data等;2、watch依赖数据的改变，然后重新执行方法
+    */
+    vm._watchers.push(this)
     // options
     if (options) {
       this.deep = !!options.deep
@@ -58,7 +63,7 @@ export default class Watcher {
     }
     this.cb = cb
     this.id = ++uid // uid for batching
-    this.active = true
+    this.active = true // 是否是活的，如果已经被销毁，则无法使用该watcher
     this.dirty = this.lazy // for lazy watchers
     this.deps = [] // 依赖数组
     this.newDeps = []
@@ -116,6 +121,7 @@ export default class Watcher {
   }
 
   /**
+   * 添加依赖
    * Add a dependency to this directive.
    */
   addDep (dep: Dep) {
@@ -157,15 +163,19 @@ export default class Watcher {
   update () {
     /* istanbul ignore else */
     if (this.lazy) {
+      // 懒加载，标记是脏数据
       this.dirty = true
     } else if (this.sync) {
+      // 同步，马上执行
       this.run()
     } else {
+      // 放到队列中，等到下一个事件轮询再执行，避免同一时间段内执行多次
       queueWatcher(this)
     }
   }
 
   /**
+   * 执行watcher真正要运行的函数
    * Scheduler job interface.
    * Will be called by the scheduler.
    */
@@ -181,8 +191,8 @@ export default class Watcher {
         this.deep
       ) {
         // set new value
-        const oldValue = this.value
-        this.value = value
+        const oldValue = this.value // 保存旧值
+        this.value = value // 新值
         if (this.user) {
           try {
             this.cb.call(this.vm, value, oldValue)
@@ -197,15 +207,18 @@ export default class Watcher {
   }
 
   /**
+   * 获取该watcher的值，只供懒加载的watcher使用，比如：computed选项
    * Evaluate the value of the watcher.
    * This only gets called for lazy watchers.
    */
   evaluate () {
+    // 更新数据
     this.value = this.get()
     this.dirty = false
   }
 
   /**
+   * 把当前watcher的所有依赖，再进行一次收集watcher
    * Depend on all deps collected by this watcher.
    */
   depend () {
@@ -216,6 +229,7 @@ export default class Watcher {
   }
 
   /**
+   * 从所有的依赖中，移除自己
    * Remove self from all dependencies' subscriber list.
    */
   teardown () {
@@ -224,6 +238,7 @@ export default class Watcher {
       // this is a somewhat expensive operation so we skip it
       // if the vm is being destroyed.
       if (!this.vm._isBeingDestroyed) {
+        // 组件不是销毁中
         remove(this.vm._watchers, this)
       }
       let i = this.deps.length
