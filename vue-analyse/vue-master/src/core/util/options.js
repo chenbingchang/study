@@ -1,24 +1,26 @@
 /* @flow */
 
-import config from '../config'
-import { warn } from './debug'
-import { nativeWatch } from './env'
-import { set } from '../observer/index'
-
 import {
   ASSET_TYPES,
   LIFECYCLE_HOOKS
 } from 'shared/constants'
-
 import {
-  extend,
-  hasOwn,
   camelize,
-  toRawType,
-  capitalize,
+
+  capitalize, extend,
+  hasOwn,
+
+
+
   isBuiltInTag,
-  isPlainObject
+  isPlainObject, toRawType
 } from 'shared/util'
+import config from '../config'
+import { set } from '../observer/index'
+import { warn } from './debug'
+import { nativeWatch } from './env'
+
+
 
 /**
  * Option overwriting strategies are functions that handle
@@ -275,20 +277,18 @@ function normalizeProps (options: Object, vm: ?Component) { // 标准化props
   if (!props) return
   const res = {} // 最终结果
   let i, val, name
-  if (Array.isArray(props)) {
-    // 数组
+  if (Array.isArray(props)) { // props是数组，组元只能是字符串
     i = props.length
     while (i--) {
       val = props[i]
       if (typeof val === 'string') {
-        name = camelize(val) // 转成驼峰命名方式
-        res[name] = { type: null }
+        name = camelize(val) // 把横杠-的格式换成驼峰命名
+        res[name] = { type: null } // 把字符串换成对象的形式，并且类型是null
       } else if (process.env.NODE_ENV !== 'production') {
         warn('props must be strings when using array syntax.')
       }
     }
-  } else if (isPlainObject(props)) {
-    // 对象
+  } else if (isPlainObject(props)) { // props是简单对象
     for (const key in props) {
       val = props[key]
       name = camelize(key) // 转成驼峰命名方式
@@ -303,6 +303,7 @@ function normalizeProps (options: Object, vm: ?Component) { // 标准化props
       vm
     )
   }
+  // 赋值转换后的结果
   options.props = res
 }
 
