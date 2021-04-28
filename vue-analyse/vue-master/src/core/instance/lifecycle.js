@@ -119,7 +119,7 @@ export function lifecycleMixin (Vue: Class<Component>) {
     // 卸载watcher
     // teardown watchers
     if (vm._watcher) {
-      vm._watcher.teardown() // 将实例自身从其他数据的依赖列表中删除
+      vm._watcher.teardown() // 将实例自身（渲染视图）从其他数据的依赖列表中删除
     }
     let i = vm._watchers.length
     while (i--) {

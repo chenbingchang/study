@@ -24,18 +24,20 @@ export function def (obj: Object, key: string, val: any, enumerable?: boolean) {
 }
 
 /**
+ * 解析简单的路劲
  * Parse simple path.
  */
-const bailRE = /[^\w.$]/
+const bailRE = /[^\w.$]/ // 不属于属性路劲的正则表达式
 export function parsePath (path: string): any {
   if (bailRE.test(path)) {
+    // 不是属性路劲，直接返回
     return
   }
-  const segments = path.split('.')
+  const segments = path.split('.') // 分割路劲
   return function (obj) {
     for (let i = 0; i < segments.length; i++) {
       if (!obj) return
-      obj = obj[segments[i]]
+      obj = obj[segments[i]] // 保存这一级的值，然后不断遍历,直到最后
     }
     return obj
   }

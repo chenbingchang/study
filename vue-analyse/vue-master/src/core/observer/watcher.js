@@ -42,7 +42,7 @@ export default class Watcher {
   constructor (
     vm: Component, // 组件实例
     expOrFn: string | Function, // 响应时要执行的方法
-    cb: Function,
+    cb: Function, // 回调函数
     options?: Object // 配置
   ) {
     this.vm = vm // 组件的引用
@@ -54,9 +54,9 @@ export default class Watcher {
     vm._watchers.push(this)
     // options
     if (options) {
-      this.deep = !!options.deep
-      this.user = !!options.user
-      this.lazy = !!options.lazy
+      this.deep = !!options.deep // watch的配置项deep
+      this.user = !!options.user // 是否用户添加
+      this.lazy = !!options.lazy // computed都是lazy
       this.sync = !!options.sync
     } else {
       this.deep = this.user = this.lazy = this.sync = false
@@ -67,7 +67,7 @@ export default class Watcher {
     this.dirty = this.lazy // for lazy watchers
     this.deps = [] // 依赖数组
     this.newDeps = []
-    this.depIds = new Set()
+    this.depIds = new Set() // dep的id数组
     this.newDepIds = new Set()
     this.expression = process.env.NODE_ENV !== 'production'
       ? expOrFn.toString()
@@ -76,6 +76,7 @@ export default class Watcher {
     if (typeof expOrFn === 'function') {
       this.getter = expOrFn // 
     } else {
+      // 解析路劲变成函数，给watch配置项用，比如'form.name'
       this.getter = parsePath(expOrFn)
       if (!this.getter) {
         this.getter = function () {}

@@ -362,7 +362,7 @@ function createWatcher (
 }
 
 export function stateMixin (Vue: Class<Component>) {
-  // 声明实例的属性别名、公共方法
+  // 声明实例的属性/方法
   // flow somehow has problems with directly declared definition object
   // when using Object.defineProperty, so we have to procedurally build up
   // the object here.
@@ -395,14 +395,17 @@ export function stateMixin (Vue: Class<Component>) {
   ): Function {
     const vm: Component = this
     if (isPlainObject(cb)) {
+      // 值是对象，需要转换一下，但最终还是通过再调$watch来实现
       return createWatcher(vm, expOrFn, cb, options)
     }
     options = options || {}
-    options.user = true
+    options.user = true // 标记用户添加
     const watcher = new Watcher(vm, expOrFn, cb, options)
     if (options.immediate) {
+      // 用当前watch的值，立即执行一次
       cb.call(vm, watcher.value)
     }
+    // 返回卸载函数
     return function unwatchFn () {
       watcher.teardown()
     }
