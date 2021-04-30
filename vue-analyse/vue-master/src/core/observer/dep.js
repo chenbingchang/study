@@ -50,14 +50,16 @@ export default class Dep {
 // the current target watcher being evaluated.
 // this is globally unique because there could be only one
 // watcher being evaluated at any time.
-Dep.target = null
-const targetStack = [] // 依赖项当前的作用域，堆数据结构
+Dep.target = null // 当前的watcher
+const targetStack = [] // 依赖项调用堆，保存当前watcher的父级
 
 export function pushTarget (_target: Watcher) {
+  // 如果当前有watcher，则放到调用堆中
   if (Dep.target) targetStack.push(Dep.target)
-  Dep.target = _target
+  Dep.target = _target // 把当前的watcher指向自己
 }
 
 export function popTarget () {
+  // 当前watcher执行完成，轮到上一个watcher
   Dep.target = targetStack.pop()
 }

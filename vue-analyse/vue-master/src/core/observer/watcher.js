@@ -57,18 +57,18 @@ export default class Watcher {
       this.deep = !!options.deep // watch的配置项deep
       this.user = !!options.user // 是否用户添加
       this.lazy = !!options.lazy // computed都是lazy
-      this.sync = !!options.sync
+      this.sync = !!options.sync // 是否同步
     } else {
       this.deep = this.user = this.lazy = this.sync = false
     }
-    this.cb = cb
+    this.cb = cb // 回调函数，只有options.user为true才会被调用
     this.id = ++uid // uid for batching
     this.active = true // 是否是活的，如果已经被销毁，则无法使用该watcher
     this.dirty = this.lazy // for lazy watchers
     this.deps = [] // 依赖数组
-    this.newDeps = []
+    this.newDeps = [] // 新增依赖数组
     this.depIds = new Set() // dep的id数组
-    this.newDepIds = new Set()
+    this.newDepIds = new Set() // 新增dep的id数组
     this.expression = process.env.NODE_ENV !== 'production'
       ? expOrFn.toString()
       : ''
@@ -98,10 +98,12 @@ export default class Watcher {
    * 对getter进行依赖收集
    */
   get () {
+    // Dep.target指向当前实例
     pushTarget(this)
     let value
     const vm = this.vm
     try {
+      // expOrFn最终会被转换成函数，然后赋值给this.getter，调用getter的第一个参数是vue实例
       value = this.getter.call(vm, vm) // 更新视图，在更新视图中会调用绑定的data数据，通过data的属性劫持从而收集依赖
     } catch (e) {
       if (this.user) {
@@ -110,11 +112,13 @@ export default class Watcher {
         throw e
       }
     } finally {
+      // 遍历值的所有属性，以便进行深度监听
       // "touch" every property so they are all tracked as
       // dependencies for deep watching
       if (this.deep) {
-        traverse(value)
+        traverse(value) // 深度监听
       }
+      // 切换到上一个watcher执行
       popTarget()
       this.cleanupDeps()
     }
@@ -137,6 +141,7 @@ export default class Watcher {
   }
 
   /**
+   * 清理依赖集合，新、旧依赖项对比
    * Clean up for dependency collection.
    */
   cleanupDeps () {
@@ -144,9 +149,12 @@ export default class Watcher {
     while (i--) {
       const dep = this.deps[i]
       if (!this.newDepIds.has(dep.id)) {
+        // 旧依赖项在新依赖项中没有，需要移除
         dep.removeSub(this)
       }
     }
+
+    // 把新依赖项给到旧的依赖性，并且清除新的依赖项
     let tmp = this.depIds
     this.depIds = this.newDepIds
     this.newDepIds = tmp
@@ -256,31 +264,39 @@ export default class Watcher {
  * getters, so that every nested property inside the object
  * is collected as a "deep" dependency.
  */
-const seenObjects = new Set()
+const seenObjects = new Set() // 深度监听依赖的id，避免重复监听
 function traverse (val: any) {
+  // 清空set
   seenObjects.clear()
   _traverse(val, seenObjects)
 }
 
 function _traverse (val: any, seen: ISet) {
   let i, keys
-  const isA = Array.isArray(val)
+  const isA = Array.isArray(val) // 判断是否是数组
   if ((!isA && !isObject(val)) || !Object.isExtensible(val)) {
+    // 不是数组且不是对象   或者  不可扩展
     return
   }
   if (val.__ob__) {
     const depId = val.__ob__.dep.id
+    // 如果已经收集过，则直接返回
     if (seen.has(depId)) {
       return
     }
+    // 记录已经收集过
     seen.add(depId)
   }
   if (isA) {
+    // 数组
     i = val.length
+    // 调用数组中的每个元素，进行收集，同时递归元素
     while (i--) _traverse(val[i], seen)
   } else {
+    // 对象
     keys = Object.keys(val)
     i = keys.length
+    // 调用对象中的每个属性，进行收集，同时递归属性值
     while (i--) _traverse(val[keys[i]], seen)
   }
 }

@@ -405,7 +405,7 @@ export function stateMixin (Vue: Class<Component>) {
       // 用当前watch的值，立即执行一次
       cb.call(vm, watcher.value)
     }
-    // 返回卸载函数
+    // 返回取消观察函数
     return function unwatchFn () {
       watcher.teardown()
     }
