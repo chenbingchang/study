@@ -17,6 +17,7 @@ import {
 const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
 
 /**
+ * 标记是否转换成响应式的
  * By default, when a reactive property is set, the new value is
  * also converted to become reactive. However when passing down props,
  * we don't want to force conversion because the value may be a nested value
@@ -39,8 +40,12 @@ export class Observer {
 
   constructor (value: any) {
     this.value = value
+    /* 
+    这个dep是留给数组类型的，因为数组无法设置getter/setter，所以需要覆盖数组的变异方法，
+    当调用数组的变异方法时，通过这里的dep来通知观察者更新
+    */
     this.dep = new Dep() // 依赖收集
-    this.vmCount = 0
+    this.vmCount = 0 // 组件数量
     def(value, '__ob__', this) // 添加"__ob__"属性
     if (Array.isArray(value)) {
       // 数组
@@ -108,6 +113,8 @@ function copyAugment (target: Object, src: Object, keys: Array<string>) {
  * Attempt to create an observer instance for a value,
  * returns the new observer if successfully observed,
  * or the existing observer if the value already has one.
+ * 尝试为value创建一个Observer实例，如果创建成功，直接返回新创建的Observer实例。
+ * 如果 Value 已经存在一个Observer实例，则直接返回它
  */
 export function observe (value: any, asRootData: ?boolean): Observer | void {
   // 不是对象、或者是VNode实例，直接返回
@@ -117,15 +124,15 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
   let ob: Observer | void
   // 判断是否已经被监听过
   if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
-    ob = value.__ob__
+    ob = value.__ob__ // __ob__是Observer的一个指向实例本身的属性
   } else if (
     observerState.shouldConvert &&
-    !isServerRendering() &&
-    (Array.isArray(value) || isPlainObject(value)) &&
-    Object.isExtensible(value) &&
-    !value._isVue
+    !isServerRendering() && // 不是服务端渲染
+    (Array.isArray(value) || isPlainObject(value)) && // 是数组或者对象
+    Object.isExtensible(value) && // 可拓展
+    !value._isVue // 不是vue组件
   ) {
-    ob = new Observer(value)
+    ob = new Observer(value) // 新建Observer
   }
   if (asRootData && ob) {
     ob.vmCount++
@@ -144,7 +151,7 @@ export function defineReactive (
   customSetter?: ?Function,
   shallow?: boolean
 ) {
-  const dep = new Dep()
+  const dep = new Dep() // 对象属性的依赖类
   // 对象键的描述
   const property = Object.getOwnPropertyDescriptor(obj, key)
   if (property && property.configurable === false) {// 对象不可配置，无法重新定义存取器，直接返回
@@ -155,18 +162,22 @@ export function defineReactive (
   const getter = property && property.get// 保存原有的存取器
   const setter = property && property.set// 保存原有的存取器
 
-  let childOb = !shallow && observe(val)
+  let childOb = !shallow && observe(val) // 检查值是否也是可以监听的类型
   // 3.重新定义set和get方法
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
     get: function reactiveGetter () {
+      // 获取值
       const value = getter ? getter.call(obj) : val
+      // 如果有watcher在收集依赖项
       if (Dep.target) {
-        dep.depend()
+        dep.depend() // 收集依赖
+        // 如果值也是响应式，也进行收集依赖
         if (childOb) {
           childOb.dep.depend()
           if (Array.isArray(value)) {
+            // 值是数组，数组所有元素都收集依赖
             dependArray(value)
           }
         }
@@ -174,22 +185,24 @@ export function defineReactive (
       return value
     },
     set: function reactiveSetter (newVal) {
+      // 获取值
       const value = getter ? getter.call(obj) : val
       /* eslint-disable no-self-compare */
       if (newVal === value || (newVal !== newVal && value !== value)) {
+        // 新值和旧值相等，直接返回
         return
       }
       /* eslint-enable no-self-compare */
       if (process.env.NODE_ENV !== 'production' && customSetter) {
         customSetter()
       }
-      if (setter) {
+      if (setter) { // 原来的setter
         setter.call(obj, newVal)
       } else {
         val = newVal
       }
       childOb = !shallow && observe(newVal) // 如果设置值是对象
-      dep.notify()
+      dep.notify() // 通知观察者
     }
   })
 }
@@ -267,13 +280,15 @@ export function del (target: Array<any> | Object, key: any) {
 }
 
 /**
+ * 递归数组所有项收集依赖
  * Collect dependencies on array elements when the array is touched, since
  * we cannot intercept array element access like property getters.
  */
 function dependArray (value: Array<any>) {
+  // 遍历所有元素
   for (let e, i = 0, l = value.length; i < l; i++) {
     e = value[i]
-    e && e.__ob__ && e.__ob__.dep.depend()
+    e && e.__ob__ && e.__ob__.dep.depend() // 如果元素是响应式则收集依赖
     if (Array.isArray(e)) {
       dependArray(e)
     }

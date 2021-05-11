@@ -61,14 +61,14 @@ export default class Watcher {
     } else {
       this.deep = this.user = this.lazy = this.sync = false
     }
-    this.cb = cb // 回调函数，只有options.user为true才会被调用
+    this.cb = cb // 回调函数
     this.id = ++uid // uid for batching
     this.active = true // 是否是活的，如果已经被销毁，则无法使用该watcher
     this.dirty = this.lazy // for lazy watchers
-    this.deps = [] // 依赖数组
-    this.newDeps = [] // 新增依赖数组
-    this.depIds = new Set() // dep的id数组
-    this.newDepIds = new Set() // 新增dep的id数组
+    this.deps = [] // 旧的依赖数组
+    this.newDeps = [] // 新的依赖数组，会保存所有依赖
+    this.depIds = new Set() // 旧的depId集合
+    this.newDepIds = new Set() // 新的depId集合，会保存所有依赖的id
     this.expression = process.env.NODE_ENV !== 'production'
       ? expOrFn.toString()
       : ''
@@ -134,6 +134,10 @@ export default class Watcher {
     if (!this.newDepIds.has(id)) {
       this.newDepIds.add(id)
       this.newDeps.push(dep) // 当前Watcher收集Dep
+      /* 
+      如果旧的依赖id集合存在该dep，则证明该dep已经保存过改watcher，不需要再次保存
+      否则证明该dep没有保存过改watcher，需要保存该watcher
+       */
       if (!this.depIds.has(id)) {
         dep.addSub(this) // Dep收集Watcher
       }
@@ -146,15 +150,16 @@ export default class Watcher {
    */
   cleanupDeps () {
     let i = this.deps.length
+    // 遍历旧的dep数组
     while (i--) {
       const dep = this.deps[i]
       if (!this.newDepIds.has(dep.id)) {
-        // 旧依赖项在新依赖项中没有，需要移除
+        // 旧依赖项在新依赖项中没有，则旧依赖项需要移除该watcher
         dep.removeSub(this)
       }
     }
 
-    // 把新依赖项给到旧的依赖性，并且清除新的依赖项
+    // 把新依赖项给到旧的依赖性，并且清空新的依赖项，以备下次收集
     let tmp = this.depIds
     this.depIds = this.newDepIds
     this.newDepIds = tmp
@@ -199,11 +204,14 @@ export default class Watcher {
         isObject(value) ||
         this.deep
       ) {
+        // 深度监听，以及监听的是对象/数组应该触发，当值相同时，有可能对象/数组已经改变
+        // 新值和旧值不等、或者新值是对象、或者是深度监听
         // set new value
         const oldValue = this.value // 保存旧值
         this.value = value // 新值
         if (this.user) {
           try {
+            // 执行watch的回调
             this.cb.call(this.vm, value, oldValue)
           } catch (e) {
             handleError(e, this.vm, `callback for watcher "${this.expression}"`)
@@ -238,7 +246,7 @@ export default class Watcher {
   }
 
   /**
-   * 从所有的依赖中，移除自己
+   * 从所有的依赖中，移除自己。相当于销毁前的操作
    * Remove self from all dependencies' subscriber list.
    */
   teardown () {
