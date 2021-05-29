@@ -46,7 +46,7 @@ export default class Watcher {
     options?: Object // 配置
   ) {
     this.vm = vm // 组件的引用
-    /* 
+    /*
     一个vm可以有多个Watcher，
     vm._watchers 是组件computed和watch依赖别的数据的watcher数组
     比如：1、computed属性，依赖prop/data等;2、watch依赖数据的改变，然后重新执行方法
@@ -55,7 +55,7 @@ export default class Watcher {
     // options
     if (options) {
       this.deep = !!options.deep // watch的配置项deep
-      this.user = !!options.user // 是否用户添加
+      this.user = !!options.user // 是否用户添加，只有wath配置项才传了这个
       this.lazy = !!options.lazy // computed都是lazy
       this.sync = !!options.sync // 是否同步
     } else {
@@ -74,7 +74,7 @@ export default class Watcher {
       : ''
     // parse expression for getter
     if (typeof expOrFn === 'function') {
-      this.getter = expOrFn // 
+      this.getter = expOrFn //
     } else {
       // 解析路劲变成函数，给watch配置项用，比如'form.name'
       this.getter = parsePath(expOrFn)
@@ -134,7 +134,7 @@ export default class Watcher {
     if (!this.newDepIds.has(id)) {
       this.newDepIds.add(id)
       this.newDeps.push(dep) // 当前Watcher收集Dep
-      /* 
+      /*
       如果旧的依赖id集合存在该dep，则证明该dep已经保存过改watcher，不需要再次保存
       否则证明该dep没有保存过改watcher，需要保存该watcher
        */
@@ -198,6 +198,7 @@ export default class Watcher {
       const value = this.get()
       if (
         value !== this.value ||
+        // 深度观察和观察在对象或者数组都应该触发，因为当值相同时，值可能已经发现变异（对象、数组是引用类型）
         // Deep watchers and watchers on Object/Arrays should fire even
         // when the value is the same, because the value may
         // have mutated.

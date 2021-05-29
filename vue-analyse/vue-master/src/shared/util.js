@@ -60,10 +60,12 @@ export function isRegExp (v: any): boolean {
 }
 
 /**
+ * 检查val是否是有效的数组下标
  * Check if val is a valid array index.
  */
 export function isValidArrayIndex (val: any): boolean {
   const n = parseFloat(String(val))
+  // isFinite全局方法，判断是否是有限数字
   return n >= 0 && Math.floor(n) === n && isFinite(val)
 }
 

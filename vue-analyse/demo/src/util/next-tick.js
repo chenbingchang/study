@@ -1,5 +1,6 @@
-let callbacks = []
+let callbacks = [] // 回调函数数组
 
+// 清空回调函数数组
 function flushCallbacks() {
   callbacks.forEach(cb => cb())
 }
@@ -23,7 +24,7 @@ if(Promise) {// then是异步方法，并且是在微任务中执行
   timerFunc = () => {
     textNode.textContent = 2
   }
-} else if(setImmediate) {
+} else if(setImmediate) { // 这个好像只有ie支持
   timerFunc = () => {
     setImmediate(flushCallbacks)
   }

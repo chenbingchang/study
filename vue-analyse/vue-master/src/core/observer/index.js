@@ -14,6 +14,7 @@ import {
   isServerRendering
 } from '../util/index'
 
+// 获取arrayMethods属性名数组
 const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
 
 /**
@@ -88,6 +89,7 @@ export class Observer {
 // helpers
 
 /**
+ * 通过阻断__proto__链增强对象或数组
  * Augment an target Object or Array by intercepting
  * the prototype chain using __proto__
  */
@@ -98,11 +100,13 @@ function protoAugment (target, src: Object, keys: any) {
 }
 
 /**
+ * 通过隐藏属性增强对象或数组
  * Augment an target Object or Array by defining
  * hidden properties.
  */
 /* istanbul ignore next */
 function copyAugment (target: Object, src: Object, keys: Array<string>) {
+  // 遍历给目标对象定义属性
   for (let i = 0, l = keys.length; i < l; i++) {
     const key = keys[i]
     def(target, key, src[key])
@@ -216,7 +220,7 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
   // 数组，直接换成调用重写的splice方法即可
   if (Array.isArray(target) && isValidArrayIndex(key)) {
     target.length = Math.max(target.length, key)
-    target.splice(key, 1, val)
+    target.splice(key, 1, val) // 修改元素
     return val
   }
 
@@ -227,7 +231,7 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
   }
 
   const ob = (target: any).__ob__
-  // 不能在Vue实例上设置，__ob__是Vue实例上的一个属性指向Vue实例本身
+  // 不能在Vue实例上设置，__ob__是响应式数据上的一个属性指向对应的Observe实例
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid adding reactive properties to a Vue instance or its root $data ' +
@@ -242,7 +246,7 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
     return val
   }
 
-  // 6.将属性定义成响应式的(疑问：不知什么情况下才会轮着这里？)
+  // 6.将属性定义成响应式的
   defineReactive(ob.value, key, val)
   ob.dep.notify()// 7.通知视图更新
   return val
@@ -260,6 +264,7 @@ export function del (target: Array<any> | Object, key: any) {
 
   const ob = (target: any).__ob__
   if (target._isVue || (ob && ob.vmCount)) {
+    // Vue实例，或者Vue实例根数据对象，报错
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid deleting properties on a Vue instance or its root $data ' +
       '- just set it to null.'
@@ -289,7 +294,7 @@ function dependArray (value: Array<any>) {
   for (let e, i = 0, l = value.length; i < l; i++) {
     e = value[i]
     e && e.__ob__ && e.__ob__.dep.depend() // 如果元素是响应式则收集依赖
-    if (Array.isArray(e)) {
+    if (Array.isArray(e)) { // 如果是数组则递归
       dependArray(e)
     }
   }

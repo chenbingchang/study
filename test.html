@@ -17,211 +17,64 @@
       }
 
       .wrap {
-        width: 250px;
+        width: 200px;
+        height: 600px;
         border: 1px solid #333;
-        margin-left: 50px;
+        overflow: auto;
       }
 
-      .span1 {
+      .item {
+        box-sizing: border-box;
+        width: 100%;
+        height: 100px;
+        margin-top: 10px;
+        background-color: gold;
       }
 
-      .span2 {
-      }
-
-      .text-wrap {
-        display: flex;
-      }
-
-      .text-img {
-        width: 140px;
-        height: 400;
-      }
-
-      .text {
-        flex: 1;
-        display: -webkit-box;
-        width: 100px;
-        
-        overflow: hidden;
-        text-overflow: ellipsis;
-        /* white-space: nowrap; */
-        height: 40px;
-        line-height: 20px;
-
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-      }
-      
-      .text em {
-        display: inline-block;
+      .item-big {
+        box-sizing: border-box;
+        width: 100%;
+        height: 300px;
+        margin-top: 10px;
+        background-color: yellowgreen;
       }
     </style>
   </head>
   <body>
-    <div class="text-wrap">
-      <div class="text-img">
-        
-      </div>
-      <div class="text">
-          <em>我</em>
-          <em>是</em>
-          <em>一</em>
-          <em>只</em>
-          <em>小</em>
-          <em>飞</em>
-          <em>鸟</em>
-          <em>我</em>
-          <em>是</em>
-          <em>一</em>
-          <em>只</em>
-          <em>小</em>
-          <em>飞</em>
-          <em>鸟</em>
-          <em>我</em>
-          <em>是</em>
-          <em>一</em>
-          <em>只</em>
-          <em>小</em>
-          <em>飞</em>
-          <em>鸟</em>
-          <em>我</em>
-          <em>是</em>
-          <em>一</em>
-          <em>只</em>
-          <em>小</em>
-          <em>飞</em>
-          <em>鸟</em>
-          <em>我</em>
-          <em>是</em>
-          <em>一</em>
-          <em>只</em>
-          <em>小</em>
-          <em>飞</em>
-          <em>鸟</em>
-          <em>我</em>
-          <em>是</em>
-          <em>一</em>
-          <em>只</em>
-          <em>小</em>
-          <em>飞</em>
-          <em>鸟</em>
-          <em>我</em>
-          <em>是</em>
-          <em>一</em>
-          <em>只</em>
-          <em>小</em>
-          <em>飞</em>
-          <em>鸟</em>
-      </div>
-    </div>
     <div class="wrap">
-      <span class="span1">路透社</span>
-      <span class="span2">
-        面对未知的病毒和突如其来的疫情，中国政府坚持人民至上、生命至上，采取了最硬核的防控措施，毫无保留地与各国分享防控诊疗经验，为世界守住了疫情防控的关键防线，为各国争取了应对疫情的宝贵时间。中国抗疫努力概括起来是四个词：公开、透明、科学、负责。反观美方呢？
-      </span>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
+      <div class="item"></div>
     </div>
     <div>
-      <input id="file" type="file" />
-    </div>
-    <div>
-      <img id="img" src="" alt="" />
-    </div>
-    <div>
-      最终生成的图片：
-      <img id="finalImg" src="" alt="" />
+      <button class="btn">新增元素</button>
     </div>
 
-    <script type="text/javascript">
-      const inputEl = document.getElementById("file")
-      const imgEl = document.getElementById("img")
-      const finalImgEl = document.getElementById("finalImg")
-      // 图片 宽度/高度  的比例，1.7是16:9
-      const imgRate = 1.7
+    <script>
+      const wrapEl = document.querySelector('.wrap')
+      const btnEl = document.querySelector('.btn')
+      
+      wrapEl.onscroll = function() {
+        console.log('滚动高度：', wrapEl.scrollTop)
+      }
+      
+      btnEl.onclick = function() {
+        let div = document.createElement('div')
 
-      inputEl.onchange = function (e) {
-        const file = e.target.files[0]
-        // 重置文件选择框的value否则下次无法触发change事件
-        e.target.value = ""
-
-        // URL.createObjectURL返回的地址是blob:xxx的形式
-        const previewUrl = URL.createObjectURL(file)
-        const previewImg = new Image()
-
-        // 预览图片，判断图片尺寸
-        previewImg.onload = function (event) {
-          // 释放内存
-          URL.revokeObjectURL(previewUrl)
-          let width = previewImg.width
-          let height = previewImg.height
-          let curRate = width / height
-
-          // 图片比例正负0.05
-          if (Math.abs(imgRate - curRate) <= 0.05) {
-            // 合格的图片比例
-          } else {
-            // 不合格
-            // 计算后的宽高
-            let computeWith = 0
-            let computeHeight = 0
-
-            // 如果宽度固定，计算后的高度比真实的高度小，则固定宽度，调整高度，否则固定高度，调整宽度
-            if (width / imgRate < height) {
-              computeWith = width
-              computeHeight = parseInt(width / imgRate)
-            } else {
-              computeWith = parseInt(height * imgRate)
-              computeHeight = height
-            }
-
-            const canvas = document.createElement("canvas")
-
-            canvas.width = computeWith
-            canvas.height = computeHeight
-            canvas
-              .getContext("2d")
-              .drawImage(previewImg, 0, 0, computeWith, computeHeight)
-            canvas.toBlob(
-              function (blob) {
-                const url = URL.createObjectURL(blob)
-
-                finalImgEl.onload = function () {
-                  // 释放内存
-                  URL.revokeObjectURL(url)
-                }
-                finalImgEl.src = url
-                // 图片在canvas中改变大小后，图片会变大，哪怕宽高比原来小了，但是图片大小还是会比原来大，猜测和压缩有关
-                downLoad(url)
-              },
-              "image/jpeg",
-              0.7 // 图片质量，即压缩
-            )
-          }
-        }
-        previewImg.src = previewUrl
+        div.setAttribute('class', 'item-big')
+        wrapEl.appendChild(div)
       }
 
-      function downLoad(url) {
-        let aEl = document.createElement("a")
-        let fileName = "final.jpeg"
-
-        aEl.href = url
-        aEl.download = fileName // 下载文件名
-        aEl.style.width = "0"
-        aEl.style.height = "0"
-        aEl.style.display = "none"
-        document.body.appendChild(aEl) // 插入body中
-        aEl.click() // 点击
-        document.body.removeChild(aEl) // 从body中移除
-      }
-
-      let obj = {
-        name: 'cbc',
-        age: 18
-      }
-
-      for (const val in obj) {
-        console.log(val)
-      }
     </script>
   </body>
 </html>

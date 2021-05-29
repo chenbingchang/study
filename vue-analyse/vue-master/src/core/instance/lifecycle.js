@@ -209,7 +209,7 @@ export function mountComponent (
     }
   }
 
-  /* 
+  /*
   创建组件的Watcher，在data数据改变时通过关联的Dep调用Watcher更新视图
   vm._watcher  是组件视图依赖数据的watcher
   vm._watchers 是组件computed和watch依赖别的数据的watcher数组
@@ -291,6 +291,7 @@ export function updateChildComponent (
   }
 }
 
+// 遍历组件的父级，如果有处于非激活状态，则返回true
 function isInInactiveTree (vm) {
   while (vm && (vm = vm.$parent)) {
     if (vm._inactive) return true
@@ -298,6 +299,7 @@ function isInInactiveTree (vm) {
   return false
 }
 
+// 激活子组件
 export function activateChildComponent (vm: Component, direct?: boolean) {
   if (direct) {
     vm._directInactive = false
@@ -307,11 +309,14 @@ export function activateChildComponent (vm: Component, direct?: boolean) {
   } else if (vm._directInactive) {
     return
   }
+  // 组件是非激活，改成激活状态
   if (vm._inactive || vm._inactive === null) {
     vm._inactive = false
+    // 遍历子组件
     for (let i = 0; i < vm.$children.length; i++) {
       activateChildComponent(vm.$children[i])
     }
+    // 触发activated生命周期
     callHook(vm, 'activated')
   }
 }
