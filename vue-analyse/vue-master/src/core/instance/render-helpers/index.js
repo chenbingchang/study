@@ -20,7 +20,7 @@ export function installRenderHelpers (target: any) {
   target._q = looseEqual
   target._i = looseIndexOf
   target._m = renderStatic
-  target._f = resolveFilter
+  target._f = resolveFilter // 过滤器
   target._k = checkKeyCodes
   target._b = bindObjectProps
   target._v = createTextVNode

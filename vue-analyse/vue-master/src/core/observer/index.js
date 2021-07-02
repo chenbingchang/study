@@ -37,23 +37,24 @@ export const observerState = {
 export class Observer {
   value: any;
   dep: Dep;
+  // 当对象是$data的根对象时，会++，用来区分data对象和data.xxx这种对象
   vmCount: number; // number of vms that has this object as root $data
 
   constructor (value: any) {
     this.value = value
-    /* 
+    /*
     这个dep是留给数组类型的，因为数组无法设置getter/setter，所以需要覆盖数组的变异方法，
     当调用数组的变异方法时，通过这里的dep来通知观察者更新
     */
     this.dep = new Dep() // 依赖收集
-    this.vmCount = 0 // 组件数量
+    this.vmCount = 0
     def(value, '__ob__', this) // 添加"__ob__"属性
     if (Array.isArray(value)) {
       // 数组
       const augment = hasProto
         ? protoAugment
         : copyAugment
-      // 1.数组的话重写数组原型方法 
+      // 1.数组的话重写数组原型方法
       augment(value, arrayMethods, arrayKeys)
       // 2.观测数组中是对象类型的数据
       this.observeArray(value)
@@ -138,7 +139,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
   ) {
     ob = new Observer(value) // 新建Observer
   }
-  if (asRootData && ob) {
+  if (asRootData && ob) { // 根数据
     ob.vmCount++
   }
   return ob
@@ -158,7 +159,7 @@ export function defineReactive (
   const dep = new Dep() // 对象属性的依赖类
   // 对象键的描述
   const property = Object.getOwnPropertyDescriptor(obj, key)
-  if (property && property.configurable === false) {// 对象不可配置，无法重新定义存取器，直接返回
+  if (property && property.configurable === false) { // 对象不可配置，无法重新定义存取器，直接返回
     return
   }
 
@@ -233,6 +234,7 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
   const ob = (target: any).__ob__
   // 不能在Vue实例上设置，__ob__是响应式数据上的一个属性指向对应的Observe实例
   if (target._isVue || (ob && ob.vmCount)) {
+    /* data上一开始没有是属性不能再新增，属性必须一开就在data中，可以放个空值 */
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid adding reactive properties to a Vue instance or its root $data ' +
       'at runtime - declare it upfront in the data option.'
@@ -264,7 +266,9 @@ export function del (target: Array<any> | Object, key: any) {
 
   const ob = (target: any).__ob__
   if (target._isVue || (ob && ob.vmCount)) {
-    // Vue实例，或者Vue实例根数据对象，报错
+    /* Vue实例，或者Vue实例根数据对象，报错
+    data里面的属性不能删除，只能删除data.xxx对象里面的属性
+     */
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid deleting properties on a Vue instance or its root $data ' +
       '- just set it to null.'

@@ -15,66 +15,88 @@
         width: 100%;
         height: 100%;
       }
-
-      .wrap {
-        width: 200px;
-        height: 600px;
-        border: 1px solid #333;
-        overflow: auto;
-      }
-
-      .item {
-        box-sizing: border-box;
-        width: 100%;
-        height: 100px;
-        margin-top: 10px;
-        background-color: gold;
-      }
-
-      .item-big {
-        box-sizing: border-box;
-        width: 100%;
-        height: 300px;
-        margin-top: 10px;
-        background-color: yellowgreen;
-      }
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
+    <div id="wrap">
+      你这很暴力啊
+      <!-- <div>
+        aaaa你好可爱啊
+      </div>
+      <strong>你是谁</strong>
+      <div>
+        <div>暴力</div>
+      </div> -->
     </div>
-    <div>
-      <button class="btn">新增元素</button>
-    </div>
+
+    <div id="result"></div>
 
     <script>
-      const wrapEl = document.querySelector('.wrap')
-      const btnEl = document.querySelector('.btn')
-      
-      wrapEl.onscroll = function() {
-        console.log('滚动高度：', wrapEl.scrollTop)
-      }
-      
-      btnEl.onclick = function() {
-        let div = document.createElement('div')
+      const wrapEl = document.querySelector('#wrap')
+      const resultEl = document.querySelector('#result')
+      let wordsReg = /(黄色)|(色情)|(妈的)|(暴力)/;
 
-        div.setAttribute('class', 'item-big')
-        wrapEl.appendChild(div)
+      let resultHtml = replaceWord(wrapEl, wordsReg, "")
+
+      resultEl.innerHTML = resultHtml
+      /* 
+      RegExp.exec()   
+      RegExp.test()   测试一个字符是否满足正则表达式
+
+
+
+
+      String.replace()    字符串替换
+      String.match()    字符串匹配
+      */
+      function replaceWord(el, wordsReg, result) {
+        for (let i = 0; i < el.childNodes.length; i++) {
+          let child = el.childNodes[i];
+
+          if (child.nodeType === Node.TEXT_NODE) {
+            // 文本节点
+            let text = child.textContent // 文本内容
+            // 匹配结果
+            let matchResult 
+
+            do {
+              matchResult = text.match(wordsReg)
+
+              if(matchResult) {
+                // 匹配成功
+                // 匹配的全内容
+                let matchText = matchResult[0]
+
+                // 匹配的前面一段文字
+                result += text.substring(0, matchResult.index)
+                // 匹配的html字符串
+                result += markWord(matchText)
+                // 把已经处理的字符串截取掉
+                text = text.slice(matchResult.index + matchText.length)
+              } else {
+                // 匹配失败，则所有都是合法字符，不用标红
+                result += text
+                text = null
+              }
+            } while (text);
+          } else {
+            // 元素节点
+            
+          }
+        }
+
+        return result
       }
 
+      // 标记敏感词
+      function markWord(word) {
+        return `<span class="fastbull-word-red">${word}</span>`
+      }
     </script>
+    <style>
+      span.fastbull-word-red {
+        color: red;
+      }
+    </style>
   </body>
 </html>

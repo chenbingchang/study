@@ -18,7 +18,7 @@ export function initAssetRegisters (Vue: GlobalAPI) {
       } else {
         /* istanbul ignore if */
         if (process.env.NODE_ENV !== 'production') {
-          if (type === 'component' && config.isReservedTag(id)) {
+          if (type === 'component' && config.isReservedTag(id)) { // 非生产环境，组件是保留标签则警告
             warn(
               'Do not use built-in or reserved HTML elements as component ' +
               'id: ' + id
@@ -28,10 +28,10 @@ export function initAssetRegisters (Vue: GlobalAPI) {
 
         if (type === 'component' && isPlainObject(definition)) { // definition是对象
           definition.name = definition.name || id
-          definition = this.options._base.extend(definition)
+          definition = this.options._base.extend(definition) // 组件通过继承即可实现
         }
 
-        if (type === 'directive' && typeof definition === 'function') {
+        if (type === 'directive' && typeof definition === 'function') { // 指令，如果参数是方法，直接把方法绑定给bind和update配置
           definition = { bind: definition, update: definition }
         }
         this.options[type + 's'][id] = definition

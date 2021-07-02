@@ -11,7 +11,7 @@ import { updateListeners } from '../vdom/helpers/index'
 
 // 初始化事件
 export function initEvents (vm: Component) {
-  vm._events = Object.create(null)
+  vm._events = Object.create(null) // 实例的事件中心
   vm._hasHookEvent = false
   // init parent attached events
   const listeners = vm.$options._parentListeners
@@ -53,6 +53,7 @@ export function eventsMixin (Vue: Class<Component>) {
   Vue.prototype.$on = function (event: string | Array<string>, fn: Function): Component {
     const vm: Component = this
     if (Array.isArray(event)) {
+      // 如果是数组，则数组中每一个事件都触发回调函数
       for (let i = 0, l = event.length; i < l; i++) {
         this.$on(event[i], fn)
       }
@@ -70,11 +71,12 @@ export function eventsMixin (Vue: Class<Component>) {
   // 一次性监听
   Vue.prototype.$once = function (event: string, fn: Function): Component {
     const vm: Component = this
+    // 嵌套一层，先移除时间再触发回调
     function on () {
       vm.$off(event, on)
       fn.apply(vm, arguments)
     }
-    on.fn = fn
+    on.fn = fn // 保存原来函数的引用来供$off时使用
     vm.$on(event, on)
     return vm
   }
