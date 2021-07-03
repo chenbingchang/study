@@ -1,18 +1,18 @@
 /* @flow */
 
-import { queueWatcher } from './scheduler'
-import Dep, { pushTarget, popTarget } from './dep'
-
-import {
-  warn,
-  remove,
-  isObject,
-  parsePath,
-  _Set as Set,
-  handleError
-} from '../util/index'
-
 import type { ISet } from '../util/index'
+import {
+  handleError, isObject,
+  parsePath, remove, warn,
+
+
+
+  _Set as Set
+} from '../util/index'
+import Dep, { popTarget, pushTarget } from './dep'
+import { queueWatcher } from './scheduler'
+
+
 
 let uid = 0
 

@@ -1,18 +1,18 @@
 /* @flow */
 
-import Dep from './dep'
-import VNode from '../vdom/vnode'
-import { arrayMethods } from './array'
 import {
   def,
-  warn,
+
   hasOwn,
   hasProto,
   isObject,
   isPlainObject,
-  isValidArrayIndex,
-  isServerRendering
+
+  isServerRendering, isValidArrayIndex, warn
 } from '../util/index'
+import VNode from '../vdom/vnode'
+import { arrayMethods } from './array'
+import Dep from './dep'
 
 const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
 
@@ -39,9 +39,9 @@ export class Observer {
 
   constructor (value: any) {
     this.value = value
-    this.dep = new Dep() // 依赖收集
+    this.dep = new Dep() // 依赖收集，整个对象的依赖
     this.vmCount = 0
-    def(value, '__ob__', this) // 添加"__ob__"属性
+    def(value, '__ob__', this) // 添加"__ob__"属性，指向observer实例
     if (Array.isArray(value)) {
       // 数组
       const augment = hasProto
@@ -58,6 +58,7 @@ export class Observer {
   }
 
   /**
+   * 监听值是对象时，遍历对象的属性变成getter/setter函数
    * Walk through each property and convert them into
    * getter/setters. This method should only be called when
    * value type is Object.
@@ -138,13 +139,13 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
  * 把对象的属性定义成响应式
  */
 export function defineReactive (
-  obj: Object,
-  key: string,
-  val: any,
+  obj: Object, // 对象
+  key: string, // 键
+  val: any, // 值
   customSetter?: ?Function,
   shallow?: boolean
 ) {
-  const dep = new Dep()
+  const dep = new Dep() // 对象中某个属性的依赖
   // 对象键的描述
   const property = Object.getOwnPropertyDescriptor(obj, key)
   if (property && property.configurable === false) {// 对象不可配置，无法重新定义存取器，直接返回
@@ -161,9 +162,11 @@ export function defineReactive (
     enumerable: true,
     configurable: true,
     get: function reactiveGetter () {
+      // 如果原来有getter则先执行
       const value = getter ? getter.call(obj) : val
+      // 如果当前watcher有值，则进行收集依赖
       if (Dep.target) {
-        dep.depend()
+        dep.depend() // 收集依赖
         if (childOb) {
           childOb.dep.depend()
           if (Array.isArray(value)) {
