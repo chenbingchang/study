@@ -74,4 +74,5 @@ export function isUnknownElement (tag: string): boolean {
   }
 }
 
+// 是否是文本框输入框类型
 export const isTextInputType = makeMap('text,number,password,search,email,tel,url')

@@ -205,7 +205,7 @@ function initComputed (vm: Component, computed: Object) {
     }
 
     if (!isSSR) {
-      /* 
+      /*
       不是服务端渲染，创建watcher。
       为了后面的computed属性缓存做准备，依赖改变时才重新计算，否则使用上一次的值
        */
@@ -233,6 +233,7 @@ function initComputed (vm: Component, computed: Object) {
   }
 }
 
+// 定义computed
 export function defineComputed (
   target: any,
   key: string,

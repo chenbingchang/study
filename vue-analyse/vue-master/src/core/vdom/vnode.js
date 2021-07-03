@@ -1,5 +1,6 @@
 /* @flow */
 
+// 虚拟DOM
 export default class VNode {
   tag: string | void;
   data: VNodeData | void;
@@ -38,29 +39,29 @@ export default class VNode {
     componentOptions?: VNodeComponentOptions,
     asyncFactory?: Function
   ) {
-    this.tag = tag
-    this.data = data
-    this.children = children
-    this.text = text
-    this.elm = elm
-    this.ns = undefined
-    this.context = context
-    this.functionalContext = undefined
-    this.functionalOptions = undefined
-    this.functionalScopeId = undefined
-    this.key = data && data.key
-    this.componentOptions = componentOptions
-    this.componentInstance = undefined
-    this.parent = undefined
-    this.raw = false
-    this.isStatic = false
-    this.isRootInsert = true
-    this.isComment = false
-    this.isCloned = false
-    this.isOnce = false
-    this.asyncFactory = asyncFactory
-    this.asyncMeta = undefined
-    this.isAsyncPlaceholder = false
+    this.tag = tag // 节点的标签名
+    this.data = data // 节点对应的对象，包含了具体的一些数据信息，比如类名、绑定、事件、其它属性，是一个VNodeData类型，可以参考VNodeData类型中的数据信息
+    this.children = children // 节点的子节点数组
+    this.text = text // 节点的文本
+    this.elm = elm // 节点对应的真实dom节点
+    this.ns = undefined // 节点的命名空间
+    this.context = context // 节点对应的Vue实例
+    this.functionalContext = undefined // 函数式组件对应的Vue实例
+    this.functionalOptions = undefined //
+    this.functionalScopeId = undefined //
+    this.key = data && data.key // 节点的key属性，被当作节点的标志，用以优化
+    this.componentOptions = componentOptions // 组件的option选项
+    this.componentInstance = undefined // 节点对应的组件的实例
+    this.parent = undefined // 节点的父节点
+    this.raw = false // 是否为原生HTML或只是普通文本，innerHTML的时候为true，textContent的时候为false
+    this.isStatic = false // 静态节点标志
+    this.isRootInsert = true // 是否作为根节点插入
+    this.isComment = false // 是否为注释节点
+    this.isCloned = false // 是否为克隆节点
+    this.isOnce = false // 是否有v-once指令
+    this.asyncFactory = asyncFactory // 异步组件工厂
+    this.asyncMeta = undefined //
+    this.isAsyncPlaceholder = false //
   }
 
   // DEPRECATED: alias for componentInstance for backwards compat.
@@ -70,17 +71,20 @@ export default class VNode {
   }
 }
 
+// 创建注释节点
 export const createEmptyVNode = (text: string = '') => {
   const node = new VNode()
   node.text = text
-  node.isComment = true
+  node.isComment = true // 为啥要标记为注释节点
   return node
 }
 
+// 创建文本节点
 export function createTextVNode (val: string | number) {
   return new VNode(undefined, undefined, undefined, String(val))
 }
 
+// 创建克隆节点，主要是为了做模板编译优化时使用
 // optimized shallow clone
 // used for static nodes and slot nodes because they may be reused across
 // multiple renders, cloning them avoids errors when DOM manipulations rely
@@ -100,13 +104,14 @@ export function cloneVNode (vnode: VNode, deep?: boolean): VNode {
   cloned.isStatic = vnode.isStatic
   cloned.key = vnode.key
   cloned.isComment = vnode.isComment
-  cloned.isCloned = true
+  cloned.isCloned = true // 标记为克隆
   if (deep && vnode.children) {
     cloned.children = cloneVNodes(vnode.children)
   }
   return cloned
 }
 
+// 创建克隆节点数组，一般是某个节点的子节点
 export function cloneVNodes (vnodes: Array<VNode>, deep?: boolean): Array<VNode> {
   const len = vnodes.length
   const res = new Array(len)

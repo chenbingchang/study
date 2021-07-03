@@ -19,6 +19,7 @@ export function isFalse (v: any): boolean %checks {
 }
 
 /**
+ * 检查数据是否是基本类型
  * Check if value is primitive
  */
 export function isPrimitive (value: any): boolean %checks {
@@ -60,10 +61,12 @@ export function isRegExp (v: any): boolean {
 }
 
 /**
+ * 检查val是否是有效的数组下标
  * Check if val is a valid array index.
  */
 export function isValidArrayIndex (val: any): boolean {
   const n = parseFloat(String(val))
+  // isFinite全局方法，判断是否是有限数字
   return n >= 0 && Math.floor(n) === n && isFinite(val)
 }
 
@@ -88,6 +91,7 @@ export function toNumber (val: string): number | string {
 }
 
 /**
+ * 创建映射，并且返回一个检查key是否在map中的函数
  * Make a map and return a function for checking if a key
  * is in that map.
  */
@@ -95,9 +99,9 @@ export function makeMap (
   str: string,
   expectsLowerCase?: boolean
 ): (key: string) => true | void {
-  const map = Object.create(null)
-  const list: Array<string> = str.split(',')
-  for (let i = 0; i < list.length; i++) {
+  const map = Object.create(null) // 创建映射对象
+  const list: Array<string> = str.split(',') // 逗号分割字符串
+  for (let i = 0; i < list.length; i++) { // map赋值
     map[list[i]] = true
   }
   return expectsLowerCase
