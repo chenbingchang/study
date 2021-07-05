@@ -29,6 +29,7 @@ import {
 
 export const emptyNode = new VNode('', {}, [])
 
+// 不知道这些对应哪些钩子
 const hooks = ['create', 'activate', 'update', 'remove', 'destroy']
 
 // 判断两个节点是否相同。a旧节点。b新节点
@@ -73,23 +74,27 @@ function createKeyToOldIdx (children, beginIdx, endIdx) {
   return map
 }
 
+// 创建path函数
 export function createPatchFunction (backend) {
   let i, j
+  // 回调钩子对象
   const cbs = {}
   /*
   代码中的nodeOps是Vue为了跨平台兼容性，对所有节点操作进行了封装，例如nodeOps.createTextNode()在浏览器端等同于document.createTextNode()
   */
   const { modules, nodeOps } = backend
 
+  // 保存钩子函数
   for (i = 0; i < hooks.length; ++i) {
-    cbs[hooks[i]] = []
+    cbs[hooks[i]] = [] // 一个钩子，一个数组
     for (j = 0; j < modules.length; ++j) {
       if (isDef(modules[j][hooks[i]])) {
-        cbs[hooks[i]].push(modules[j][hooks[i]])
+        cbs[hooks[i]].push(modules[j][hooks[i]]) // 保存到对应钩子数组
       }
     }
   }
 
+  // 创建子节点为空的节点
   function emptyNodeAt (elm) {
     return new VNode(nodeOps.tagName(elm).toLowerCase(), {}, [], undefined, elm)
   }
@@ -196,11 +201,14 @@ export function createPatchFunction (backend) {
     }
   }
 
+  // 创建组件
   function createComponent (vnode, insertedVnodeQueue, parentElm, refElm) {
     let i = vnode.data
     if (isDef(i)) {
+      // 有组件实例，并且是keepAlive
       const isReactivated = isDef(vnode.componentInstance) && i.keepAlive
       if (isDef(i = i.hook) && isDef(i = i.init)) {
+        // 初始化钩子
         i(vnode, false /* hydrating */, parentElm, refElm)
       }
       // after calling the init hook, if the vnode is a child component
@@ -217,11 +225,13 @@ export function createPatchFunction (backend) {
     }
   }
 
+  // 初始化组件
   function initComponent (vnode, insertedVnodeQueue) {
     if (isDef(vnode.data.pendingInsert)) {
       insertedVnodeQueue.push.apply(insertedVnodeQueue, vnode.data.pendingInsert)
       vnode.data.pendingInsert = null
     }
+    // 元素dom
     vnode.elm = vnode.componentInstance.$el
     if (isPatchable(vnode)) {
       invokeCreateHooks(vnode, insertedVnodeQueue)
@@ -284,6 +294,7 @@ export function createPatchFunction (backend) {
     }
   }
 
+  // 判断vnode能否path
   function isPatchable (vnode) {
     while (vnode.componentInstance) {
       vnode = vnode.componentInstance._vnode
@@ -303,6 +314,7 @@ export function createPatchFunction (backend) {
     }
   }
 
+  // 设置css的scoped
   // set scope id attribute for scoped CSS.
   // this is implemented as a special case to avoid the overhead
   // of going through the normal attribute patching process.

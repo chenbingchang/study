@@ -43,9 +43,9 @@ let platformGetTagNamespace
 type Attr = { name: string; value: string };
 
 export function createASTElement (
-  tag: string,
-  attrs: Array<Attr>,
-  parent: ASTElement | void
+  tag: string, // 标签名
+  attrs: Array<Attr>, // 属性
+  parent: ASTElement | void // 父级
 ): ASTElement {
   return {
     type: 1,
@@ -58,17 +58,19 @@ export function createASTElement (
 }
 
 /**
+ * 转换HTML字符串到AST(抽象语法树)
  * Convert HTML string to AST.
  */
 export function parse (
   template: string,
   options: CompilerOptions
 ): ASTElement | void {
+  // 警告
   warn = options.warn || baseWarn
 
-  platformIsPreTag = options.isPreTag || no
-  platformMustUseProp = options.mustUseProp || no
-  platformGetTagNamespace = options.getTagNamespace || no
+  platformIsPreTag = options.isPreTag || no // 是否是pre标签
+  platformMustUseProp = options.mustUseProp || no // 是否必须使用属性来绑定值
+  platformGetTagNamespace = options.getTagNamespace || no // 获取标签的命名空间
 
   transforms = pluckModuleFunction(options.modules, 'transformNode')
   preTransforms = pluckModuleFunction(options.modules, 'preTransformNode')
@@ -107,8 +109,8 @@ export function parse (
     isUnaryTag: options.isUnaryTag,
     canBeLeftOpenTag: options.canBeLeftOpenTag,
     shouldDecodeNewlines: options.shouldDecodeNewlines,
-    shouldKeepComment: options.comments,
-    // 开始标签
+    shouldKeepComment: options.comments, // 是否保留注释
+    // 开始标签。标签名tag；标签属性attrs；标签是否自闭合unary；
     start (tag, attrs, unary) {
       // check namespace.
       // inherit parent ns if there is one
@@ -120,6 +122,7 @@ export function parse (
         attrs = guardIESVGBug(attrs)
       }
 
+      // 创建抽象语法树
       let element: ASTElement = createASTElement(tag, attrs, currentParent)
       if (ns) {
         element.ns = ns
@@ -261,17 +264,17 @@ export function parse (
         ? isTextTag(currentParent) ? text : decodeHTMLCached(text)
         // only preserve whitespace if its not right after a starting tag
         : preserveWhitespace && children.length ? ' ' : ''
-      if (text) {
+      if (text) { // text是带变量的动态文本
         let expression
         if (!inVPre && text !== ' ' && (expression = parseText(text, delimiters))) {
           children.push({
-            type: 2,
+            type: 2, // 动态文本
             expression,
             text
           })
         } else if (text !== ' ' || !children.length || children[children.length - 1].text !== ' ') {
           children.push({
-            type: 3,
+            type: 3, // 静态文本
             text
           })
         }

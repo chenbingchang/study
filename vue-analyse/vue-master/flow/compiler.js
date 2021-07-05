@@ -71,15 +71,15 @@ declare type ASTNode = ASTElement | ASTText | ASTExpression;
 
 declare type ASTElement = {
   type: 1;
-  tag: string;
+  tag: string; // 标签名称
   attrsList: Array<{ name: string; value: string }>;
   attrsMap: { [key: string]: string | null };
-  parent: ASTElement | void;
-  children: Array<ASTNode>;
+  parent: ASTElement | void; // 父级节点
+  children: Array<ASTNode>; // 子级节点
 
   processed?: true;
 
-  static?: boolean;
+  static?: boolean; // 静态节点
   staticRoot?: boolean;
   staticInFor?: boolean;
   staticProcessed?: boolean;
@@ -101,32 +101,32 @@ declare type ASTElement = {
   scopedSlots?: { [name: string]: ASTElement };
 
   ref?: string;
-  refInFor?: boolean;
+  refInFor?: boolean; // for中的ref
 
-  if?: string;
+  if?: string; // v-if
   ifProcessed?: boolean;
   elseif?: string;
   else?: true;
   ifConditions?: ASTIfConditions;
 
-  for?: string;
+  for?: string; // v-for
   forProcessed?: boolean;
-  key?: string;
+  key?: string; // key
   alias?: string;
   iterator1?: string;
   iterator2?: string;
 
-  staticClass?: string;
-  classBinding?: string;
-  staticStyle?: string;
-  styleBinding?: string;
-  events?: ASTElementHandlers;
-  nativeEvents?: ASTElementHandlers;
+  staticClass?: string; // 静态类名
+  classBinding?: string; // 绑定类名
+  staticStyle?: string; // 静态样式
+  styleBinding?: string; // 绑定样式
+  events?: ASTElementHandlers; // 事件
+  nativeEvents?: ASTElementHandlers; // 原生事件
 
   transition?: string | true;
   transitionOnAppear?: boolean;
 
-  model?: {
+  model?: { // v-model
     value: string;
     callback: string;
     expression: string;
@@ -181,7 +181,7 @@ declare type SFCCustomBlock = {
   start?: number;
   end?: number;
   src?: string;
-  attrs: {[attribute:string]: string};
+  attrs: {[attribute: string]: string};
 };
 
 declare type SFCBlock = {

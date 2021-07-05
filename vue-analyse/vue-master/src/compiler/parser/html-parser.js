@@ -13,17 +13,17 @@ import { makeMap, no } from 'shared/util'
 import { isNonPhrasingTag } from 'web/compiler/util'
 
 // Regular Expressions for parsing tags and attributes
-const attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/
+const attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/ // 属性
 // could use https://www.w3.org/TR/1999/REC-xml-names-19990114/#NT-QName
 // but for Vue templates we can enforce a simple charset
 const ncname = '[a-zA-Z_][\\w\\-\\.]*'
-const qnameCapture = `((?:${ncname}\\:)?${ncname})`
-const startTagOpen = new RegExp(`^<${qnameCapture}`)
-const startTagClose = /^\s*(\/?)>/
-const endTag = new RegExp(`^<\\/${qnameCapture}[^>]*>`)
-const doctype = /^<!DOCTYPE [^>]+>/i
-const comment = /^<!--/
-const conditionalComment = /^<!\[/
+const qnameCapture = `((?:${ncname}\\:)?${ncname})` // 命名捕获
+const startTagOpen = new RegExp(`^<${qnameCapture}`) // 开始标签的起始
+const startTagClose = /^\s*(\/?)>/ // 开始标签的终点
+const endTag = new RegExp(`^<\\/${qnameCapture}[^>]*>`) // 结束标签
+const doctype = /^<!DOCTYPE [^>]+>/i // DOCTYPE
+const comment = /^<!--/ // 注释
+const conditionalComment = /^<!\[/ // 条件注释结尾，以 <![ 开头
 
 let IS_REGEX_CAPTURING_BROKEN = false
 'x'.replace(/x(.)?/g, function (m, g) {
@@ -55,9 +55,9 @@ function decodeAttr (value, shouldDecodeNewlines) {
 
 export function parseHTML (html, options) {
   const stack = [] // 维护AST节点层级的栈
-  const expectHTML = options.expectHTML
-  const isUnaryTag = options.isUnaryTag || no
-  const canBeLeftOpenTag = options.canBeLeftOpenTag || no //用来检测一个标签是否是可以省略闭合标签的非自闭合标签
+  const expectHTML = options.expectHTML // 预计是HTML
+  const isUnaryTag = options.isUnaryTag || no // 自闭标签映射
+  const canBeLeftOpenTag = options.canBeLeftOpenTag || no // 用来检测一个标签是否是可以省略闭合标签的非自闭合标签
   // 解析到的下标
   let index = 0
   // last：存储剩余还未解析的模板字符串; lastTag：存储着位于 stack 栈顶的元素
@@ -75,7 +75,7 @@ export function parseHTML (html, options) {
        * 开始标签:<div>
        * 结束标签:</div>
        * 注释:<!-- 我是注释 -->
-       * 条件注释:<!-- [if !IE] --> <!-- [endif] -->
+       * 条件注释:<!--[if !IE]> <![endif]-->
        * DOCTYPE:<!DOCTYPE html>
        * 需要一一去匹配尝试
        */
@@ -86,7 +86,7 @@ export function parseHTML (html, options) {
           const commentEnd = html.indexOf('-->')
 
           if (commentEnd >= 0) {
-            if (options.shouldKeepComment) {
+            if (options.shouldKeepComment) { // 是否保留注释
               options.comment(html.substring(4, commentEnd))
             }
             advance(commentEnd + 3)
@@ -166,13 +166,13 @@ export function parseHTML (html, options) {
         text = html.substring(0, textEnd)
         advance(textEnd)
       }
-      
+
       // 整个模板字符串里没有找到`<`,说明整个模板字符串都是文本
       if (textEnd < 0) {
         text = html
         html = ''
       }
-      
+
       // 把截取出来的text转化成textAST
       if (options.chars && text) {
         // 调用配置的字符串钩子
@@ -218,6 +218,7 @@ export function parseHTML (html, options) {
   // Clean up any remaining tags
   parseEndTag()
 
+  // 裁剪已经解析过的
   function advance (n) {
     index += n
     html = html.substring(n)
@@ -355,13 +356,13 @@ export function parseHTML (html, options) {
           options.end(stack[i].tag, start, end)
         }
       }
-      
+
       // 删除已经关闭的标签
       // Remove the open elements from the stack
       stack.length = pos
       lastTag = pos && stack[pos - 1].tag // 保存栈顶的标签名
     } else if (lowerCasedTagName === 'br') {
-      /* 
+      /*
       浏览器会自动把</br>标签解析为正常的 <br>标签，而对于</p>浏览器则自动将其补全为<p></p>，
       所以Vue为了与浏览器对这两个标签的行为保持一致，故对这两个便签单独判断处理
       */

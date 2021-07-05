@@ -10,14 +10,15 @@ export function createCompilerCreator (baseCompile: Function): Function {
       template: string,
       options?: CompilerOptions
     ): CompiledResult {
+      // 最终的配置
       const finalOptions = Object.create(baseOptions)
       const errors = []
       const tips = []
       finalOptions.warn = (msg, tip) => {
         (tip ? tips : errors).push(msg)
       }
-      
-      // 合并配置
+
+      // 合并配置，把用户自定义的和默认的配置进行合并
       if (options) {
         // merge custom modules
         if (options.modules) {
@@ -27,7 +28,7 @@ export function createCompilerCreator (baseCompile: Function): Function {
         // merge custom directives
         if (options.directives) {
           finalOptions.directives = extend(
-            Object.create(baseOptions.directives),
+            Object.create(baseOptions.directives), // 全局指令
             options.directives
           )
         }

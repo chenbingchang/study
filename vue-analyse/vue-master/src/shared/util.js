@@ -244,6 +244,7 @@ export function toObject (arr: Array<any>): Object {
 export function noop (a?: any, b?: any, c?: any) {}
 
 /**
+ * 总是返回false
  * Always return false.
  */
 export const no = (a?: any, b?: any, c?: any) => false
