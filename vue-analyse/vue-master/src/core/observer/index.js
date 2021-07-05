@@ -1,18 +1,18 @@
 /* @flow */
 
-import Dep from './dep'
-import VNode from '../vdom/vnode'
-import { arrayMethods } from './array'
 import {
   def,
-  warn,
+
   hasOwn,
   hasProto,
   isObject,
   isPlainObject,
-  isValidArrayIndex,
-  isServerRendering
+
+  isServerRendering, isValidArrayIndex, warn
 } from '../util/index'
+import VNode from '../vdom/vnode'
+import { arrayMethods } from './array'
+import Dep from './dep'
 
 // 获取arrayMethods属性名数组
 const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
@@ -48,7 +48,7 @@ export class Observer {
     */
     this.dep = new Dep() // 依赖收集
     this.vmCount = 0
-    def(value, '__ob__', this) // 添加"__ob__"属性
+    def(value, '__ob__', this) // 添加"__ob__"属性，指向observer实例
     if (Array.isArray(value)) {
       // 数组
       const augment = hasProto
@@ -65,6 +65,7 @@ export class Observer {
   }
 
   /**
+   * 监听值是对象时，遍历对象的属性变成getter/setter函数
    * Walk through each property and convert them into
    * getter/setters. This method should only be called when
    * value type is Object.
@@ -150,9 +151,9 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
  * 把对象的属性定义成响应式
  */
 export function defineReactive (
-  obj: Object,
-  key: string,
-  val: any,
+  obj: Object, // 对象
+  key: string, // 键
+  val: any, // 值
   customSetter?: ?Function,
   shallow?: boolean
 ) {
@@ -173,9 +174,9 @@ export function defineReactive (
     enumerable: true,
     configurable: true,
     get: function reactiveGetter () {
-      // 获取值
+      // 如果原来有getter则先执行
       const value = getter ? getter.call(obj) : val
-      // 如果有watcher在收集依赖项
+      // 如果当前watcher有值，则进行收集依赖
       if (Dep.target) {
         dep.depend() // 收集依赖
         // 如果值也是响应式，也进行收集依赖

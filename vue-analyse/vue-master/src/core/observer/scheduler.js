@@ -1,14 +1,12 @@
 /* @flow */
 
-import type Watcher from './watcher'
 import config from '../config'
-import { callHook, activateChildComponent } from '../instance/lifecycle'
-
+import { activateChildComponent, callHook } from '../instance/lifecycle'
 import {
-  warn,
-  nextTick,
-  devtools
+  devtools, nextTick, warn
 } from '../util/index'
+import type Watcher from './watcher'
+
 
 export const MAX_UPDATE_COUNT = 100
 
@@ -133,7 +131,7 @@ function callActivatedHooks (queue) {
 }
 
 /**
- * watcher队列
+ * watcher队列，确保同一个watcher只有一个
  * Push a watcher into the watcher queue.
  * Jobs with duplicate IDs will be skipped unless it's
  * pushed when the queue is being flushed.
