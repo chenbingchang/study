@@ -12,6 +12,11 @@
 import { makeMap, no } from 'shared/util'
 import { isNonPhrasingTag } from 'web/compiler/util'
 
+/*
+  匹配属性
+  比如：class="aa" checked  :key="item.id"
+  id='cc' style=""  xxx=yyy  id = 'aaa'
+*/
 // Regular Expressions for parsing tags and attributes
 const attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/ // 属性
 // could use https://www.w3.org/TR/1999/REC-xml-names-19990114/#NT-QName
@@ -41,15 +46,20 @@ const decodingMap = {
   '&amp;': '&',
   '&#10;': '\n'
 }
+// 转义的特殊字符
 const encodedAttr = /&(?:lt|gt|quot|amp);/g
+// &#10;   是换行
 const encodedAttrWithNewLines = /&(?:lt|gt|quot|amp|#10);/g
 
 // #5992
 const isIgnoreNewlineTag = makeMap('pre,textarea', true)
 const shouldIgnoreFirstNewline = (tag, html) => tag && isIgnoreNewlineTag(tag) && html[0] === '\n'
 
+// 解码属性
 function decodeAttr (value, shouldDecodeNewlines) {
+  // 需要转换的正则表达式
   const re = shouldDecodeNewlines ? encodedAttrWithNewLines : encodedAttr
+  // 把转义的字符替换成正常的值；match 是匹配的子串
   return value.replace(re, match => decodingMap[match])
 }
 
@@ -231,7 +241,7 @@ export function parseHTML (html, options) {
     if (start) {
       const match = {
         tagName: start[1], // 标签名
-        attrs: [], // 匹配到的属性数组
+        attrs: [], // 匹配到的属性数组，元素都是match结果
         start: index // 开始下标
       }
       advance(start[0].length)
@@ -256,7 +266,7 @@ export function parseHTML (html, options) {
        * 因此，我们可以通过end[1]是否是"/"来判断该标签是否是自闭合标签
        */
       if (end) {
-        match.unarySlash = end[1]
+        match.unarySlash = end[1] // 保存自闭合结果
         advance(end[0].length)
         match.end = index // 结束下标
 
@@ -268,32 +278,38 @@ export function parseHTML (html, options) {
   // 处理开始标签
   function handleStartTag (match) {
     const tagName = match.tagName // 开始标签的标签名
-    const unarySlash = match.unarySlash // 是否为自闭合标签的标志，自闭合为"",非自闭合为"/"
+    const unarySlash = match.unarySlash // 是否为自闭合标签的标志，自闭合为"/",非自闭合为""
 
+    // 如果HTML标签
     if (expectHTML) {
       if (lastTag === 'p' && isNonPhrasingTag(tagName)) {
         parseEndTag(lastTag)
       }
+      // 如果当前标签是可以省略结束标签，并且和当前标签相等
       if (canBeLeftOpenTag(tagName) && lastTag === tagName) {
-        parseEndTag(tagName)
+        parseEndTag(tagName) // 处理结束标签
       }
     }
 
-    const unary = isUnaryTag(tagName) || !!unarySlash // 布尔值，标志是否为自闭合标签
+    const unary = isUnaryTag(tagName) || !!unarySlash // 布尔值，标志是否为自闭合标签，如：link/img/input
 
     const l = match.attrs.length // match.attrs 数组的长度
     const attrs = new Array(l) // 一个与match.attrs数组长度相等的数组
     for (let i = 0; i < l; i++) {
       const args = match.attrs[i]
+      // 使用交替捕获多个匹配项的 Javascript 正则表达式将某些结果的捕获字段设置为未定义
       // hackish work around FF bug https://bugzilla.mozilla.org/show_bug.cgi?id=369778
       if (IS_REGEX_CAPTURING_BROKEN && args[0].indexOf('""') === -1) {
+        // 如果总的匹配中没有找到包裹的双引号，则把3/4/5中的空字符串清空
         if (args[3] === '') { delete args[3] }
         if (args[4] === '') { delete args[4] }
         if (args[5] === '') { delete args[5] }
       }
+      // 属性的值
       const value = args[3] || args[4] || args[5] || ''
       attrs[i] = {
-        name: args[1],
+        name: args[1], // 属性名称
+        // 属性值
         value: decodeAttr(
           value,
           options.shouldDecodeNewlines
@@ -302,7 +318,9 @@ export function parseHTML (html, options) {
     }
 
     if (!unary) {
+      // 不是自闭合标签。要放到AST节点层级中
       stack.push({ tag: tagName, lowerCasedTag: tagName.toLowerCase(), attrs: attrs })
+      // 栈顶元素
       lastTag = tagName
     }
 

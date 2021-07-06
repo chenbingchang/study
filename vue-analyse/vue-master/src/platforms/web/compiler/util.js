@@ -8,6 +8,7 @@ export const isUnaryTag = makeMap(
   'link,meta,param,source,track,wbr'
 )
 
+// 可以省略结束标签的元素
 // Elements that you can, intentionally, leave open
 // (and which close themselves)
 export const canBeLeftOpenTag = makeMap(

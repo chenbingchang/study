@@ -33,3 +33,12 @@ port2El.onclick = function() {
   port2.postMessage(["三体", '斗罗', '大陆'])
   console.log('点击port2El执行完成------@@@@@@')
 }
+
+let str = 'aabbcc gg wo'
+
+let newStr = str.replace(/aa|gg/g, match => {
+  console.log(match)
+  return "**"
+})
+
+console.log(newStr)
