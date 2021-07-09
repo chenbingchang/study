@@ -330,14 +330,15 @@ function processRawAttrs (el) {
 
 // 处理AST
 export function processElement (element: ASTElement, options: CompilerOptions) {
-  processKey(element)
+  processKey(element) // 处理key
 
+  // 在删除结构属性后确定此元素是否为普通元素
   // determine whether this is a plain element after
   // removing structural attributes
   element.plain = !element.key && !element.attrsList.length
 
-  processRef(element)
-  processSlot(element)
+  processRef(element) // 处理ref
+  processSlot(element) // 处理插槽相关
   processComponent(element)
   for (let i = 0; i < transforms.length; i++) {
     element = transforms[i](element, options) || element
@@ -345,7 +346,7 @@ export function processElement (element: ASTElement, options: CompilerOptions) {
   processAttrs(element)
 }
 
-// 处理key
+// 处理key属性
 function processKey (el) {
   // 获取绑定的key属性
   const exp = getBindingAttr(el, 'key')
@@ -358,11 +359,13 @@ function processKey (el) {
   }
 }
 
+// 处理ref属性
 function processRef (el) {
+  // 获取绑定的ref属性
   const ref = getBindingAttr(el, 'ref')
   if (ref) {
-    el.ref = ref
-    el.refInFor = checkInFor(el)
+    el.ref = ref // 保存表达式或值
+    el.refInFor = checkInFor(el) // 是否是v-for中的ref
   }
 }
 
@@ -469,9 +472,13 @@ function processOnce (el) {
   }
 }
 
+// 处理slot
 function processSlot (el) {
   if (el.tag === 'slot') {
+    // slot标签
+    // 获取绑定的name属性，即具名插槽
     el.slotName = getBindingAttr(el, 'name')
+    // 警告slot不能有key属性
     if (process.env.NODE_ENV !== 'production' && el.key) {
       warn(
         `\`key\` does not work on <slot> because slots are abstract outlets ` +
@@ -480,9 +487,13 @@ function processSlot (el) {
       )
     }
   } else {
+    // 不是slot标签
     let slotScope
     if (el.tag === 'template') {
+      // template标签
+      // 已抛弃的插槽作用域写法
       slotScope = getAndRemoveAttr(el, 'scope')
+      // template有scope属性警告，应该使用slot-scope
       /* istanbul ignore if */
       if (process.env.NODE_ENV !== 'production' && slotScope) {
         warn(
@@ -493,12 +504,16 @@ function processSlot (el) {
           true
         )
       }
+      // 插槽作用域
       el.slotScope = slotScope || getAndRemoveAttr(el, 'slot-scope')
     } else if ((slotScope = getAndRemoveAttr(el, 'slot-scope'))) {
+      // slot-scope属性，可以写在所有标签
       el.slotScope = slotScope
     }
+    // 目标插槽
     const slotTarget = getBindingAttr(el, 'slot')
     if (slotTarget) {
+      // 为空，则默认default
       el.slotTarget = slotTarget === '""' ? '"default"' : slotTarget
       // preserve slot as an attribute for native shadow DOM compat
       // only for non-scoped slots.
@@ -509,8 +524,10 @@ function processSlot (el) {
   }
 }
 
+// 处理内置组件Component
 function processComponent (el) {
   let binding
+  // 获取绑定is属性
   if ((binding = getBindingAttr(el, 'is'))) {
     el.component = binding
   }
@@ -598,12 +615,15 @@ function processAttrs (el) {
   }
 }
 
+// 检查AST是否在v-for指令中，从自己到顶级的父级都要查找
 function checkInFor (el: ASTElement): boolean {
   let parent = el
   while (parent) {
+    // for属性有值，表示有v-for
     if (parent.for !== undefined) {
       return true
     }
+    // 查找父级
     parent = parent.parent
   }
   return false

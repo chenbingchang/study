@@ -86,13 +86,13 @@ declare type ASTElement = {
   hasBindings?: boolean;
 
   text?: string;
-  attrs?: Array<{ name: string; value: string }>;
+  attrs?: Array<{ name: string; value: string }>; // 属性数组
   props?: Array<{ name: string; value: string }>;
   plain?: boolean; // 没有任何属性时标记
   pre?: true; // 是否是pre标签
   ns?: string; // 命名空间
 
-  component?: string;
+  component?: string; // 动态组件的is属性值
   inlineTemplate?: true;
   transitionMode?: string | null;
   slotName?: ?string;
@@ -103,13 +103,13 @@ declare type ASTElement = {
   ref?: string; // ref
   refInFor?: boolean; // for中的ref
 
-  if?: string; // v-if
+  if?: string; // v-if 表达式
   ifProcessed?: boolean;
-  elseif?: string; // v-elseif
+  elseif?: string; // v-elseif 表达式
   else?: true; // v-else
   ifConditions?: ASTIfConditions; // 条件表达式数组
 
-  for?: string; // v-for
+  for?: string; // v-for 循环的变量
   forProcessed?: boolean;
   key?: string; // key
   alias?: string; // 元素值，有可能是解构赋值

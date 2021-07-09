@@ -2,6 +2,7 @@
 
 import { parseFilters } from './parser/filter-parser'
 
+// 基本警告
 export function baseWarn (msg: string) {
   console.error(`[Vue compiler]: ${msg}`)
 }
@@ -16,14 +17,17 @@ export function pluckModuleFunction<F: Function> (
     : []
 }
 
+// 添加prop
 export function addProp (el: ASTElement, name: string, value: string) {
   (el.props || (el.props = [])).push({ name, value })
 }
 
+// 添加属性
 export function addAttr (el: ASTElement, name: string, value: string) {
   (el.attrs || (el.attrs = [])).push({ name, value })
 }
 
+// 添加指令
 export function addDirective (
   el: ASTElement,
   name: string,
