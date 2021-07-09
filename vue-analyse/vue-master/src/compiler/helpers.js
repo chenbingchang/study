@@ -6,6 +6,7 @@ export function baseWarn (msg: string) {
   console.error(`[Vue compiler]: ${msg}`)
 }
 
+// 采摘模块方法
 export function pluckModuleFunction<F: Function> (
   modules: ?Array<Object>,
   key: string
@@ -94,19 +95,24 @@ export function addHandler (
   }
 }
 
+// 获取绑定属性
 export function getBindingAttr (
   el: ASTElement,
   name: string,
   getStatic?: boolean
 ): ?string {
+  // 绑定属性比静态多了':'或者'v-bind:'
   const dynamicValue =
     getAndRemoveAttr(el, ':' + name) ||
     getAndRemoveAttr(el, 'v-bind:' + name)
   if (dynamicValue != null) {
+    // 解析过滤器
     return parseFilters(dynamicValue)
   } else if (getStatic !== false) {
+    // 没有绑定属性，并且没有指定必须获取静态属性，则默认获取静态属性
     const staticValue = getAndRemoveAttr(el, name)
     if (staticValue != null) {
+      // 从非绑定属性取的值要序列化，保证后面用的时候是一致的
       return JSON.stringify(staticValue)
     }
   }
@@ -123,7 +129,9 @@ export function getAndRemoveAttr (
 ): ?string {
   let val
   if ((val = el.attrsMap[name]) != null) {
+    // 有该属性
     const list = el.attrsList
+    // 遍历attrsList，找到并且删除
     for (let i = 0, l = list.length; i < l; i++) {
       if (list[i].name === name) {
         list.splice(i, 1)
@@ -131,6 +139,7 @@ export function getAndRemoveAttr (
       }
     }
   }
+  // 如果要从attrsMap中删除，则删除
   if (removeFromMap) {
     delete el.attrsMap[name]
   }

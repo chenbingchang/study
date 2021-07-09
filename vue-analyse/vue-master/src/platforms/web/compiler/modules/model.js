@@ -22,11 +22,16 @@ import {
   createASTElement
 } from 'compiler/parser/index'
 
+// @todo: 有些复杂，待深入
 function preTransformNode (el: ASTElement, options: CompilerOptions) {
   if (el.tag === 'input') {
+    // input标签
     const map = el.attrsMap
     if (map['v-model'] && (map['v-bind:type'] || map[':type'])) {
+      // 动态绑定input的type
+      // 绑定type
       const typeBinding: any = getBindingAttr(el, 'type')
+      // if
       const ifCondition = getAndRemoveAttr(el, 'v-if', true)
       const ifConditionExtra = ifCondition ? `&&(${ifCondition})` : ``
       // 1. checkbox
@@ -35,7 +40,7 @@ function preTransformNode (el: ASTElement, options: CompilerOptions) {
       processFor(branch0)
       addRawAttr(branch0, 'type', 'checkbox')
       processElement(branch0, options)
-      branch0.processed = true // prevent it from double-processed
+      branch0.processed = true // prevent it from double-processed    阻止被处理两次
       branch0.if = `type==='checkbox'` + ifConditionExtra
       addIfCondition(branch0, {
         exp: branch0.if,
@@ -64,10 +69,12 @@ function preTransformNode (el: ASTElement, options: CompilerOptions) {
   }
 }
 
+// 克隆AST
 function cloneASTElement (el) {
   return createASTElement(el.tag, el.attrsList.slice(), el.parent)
 }
 
+// AST添加属性
 function addRawAttr (el, name, value) {
   el.attrsMap[name] = value
   el.attrsList.push({ name, value })

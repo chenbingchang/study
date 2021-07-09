@@ -19,10 +19,10 @@ import {
   pluckModuleFunction
 } from '../helpers'
 
-export const onRE = /^@|^v-on:/
-export const dirRE = /^v-|^@|^:/
-export const forAliasRE = /(.*?)\s+(?:in|of)\s+(.*)/
-export const forIteratorRE = /\((\{[^}]*\}|[^,]*),([^,]*)(?:,([^,]*))?\)/
+export const onRE = /^@|^v-on:/ // 事件绑定属性
+export const dirRE = /^v-|^@|^:/ // 指令、事件、绑定值
+export const forAliasRE = /(.*?)\s+(?:in|of)\s+(.*)/ // v-for别名正则，非贪婪?只能出现在*或+后面
+export const forIteratorRE = /\((\{[^}]*\}|[^,]*),([^,]*)(?:,([^,]*))?\)/ // 迭代正则，每次循环的变量
 
 const argRE = /:(.*)$/ // 参数正则
 const bindRE = /^:|^v-bind:/ // bind正则
@@ -72,6 +72,7 @@ export function parse (
   platformMustUseProp = options.mustUseProp || no // 是否必须使用属性来绑定值
   platformGetTagNamespace = options.getTagNamespace || no // 获取标签的命名空间
 
+  // 截取各模块对应的函数放到数组里面
   transforms = pluckModuleFunction(options.modules, 'transformNode')
   preTransforms = pluckModuleFunction(options.modules, 'preTransformNode')
   postTransforms = pluckModuleFunction(options.modules, 'postTransformNode')
@@ -80,12 +81,13 @@ export function parse (
 
   const stack = []
   const preserveWhitespace = options.preserveWhitespace !== false
-  let root
-  let currentParent
-  let inVPre = false
-  let inPre = false
-  let warned = false
+  let root // 根结点
+  let currentParent // 当前的父级
+  let inVPre = false // AST是否有v-pre指令，有的话可以跳过编译
+  let inPre = false // AST是否是pre标签，pre标签里面的内容需要原样输出
+  let warned = false // 是否有警告
 
+  // 只警告一次
   function warnOnce (msg) {
     if (!warned) {
       warned = true
@@ -112,10 +114,12 @@ export function parse (
     shouldKeepComment: options.comments, // 是否保留注释
     // 开始标签。标签名tag；标签属性attrs；标签是否自闭合unary；
     start (tag, attrs, unary) {
+      // 标签的命名空间
       // check namespace.
       // inherit parent ns if there is one
       const ns = (currentParent && currentParent.ns) || platformGetTagNamespace(tag)
 
+      // 处理IE svg的bug
       // handle IE svg bug
       /* istanbul ignore if */
       if (isIE && ns === 'svg') {
@@ -128,6 +132,7 @@ export function parse (
         element.ns = ns
       }
 
+      // 不解析的标签style/script
       if (isForbiddenTag(element) && !isServerRendering()) {
         element.forbidden = true
         process.env.NODE_ENV !== 'production' && warn(
@@ -137,27 +142,32 @@ export function parse (
         )
       }
 
+      // 预转换
       // apply pre-transforms
       for (let i = 0; i < preTransforms.length; i++) {
         element = preTransforms[i](element, options) || element
       }
 
       if (!inVPre) {
+        // 判断是否有v-pre指令
         processPre(element)
         if (element.pre) {
           inVPre = true
         }
       }
+      // 是否是pre标签
       if (platformIsPreTag(element.tag)) {
         inPre = true
       }
+      // 如果有v-pre指令，处理原始属性
       if (inVPre) {
         processRawAttrs(element)
       } else if (!element.processed) {
-        // structural directives
-        processFor(element)
-        processIf(element)
-        processOnce(element)
+        // 如果没有被处理过，则处理
+        // structural directives  结构指令
+        processFor(element) // v-for
+        processIf(element) // v-if
+        processOnce(element) // v-once
         // element-scope stuff
         processElement(element, options)
       }
@@ -292,15 +302,18 @@ export function parse (
   return root
 }
 
+// 处理v-pre指令。v-pre表示跳过这个元素和它的子元素的编译过程。可以用来显示原始 Mustache 标签
 function processPre (el) {
   if (getAndRemoveAttr(el, 'v-pre') != null) {
-    el.pre = true
+    el.pre = true // 标记是pre标签
   }
 }
 
+// 处理原始属性
 function processRawAttrs (el) {
   const l = el.attrsList.length
   if (l) {
+    // 从attrsList属性，移到attrs属性
     const attrs = el.attrs = new Array(l)
     for (let i = 0; i < l; i++) {
       attrs[i] = {
@@ -309,11 +322,13 @@ function processRawAttrs (el) {
       }
     }
   } else if (!el.pre) {
+    // 没有任何属性，则标记简单
     // non root node in pre blocks with no attributes
     el.plain = true
   }
 }
 
+// 处理AST
 export function processElement (element: ASTElement, options: CompilerOptions) {
   processKey(element)
 
@@ -330,13 +345,16 @@ export function processElement (element: ASTElement, options: CompilerOptions) {
   processAttrs(element)
 }
 
+// 处理key
 function processKey (el) {
+  // 获取绑定的key属性
   const exp = getBindingAttr(el, 'key')
   if (exp) {
+    // 警告，template中的key
     if (process.env.NODE_ENV !== 'production' && el.tag === 'template') {
       warn(`<template> cannot be keyed. Place the key on real elements instead.`)
     }
-    el.key = exp
+    el.key = exp // 保存表达式或值
   }
 }
 
@@ -348,46 +366,57 @@ function processRef (el) {
   }
 }
 
+// 处理v-for指令
 export function processFor (el: ASTElement) {
   let exp
+  // 获取v-for属性值
   if ((exp = getAndRemoveAttr(el, 'v-for'))) {
     const inMatch = exp.match(forAliasRE)
     if (!inMatch) {
+      // 没有匹配，警告，返回
       process.env.NODE_ENV !== 'production' && warn(
         `Invalid v-for expression: ${exp}`
       )
       return
     }
-    el.for = inMatch[2].trim()
+    el.for = inMatch[2].trim() // 循环的变量
+    // 每项的别名，如(item, index, arr)、item、({name, age, desc}, index, arr)
     const alias = inMatch[1].trim()
     const iteratorMatch = alias.match(forIteratorRE)
     if (iteratorMatch) {
-      el.alias = iteratorMatch[1].trim()
-      el.iterator1 = iteratorMatch[2].trim()
+      // 匹配成功
+      el.alias = iteratorMatch[1].trim() // 元素值，有可能是解构赋值
+      el.iterator1 = iteratorMatch[2].trim() // 元素下标
       if (iteratorMatch[3]) {
-        el.iterator2 = iteratorMatch[3].trim()
+        el.iterator2 = iteratorMatch[3].trim() // 元素所在的数组
       }
     } else {
+      // 匹配失败，则只有一个参数即元素值
       el.alias = alias
     }
   }
 }
 
+// 处理v-if指令
 function processIf (el) {
+  // 获取v-if属性值
   const exp = getAndRemoveAttr(el, 'v-if')
   if (exp) {
-    el.if = exp
+    // 有v-if
+    el.if = exp // 保存表达式
     addIfCondition(el, {
       exp: exp,
       block: el
     })
   } else {
+    // 判断是否是v-else
     if (getAndRemoveAttr(el, 'v-else') != null) {
-      el.else = true
+      el.else = true // 标记v-else
     }
+    // 获取v-else-if
     const elseif = getAndRemoveAttr(el, 'v-else-if')
     if (elseif) {
-      el.elseif = elseif
+      el.elseif = elseif // 保存表达式
     }
   }
 }
@@ -424,13 +453,15 @@ function findPrevElement (children: Array<any>): ASTElement | void {
   }
 }
 
+// 添加if条件
 export function addIfCondition (el: ASTElement, condition: ASTIfCondition) {
   if (!el.ifConditions) {
-    el.ifConditions = []
+    el.ifConditions = [] // 初始化
   }
-  el.ifConditions.push(condition)
+  el.ifConditions.push(condition) // 保存到数组
 }
 
+// 处理v-once指令。只渲染元素和组件一次
 function processOnce (el) {
   const once = getAndRemoveAttr(el, 'v-once')
   if (once != null) {
@@ -590,15 +621,18 @@ function parseModifiers (name: string): Object | void {
   }
 }
 
+// 创建属性的map
 function makeAttrsMap (attrs: Array<Object>): Object {
   const map = {}
   for (let i = 0, l = attrs.length; i < l; i++) {
+    // 重复属性警告
     if (
       process.env.NODE_ENV !== 'production' &&
       map[attrs[i].name] && !isIE && !isEdge
     ) {
       warn('duplicate attribute: ' + attrs[i].name)
     }
+    // key为属性名，value为属性值
     map[attrs[i].name] = attrs[i].value
   }
   return map
@@ -609,10 +643,11 @@ function isTextTag (el): boolean {
   return el.tag === 'script' || el.tag === 'style'
 }
 
+// 是否是禁止标签
 function isForbiddenTag (el): boolean {
   return (
-    el.tag === 'style' ||
-    (el.tag === 'script' && (
+    el.tag === 'style' || // style标签
+    (el.tag === 'script' && ( // script标签并且是js语言
       !el.attrsMap.type ||
       el.attrsMap.type === 'text/javascript'
     ))

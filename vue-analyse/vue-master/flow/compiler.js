@@ -88,9 +88,9 @@ declare type ASTElement = {
   text?: string;
   attrs?: Array<{ name: string; value: string }>;
   props?: Array<{ name: string; value: string }>;
-  plain?: boolean;
-  pre?: true;
-  ns?: string;
+  plain?: boolean; // 没有任何属性时标记
+  pre?: true; // 是否是pre标签
+  ns?: string; // 命名空间
 
   component?: string;
   inlineTemplate?: true;
@@ -100,21 +100,21 @@ declare type ASTElement = {
   slotScope?: ?string;
   scopedSlots?: { [name: string]: ASTElement };
 
-  ref?: string;
+  ref?: string; // ref
   refInFor?: boolean; // for中的ref
 
   if?: string; // v-if
   ifProcessed?: boolean;
-  elseif?: string;
-  else?: true;
-  ifConditions?: ASTIfConditions;
+  elseif?: string; // v-elseif
+  else?: true; // v-else
+  ifConditions?: ASTIfConditions; // 条件表达式数组
 
   for?: string; // v-for
   forProcessed?: boolean;
   key?: string; // key
-  alias?: string;
-  iterator1?: string;
-  iterator2?: string;
+  alias?: string; // 元素值，有可能是解构赋值
+  iterator1?: string; // 元素下标
+  iterator2?: string; // 元素所在的数组
 
   staticClass?: string; // 静态类名
   classBinding?: string; // 绑定类名
@@ -127,8 +127,8 @@ declare type ASTElement = {
   transitionOnAppear?: boolean;
 
   model?: { // v-model
-    value: string;
-    callback: string;
+    value: string; // 初始化
+    callback: string; // 更新回调
     expression: string;
   };
 

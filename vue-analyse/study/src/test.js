@@ -34,11 +34,38 @@ port2El.onclick = function() {
   console.log('点击port2El执行完成------@@@@@@')
 }
 
-let str = 'aabbcc gg wo'
+// function A () {
 
-let newStr = str.replace(/aa|gg/g, match => {
-  console.log(match)
-  return "**"
-})
+// }
 
-console.log(newStr)
+// A.prototype.n = 1
+
+// var b = new A()
+
+// A.prototype = {
+//   n: 2,
+//   m: 3
+// }
+
+// var c = new A()
+// console.log(b.n, b.m, c.n, c.m)
+
+
+// var F = function() {}
+// Object.prototype.a = function() {
+//   console.log('a()')
+// }
+// Function.prototype.b = function() {
+//   console.log('b()')
+// }
+
+// var f = new F()
+
+// f.a()
+// f.b()
+// F.a()
+// F.b()
+
+let str = "啊"
+
+console.log('啊', str.codePointAt(0))
