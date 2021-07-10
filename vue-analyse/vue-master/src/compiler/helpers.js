@@ -29,22 +29,23 @@ export function addAttr (el: ASTElement, name: string, value: string) {
 
 // 添加指令
 export function addDirective (
-  el: ASTElement,
-  name: string,
-  rawName: string,
-  value: string,
-  arg: ?string,
-  modifiers: ?ASTModifiers
+  el: ASTElement, // AST
+  name: string, // 属性名，如slot
+  rawName: string, // 解析时完整的属性名，如v-slot
+  value: string, // 属性值
+  arg: ?string, // 指令的参数
+  modifiers: ?ASTModifiers // 指令的修饰符
 ) {
   (el.directives || (el.directives = [])).push({ name, rawName, value, arg, modifiers })
 }
 
+// 添加事件(v-on)
 export function addHandler (
-  el: ASTElement,
-  name: string,
-  value: string,
-  modifiers: ?ASTModifiers,
-  important?: boolean,
+  el: ASTElement, // AST
+  name: string, // 事件名称
+  value: string, // 处理函数
+  modifiers: ?ASTModifiers, // 修饰符
+  important?: boolean, // 重要性，多个相同事件的调用顺序
   warn?: Function
 ) {
   // warn prevent and passive modifier
@@ -78,9 +79,9 @@ export function addHandler (
   // 判断是否是原生事件，原生事件和非原生事件分开存放
   if (modifiers && modifiers.native) {
     delete modifiers.native
-    events = el.nativeEvents || (el.nativeEvents = {})
+    events = el.nativeEvents || (el.nativeEvents = {}) // 原生事件
   } else {
-    events = el.events || (el.events = {})
+    events = el.events || (el.events = {}) // 非原生事件
   }
   // 新的处理对象
   const newHandler = { value, modifiers }
@@ -122,6 +123,7 @@ export function getBindingAttr (
   }
 }
 
+// 获取属性，并且从attrsList中删除
 // note: this only removes the attr from the Array (attrsList) so that it
 // doesn't get processed by processAttrs.
 // By default it does NOT remove it from the map (attrsMap) because the map is

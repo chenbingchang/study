@@ -79,7 +79,7 @@ export function parse (
 
   delimiters = options.delimiters
 
-  const stack = []
+  const stack = [] // AST堆栈
   const preserveWhitespace = options.preserveWhitespace !== false
   let root // 根结点
   let currentParent // 当前的父级
@@ -169,9 +169,10 @@ export function parse (
         processIf(element) // v-if
         processOnce(element) // v-once
         // element-scope stuff
-        processElement(element, options)
+        processElement(element, options) // 处理DOM相关的数据
       }
 
+      // 检查根节点约束
       function checkRootConstraints (el) {
         if (process.env.NODE_ENV !== 'production') {
           if (el.tag === 'slot' || el.tag === 'template') {
@@ -189,11 +190,13 @@ export function parse (
         }
       }
 
-      // tree management
+      // tree management 根节点
       if (!root) {
+        // 没有根节点，则当前的元素就是根节点
         root = element
         checkRootConstraints(root)
       } else if (!stack.length) {
+        // !stack.length  @todo: 这里有点懵
         // allow root elements with v-if, v-else-if and v-else
         if (root.if && (element.elseif || element.else)) {
           checkRootConstraints(element)
@@ -221,9 +224,10 @@ export function parse (
           element.parent = currentParent
         }
       }
+      // 如果没有闭合
       if (!unary) {
-        currentParent = element
-        stack.push(element)
+        currentParent = element // 当前父级指向  当前节点
+        stack.push(element) // 添加到堆栈
       } else {
         endPre(element)
       }
@@ -339,11 +343,12 @@ export function processElement (element: ASTElement, options: CompilerOptions) {
 
   processRef(element) // 处理ref
   processSlot(element) // 处理插槽相关
-  processComponent(element)
+  processComponent(element) // 处理内置组件Component
+  // 遍历调用所有的转换对AST进行处理
   for (let i = 0; i < transforms.length; i++) {
     element = transforms[i](element, options) || element
   }
-  processAttrs(element)
+  processAttrs(element) // 处理属性数组
 }
 
 // 处理key属性
@@ -529,77 +534,88 @@ function processComponent (el) {
   let binding
   // 获取绑定is属性
   if ((binding = getBindingAttr(el, 'is'))) {
-    el.component = binding
+    el.component = binding // 保存表达式或值
   }
+  // 内联模板
   if (getAndRemoveAttr(el, 'inline-template') != null) {
-    el.inlineTemplate = true
+    el.inlineTemplate = true // 标记是内联模板
   }
 }
 
 // 处理属性数组
 function processAttrs (el) {
-  const list = el.attrsList
+  const list = el.attrsList // 属性列表
   let i, l, name, rawName, value, modifiers, isProp
   for (i = 0, l = list.length; i < l; i++) {
-    name = rawName = list[i].name
-    value = list[i].value
-    // 判断属性是否是指令
+    name = rawName = list[i].name // 属性名
+    value = list[i].value // 属性值
+    // 判断属性名是否是指令、事件、绑定值
     if (dirRE.test(name)) {
-      // 指令属性
+      // 指令、事件、绑定值属性
       // mark element as dynamic  将元素标记为动态
       el.hasBindings = true
-      // modifiers
+      // modifiers  修饰符对象
       modifiers = parseModifiers(name)
       if (modifiers) {
         name = name.replace(modifierRE, '') // 去掉修饰符
       }
-      if (bindRE.test(name)) { // v-bind
-        name = name.replace(bindRE, '')
-        value = parseFilters(value)
+      if (bindRE.test(name)) { // v-bind指令
+        name = name.replace(bindRE, '') // 去掉v-bind指令的特征
+        value = parseFilters(value) // 属性值需要解析过滤器
         isProp = false
+        // 是否有修饰符
         if (modifiers) {
+          // v-bind .prop修饰符，作为一个 DOM property 绑定而不是作为 attribute 绑定
           if (modifiers.prop) {
             isProp = true
-            name = camelize(name)
+            name = camelize(name) // 驼峰命名
+            // innerHtml特殊处理，保证和DOM的属性一致
             if (name === 'innerHtml') name = 'innerHTML'
           }
+          // .camel 是否转为驼峰命名
           if (modifiers.camel) {
             name = camelize(name)
           }
+          // .sync  语法糖，会扩展成一个更新父组件绑定值的 v-on 侦听器
           if (modifiers.sync) {
             addHandler(
               el,
-              `update:${camelize(name)}`,
-              genAssignmentCode(value, `$event`)
+              `update:${camelize(name)}`, // 事件名称
+              genAssignmentCode(value, `$event`) // 回调函数体字符串，注意是函数体
             )
           }
         }
+        // 判断是否是.prop修饰符
         if (isProp || (
           !el.component && platformMustUseProp(el.tag, el.attrsMap.type, name)
         )) {
           addProp(el, name, value)
         } else {
+          // 添加属性
           addAttr(el, name, value)
         }
       } else if (onRE.test(name)) { // v-on
-        name = name.replace(onRE, '')
+        name = name.replace(onRE, '') // 去掉v-on指令的特征
+        // 添加事件
         addHandler(el, name, value, modifiers, false, warn)
-      } else { // normal directives
+      } else { // normal directives  正常指令（非v-bind、非v-on）
         name = name.replace(dirRE, '')
-        // parse arg
+        // parse arg  解析参数
         const argMatch = name.match(argRE)
-        const arg = argMatch && argMatch[1]
+        const arg = argMatch && argMatch[1] // 参数名称
         if (arg) {
-          name = name.slice(0, -(arg.length + 1))
+          name = name.slice(0, -(arg.length + 1)) // 去掉参数后的属性名称
         }
+        // 添加指令
         addDirective(el, name, rawName, value, arg, modifiers)
         if (process.env.NODE_ENV !== 'production' && name === 'model') {
           checkForAliasModel(el, value)
         }
       }
     } else {
-      // literal attribute
+      // literal attribute  文字属性
       if (process.env.NODE_ENV !== 'production') {
+        // 字符串不能包含在   {{}}  中
         const expression = parseText(value, delimiters)
         if (expression) {
           warn(
@@ -610,6 +626,7 @@ function processAttrs (el) {
           )
         }
       }
+      // 文字属性，直接添加属性
       addAttr(el, name, JSON.stringify(value))
     }
   }
@@ -690,6 +707,7 @@ function guardIESVGBug (attrs) {
   return res
 }
 
+// el同时存在v-for和v-model，如果v-for的元素值的变量名和 v-model的变量名相同，则警告
 function checkForAliasModel (el, value) {
   let _el = el
   while (_el) {

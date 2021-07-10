@@ -72,12 +72,12 @@ declare type ASTNode = ASTElement | ASTText | ASTExpression;
 declare type ASTElement = {
   type: 1;
   tag: string; // 标签名称
-  attrsList: Array<{ name: string; value: string }>;
-  attrsMap: { [key: string]: string | null };
+  attrsList: Array<{ name: string; value: string }>; // 解析模板时的保存的属性列表
+  attrsMap: { [key: string]: string | null }; // attrsList的映射对象
   parent: ASTElement | void; // 父级节点
   children: Array<ASTNode>; // 子级节点
 
-  processed?: true;
+  processed?: true; // 是否已经处理
 
   static?: boolean; // 静态节点
   staticRoot?: boolean;
@@ -87,7 +87,7 @@ declare type ASTElement = {
 
   text?: string;
   attrs?: Array<{ name: string; value: string }>; // 属性数组
-  props?: Array<{ name: string; value: string }>;
+  props?: Array<{ name: string; value: string }>; // 元素的property。.prop修饰符
   plain?: boolean; // 没有任何属性时标记
   pre?: true; // 是否是pre标签
   ns?: string; // 命名空间
@@ -132,7 +132,7 @@ declare type ASTElement = {
     expression: string;
   };
 
-  directives?: Array<ASTDirective>;
+  directives?: Array<ASTDirective>; // 除v-on/v-bind外的指令数组
 
   forbidden?: true;
   once?: true;

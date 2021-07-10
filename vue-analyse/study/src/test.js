@@ -34,38 +34,14 @@ port2El.onclick = function() {
   console.log('点击port2El执行完成------@@@@@@')
 }
 
-// function A () {
+const mustUseProp = (tag, type, attr) => {
+  return (
+    (attr === 'value' && tag === 'input') && type !== 'button' ||
+    (attr === 'selected' && tag === 'option') ||
+    (attr === 'checked' && tag === 'input') ||
+    (attr === 'muted' && tag === 'video')
+  )
+}
 
-// }
-
-// A.prototype.n = 1
-
-// var b = new A()
-
-// A.prototype = {
-//   n: 2,
-//   m: 3
-// }
-
-// var c = new A()
-// console.log(b.n, b.m, c.n, c.m)
-
-
-// var F = function() {}
-// Object.prototype.a = function() {
-//   console.log('a()')
-// }
-// Function.prototype.b = function() {
-//   console.log('b()')
-// }
-
-// var f = new F()
-
-// f.a()
-// f.b()
-// F.a()
-// F.b()
-
-let str = "啊"
-
-console.log('啊', str.codePointAt(0))
+console.log(mustUseProp('input', 'text', 'value'));
+console.log(mustUseProp('input', 'button', 'value'));
