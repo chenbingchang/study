@@ -18,85 +18,38 @@
     </style>
   </head>
   <body>
-    <div id="wrap">
-      你这很暴力啊
-      <!-- <div>
-        aaaa你好可爱啊
-      </div>
-      <strong>你是谁</strong>
-      <div>
-        <div>暴力</div>
-      </div> -->
-    </div>
-
-    <div id="result"></div>
+    <div id="wrap">你这很暴力啊</div>
 
     <script>
-      const wrapEl = document.querySelector('#wrap')
-      const resultEl = document.querySelector('#result')
-      let wordsReg = /(黄色)|(色情)|(妈的)|(暴力)/;
+      const webSocket = new WebSocket("ws://47.91.220.207:31793")
 
-      let resultHtml = replaceWord(wrapEl, wordsReg, "")
-
-      resultEl.innerHTML = resultHtml
-      /* 
-      RegExp.exec()   
-      RegExp.test()   测试一个字符是否满足正则表达式
-
-
-
-
-      String.replace()    字符串替换
-      String.match()    字符串匹配
-      */
-      function replaceWord(el, wordsReg, result) {
-        for (let i = 0; i < el.childNodes.length; i++) {
-          let child = el.childNodes[i];
-
-          if (child.nodeType === Node.TEXT_NODE) {
-            // 文本节点
-            let text = child.textContent // 文本内容
-            // 匹配结果
-            let matchResult 
-
-            do {
-              matchResult = text.match(wordsReg)
-
-              if(matchResult) {
-                // 匹配成功
-                // 匹配的全内容
-                let matchText = matchResult[0]
-
-                // 匹配的前面一段文字
-                result += text.substring(0, matchResult.index)
-                // 匹配的html字符串
-                result += markWord(matchText)
-                // 把已经处理的字符串截取掉
-                text = text.slice(matchResult.index + matchText.length)
-              } else {
-                // 匹配失败，则所有都是合法字符，不用标红
-                result += text
-                text = null
-              }
-            } while (text);
-          } else {
-            // 元素节点
-            
-          }
-        }
-
-        return result
+      webSocket.onclose = function (e) {
+        console.log("webSocket.onclose事件", new Date().toLocaleTimeString())
       }
 
-      // 标记敏感词
-      function markWord(word) {
-        return `<span class="fastbull-word-red">${word}</span>`
+      setTimeout(() => {
+        console.log("第1次触发close")
+        manualClose()
+      }, 5000)
+      setTimeout(() => {
+        console.log('第2次触发close')
+        manualClose()
+      }, 7000)
+      setTimeout(() => {
+        console.log('第3次触发close')
+        manualClose()
+      }, 9000)
+
+      function manualClose() {
+        webSocket.close()
+        
+        // if (webSocket.readyState === WebSocket.OPEN) {
+        //   console.log("打开中，手动关闭")
+        //   webSocket.close()
+        // } else {
+        //   console.log("已经关闭，不用再关闭")
+        // }
       }
     </script>
-    <style>
-      span.fastbull-word-red {
-        color: red;
-      }
-    </style>
   </body>
 </html>

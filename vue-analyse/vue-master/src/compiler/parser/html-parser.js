@@ -53,6 +53,7 @@ const encodedAttrWithNewLines = /&(?:lt|gt|quot|amp|#10);/g
 
 // #5992
 const isIgnoreNewlineTag = makeMap('pre,textarea', true)
+// pre/textarea标签会忽略开始标签后的换行
 const shouldIgnoreFirstNewline = (tag, html) => tag && isIgnoreNewlineTag(tag) && html[0] === '\n'
 
 // 解码属性
@@ -201,13 +202,15 @@ export function parseHTML (html, options) {
             .replace(/<!--([\s\S]*?)-->/g, '$1')
             .replace(/<!\[CDATA\[([\s\S]*?)]]>/g, '$1')
         }
+        // 应该忽略第一行，\n是一个字符
         if (shouldIgnoreFirstNewline(stackedTag, text)) {
           text = text.slice(1)
         }
         if (options.chars) {
+          // 调用chars创建文本AST
           options.chars(text)
         }
-        return ''
+        return '' // 替换掉
       })
       index += html.length - rest.length
       html = rest

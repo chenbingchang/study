@@ -35,8 +35,7 @@ const resolve = p => {
   }
 }
 
-
-/* 
+/*
 不同打包方式，的入口、出口不一样
 web / weex 不同的平台
 Runtime only / Runtime + compiler 是否带编译模块
@@ -180,7 +179,7 @@ function genConfig (name) {
   const opts = builds[name]
   const config = {
     input: opts.entry,
-    sourceMap: true,
+    sourceMap: true, // 为了调试，加的配置
     external: opts.external,
     plugins: [
       replace({

@@ -5,15 +5,16 @@ import { parseFilters } from './filter-parser'
 
 // 默认的文本变量匹配表达式
 const defaultTagRE = /\{\{((?:.|\n)+?)\}\}/g
-const regexEscapeRE = /[-.*+?^${}()|[\]\/\\]/g
+const regexEscapeRE = /[-.*+?^${}()|[\]\/\\]/g // 正则表达式需要转义的字符
 
 // 构建变量的正则表达式
 const buildRegex = cached(delimiters => {
-  const open = delimiters[0].replace(regexEscapeRE, '\\$&')
+  const open = delimiters[0].replace(regexEscapeRE, '\\$&') // 把需要转义的字符转义，加多'\\'
   const close = delimiters[1].replace(regexEscapeRE, '\\$&')
-  return new RegExp(open + '((?:.|\\n)+?)' + close, 'g')
+  return new RegExp(open + '((?:.|\\n)+?)' + close, 'g') // 开始和结束之间包裹   任意内容或者换行，非贪婪
 })
 
+// 解析文本
 export function parseText (
   text: string,
   delimiters?: [string, string]
@@ -30,14 +31,14 @@ export function parseText (
   let match, index
   // 循环匹配文本中的变量
   while ((match = tagRE.exec(text))) {
-    index = match.index
+    index = match.index // 匹配到的字符位于原始字符串的基于0的索引值
     // push text token
     if (index > lastIndex) {
       // 先把'{{'前面的文本放入tokens中
       tokens.push(JSON.stringify(text.slice(lastIndex, index)))
     }
     // tag token
-    // 取出'{{ }}'中间的变量exp
+    // 取出'{{ }}'中间的变量exp，并且解析过滤器
     const exp = parseFilters(match[1].trim())
     // 把变量exp改成_s(exp)形式也放入tokens中
     tokens.push(`_s(${exp})`)

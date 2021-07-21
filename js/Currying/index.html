@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    function curring(fn) {
+      let allArg = []
+
+      function next() {
+        let args = Array.prototype.slice.apply(arguments)
+
+        if(args.length > 0) {
+          allArg = allArg.concat(args)
+          return next
+        } else {
+          return fn.apply(null, allArg)
+        }
+      }
+
+      return next
+    }
+
+    // Function
+    // Function.prototype.call.apply(self, arguments)
+
+    // Function.prototype.call  的this指向self
+    // Function.prototype.call(arguments)
+    
+
+    function foo(desc) {
+      this.desc = desc
+      console.log(this.desc)
+    }
+
+    // Function.prototype.call(foo)
+
+    foo('测试描述')
+
+    let obj = {
+      desc: "这是一个地址"
+    }
+
+    foo.call(obj, '绑定this')
+    console.log('---------------')
+    console.log(obj)
+    console.log(foo.call === Function.prototype.call)
+
+    // Function.prototype.call的上下文this就是将要调用的函数
+
+    function myCall(arguments) {
+      this
+      
+
+      this(arguments[1-n])
+    }
+
+    // Function.prototype.call.apply(foo, arguments)
+    /* 
+    Function.prototype.call 运行时上下文指向  foo  函数
+    Function.prototype.call(arguments)
+
+    Function.prototype.call(arguments)   在运行
+    */
+    console.log(Function.prototype.call(obj))
+    console.log(String.call({}))
+    
+    
+
+
+  </script>
+</body>
+</html>

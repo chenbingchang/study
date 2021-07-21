@@ -28,6 +28,7 @@ const argRE = /:(.*)$/ // 参数正则
 const bindRE = /^:|^v-bind:/ // bind正则
 const modifierRE = /\.[^.]+/g // 修饰符正则
 
+// 缓存解码的HTML字符串
 const decodeHTMLCached = cached(he.decode)
 
 // configurable state
@@ -95,7 +96,9 @@ export function parse (
     }
   }
 
+  // 结束pre
   function endPre (element) {
+    // 检查pre的状态，如果是pre则重置inVPre
     // check pre state
     if (element.pre) {
       inVPre = false
@@ -196,13 +199,19 @@ export function parse (
         root = element
         checkRootConstraints(root)
       } else if (!stack.length) {
-        // !stack.length  @todo: 这里有点懵
+        /*
+          root在解析HTML中不会清空。有根节点，并且stack为空数组。如下：
+          <template>
+            <div v-if="isHello">Hello</div>
+            <div v-else>Hi</div>
+          </template>
+        */
         // allow root elements with v-if, v-else-if and v-else
         if (root.if && (element.elseif || element.else)) {
           checkRootConstraints(element)
           addIfCondition(root, {
-            exp: element.elseif,
-            block: element
+            exp: element.elseif, // 如果是element.else则elseif为undefined，判断时!exp为true就算成功
+            block: element // 条件表达式对应的AST
           })
         } else if (process.env.NODE_ENV !== 'production') {
           warnOnce(
@@ -213,15 +222,16 @@ export function parse (
         }
       }
       if (currentParent && !element.forbidden) {
-        if (element.elseif || element.else) {
+        // 有父级，并且当前元素不是禁止的
+        if (element.elseif || element.else) { // 处理v-else(-if)
           processIfConditions(element, currentParent)
-        } else if (element.slotScope) { // scoped slot
+        } else if (element.slotScope) { // scoped slot  作用域插槽
           currentParent.plain = false
-          const name = element.slotTarget || '"default"'
-          ;(currentParent.scopedSlots || (currentParent.scopedSlots = {}))[name] = element
+          const name = element.slotTarget || '"default"' // 目标插槽
+          ;(currentParent.scopedSlots || (currentParent.scopedSlots = {}))[name] = element // 保存作用域插槽
         } else {
-          currentParent.children.push(element)
-          element.parent = currentParent
+          currentParent.children.push(element) // 父级保存子级
+          element.parent = currentParent // 子级保存父级
         }
       }
       // 如果没有闭合
@@ -229,6 +239,7 @@ export function parse (
         currentParent = element // 当前父级指向  当前节点
         stack.push(element) // 添加到堆栈
       } else {
+        // 已经闭合
         endPre(element)
       }
       // apply post-transforms
@@ -251,13 +262,16 @@ export function parse (
     },
     // 当解析到标签的文本时，触发chars
     chars (text: string) {
+      // 如果没有父级，文本AST报错
       if (!currentParent) {
         if (process.env.NODE_ENV !== 'production') {
           if (text === template) {
+            // 组件模板需要根元素，而不是只有文本
             warnOnce(
               'Component template requires a root element, rather than just text.'
             )
           } else if ((text = text.trim())) {
+            // 根节点外的文本将被忽略
             warnOnce(
               `text "${text}" outside root element will be ignored.`
             )
@@ -273,7 +287,7 @@ export function parse (
       ) {
         return
       }
-      const children = currentParent.children
+      const children = currentParent.children // 父级子节点
       text = inPre || text.trim()
         ? isTextTag(currentParent) ? text : decodeHTMLCached(text)
         // only preserve whitespace if its not right after a starting tag
@@ -283,7 +297,7 @@ export function parse (
         if (!inVPre && text !== ' ' && (expression = parseText(text, delimiters))) {
           children.push({
             type: 2, // 动态文本
-            expression,
+            expression, // 表达式
             text
           })
         } else if (text !== ' ' || !children.length || children[children.length - 1].text !== ' ') {
@@ -429,14 +443,17 @@ function processIf (el) {
   }
 }
 
+// 处理v-else和v-else-if条件表达式，在父级中找到前面有v-if的节点，然后添加到v-if的节点哪里
 function processIfConditions (el, parent) {
   const prev = findPrevElement(parent.children)
   if (prev && prev.if) {
+    // 找到v-if节点，添加表达式
     addIfCondition(prev, {
       exp: el.elseif,
       block: el
     })
   } else if (process.env.NODE_ENV !== 'production') {
+    // 警告，有v-elseif或者v-else，而前面没有v-if
     warn(
       `v-${el.elseif ? ('else-if="' + el.elseif + '"') : 'else'} ` +
       `used on element <${el.tag}> without corresponding v-if.`
@@ -444,18 +461,25 @@ function processIfConditions (el, parent) {
   }
 }
 
+// 在子节点中找到前面一个元素节点
 function findPrevElement (children: Array<any>): ASTElement | void {
   let i = children.length
+  // 倒序查找
   while (i--) {
+    // 判断节点类型
     if (children[i].type === 1) {
+      // 元素节点，直接返回
       return children[i]
     } else {
+      // 非元素节点
       if (process.env.NODE_ENV !== 'production' && children[i].text !== ' ') {
+        // 文本节点。警告，v-if和v-else(-if)之间的文本节点会被忽略
         warn(
           `text "${children[i].text.trim()}" between v-if and v-else(-if) ` +
           `will be ignored.`
         )
       }
+      // 删除v-if和v-else(-if)之间的文本节点
       children.pop()
     }
   }
