@@ -255,6 +255,7 @@ export const no = (a?: any, b?: any, c?: any) => false
 export const identity = (_: any) => _
 
 /**
+ * 从编译器模块生成静态键字符串。web平台，预测返回  "staticStyle,staticClass"
  * Generate a static keys string from compiler modules.
  */
 export function genStaticKeys (modules: Array<ModuleOptions>): string {

@@ -80,8 +80,8 @@ declare type ASTElement = {
   processed?: true; // 是否已经处理
 
   static?: boolean; // 静态节点
-  staticRoot?: boolean;
-  staticInFor?: boolean;
+  staticRoot?: boolean; // 静态根节点
+  staticInFor?: boolean; // v-for中的静态节点
   staticProcessed?: boolean;
   hasBindings?: boolean;
 

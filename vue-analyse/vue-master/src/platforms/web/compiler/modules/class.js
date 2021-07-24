@@ -49,7 +49,7 @@ function genData (el: ASTElement): string {
 }
 
 export default {
-  staticKeys: ['staticClass'],
+  staticKeys: ['staticClass'], // 静态属性key，优化性能
   transformNode,
   genData
 }

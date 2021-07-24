@@ -253,11 +253,12 @@ export function parse (
       const element = stack[stack.length - 1]
       const lastNode = element.children[element.children.length - 1]
       if (lastNode && lastNode.type === 3 && lastNode.text === ' ' && !inPre) {
+        // 删除尾随空格节点
         element.children.pop()
       }
-      // pop stack
+      // pop stack  删除最后一个节点
       stack.length -= 1
-      currentParent = stack[stack.length - 1]
+      currentParent = stack[stack.length - 1] // 变更当前的父级
       endPre(element)
     },
     // 当解析到标签的文本时，触发chars
@@ -311,7 +312,7 @@ export function parse (
     // 注释节点
     comment (text: string) {
       currentParent.children.push({
-        type: 3,
+        type: 3, // 静态文本，注释节点都是静态的
         text,
         isComment: true
       })

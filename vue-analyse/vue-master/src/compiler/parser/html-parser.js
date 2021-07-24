@@ -193,10 +193,12 @@ export function parseHTML (html, options) {
       // 父元素为script、style、textarea时，其内部的内容全部当做纯文本处理
       let endTagLength = 0
       const stackedTag = lastTag.toLowerCase()
-      // 拼凑文本和结束标签的正则表达式
+      // 拼凑文本和结束标签的正则表达式，分组1：文本；分组2：结束标签
       const reStackedTag = reCache[stackedTag] || (reCache[stackedTag] = new RegExp('([\\s\\S]*?)(</' + stackedTag + '[^>]*>)', 'i'))
+      // 替换掉，比如：  console.log('aa')</script>
       const rest = html.replace(reStackedTag, function (all, text, endTag) {
-        endTagLength = endTag.length
+        endTagLength = endTag.length // 结束标签的长度
+        // 这个判断搞不懂
         if (!isPlainTextElement(stackedTag) && stackedTag !== 'noscript') {
           text = text
             .replace(/<!--([\s\S]*?)-->/g, '$1')
@@ -212,12 +214,13 @@ export function parseHTML (html, options) {
         }
         return '' // 替换掉
       })
-      index += html.length - rest.length
-      html = rest
+      index += html.length - rest.length // 改变解析下标
+      html = rest // 保存剩余的模板
+      // 前面这里已经把结束标签给替换掉了，这里需要闭合标签，解析结束标签
       parseEndTag(stackedTag, index - endTagLength, index)
     }
 
-    // 将整个字符串作为文本对待
+    // 将整个字符串作为文本对待，然后终止循环
     if (html === last) {
       options.chars && options.chars(html)
       if (process.env.NODE_ENV !== 'production' && !stack.length && options.warn) {
@@ -365,7 +368,7 @@ export function parseHTML (html, options) {
         /* 正常情况下，stack栈的栈顶元素应该和当前的结束标签tagName 匹配，也就是说正常的pos应该是栈顶位置，
         后面不应该再有元素，如果后面还有元素，那么后面的元素就都缺少闭合标签 */
         if (process.env.NODE_ENV !== 'production' &&
-          (i > pos || !tagName) &&
+          (i > pos || !tagName) && // !tagName标签名不存在，是最后的清空stack的操作，检查未闭合的标签，发出警告
           options.warn
         ) {
           options.warn(

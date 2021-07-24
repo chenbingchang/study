@@ -1,7 +1,7 @@
 /* @flow */
 
 import { genHandlers } from './events'
-import baseDirectives from '../directives/index'
+import baseDirectives from '../directives/index' // 基础指令
 import { camelize, no, extend } from 'shared/util'
 import { baseWarn, pluckModuleFunction } from '../helpers'
 
@@ -9,6 +9,7 @@ type TransformFunction = (el: ASTElement, code: string) => string;
 type DataGenFunction = (el: ASTElement) => string;
 type DirectiveFunction = (el: ASTElement, dir: ASTDirective, warn: Function) => boolean;
 
+// 代码生成状态
 export class CodegenState {
   options: CompilerOptions;
   warn: Function;
@@ -20,15 +21,15 @@ export class CodegenState {
   staticRenderFns: Array<string>;
 
   constructor (options: CompilerOptions) {
-    this.options = options
-    this.warn = options.warn || baseWarn
-    this.transforms = pluckModuleFunction(options.modules, 'transformCode')
-    this.dataGenFns = pluckModuleFunction(options.modules, 'genData')
-    this.directives = extend(extend({}, baseDirectives), options.directives)
-    const isReservedTag = options.isReservedTag || no
-    this.maybeComponent = (el: ASTElement) => !isReservedTag(el.tag)
+    this.options = options // 编译配置
+    this.warn = options.warn || baseWarn // 警告函数
+    this.transforms = pluckModuleFunction(options.modules, 'transformCode') // 转换code。web平台为[]
+    this.dataGenFns = pluckModuleFunction(options.modules, 'genData') // 最生成data。web平台有标签的类和样式
+    this.directives = extend(extend({}, baseDirectives), options.directives) // 指令，每个可以生成对应的render函数字符串
+    const isReservedTag = options.isReservedTag || no // 平台保留标签
+    this.maybeComponent = (el: ASTElement) => !isReservedTag(el.tag) // 判断是否是组件
     this.onceId = 0
-    this.staticRenderFns = []
+    this.staticRenderFns = [] // 静态渲染函数数组
   }
 }
 
@@ -37,6 +38,7 @@ export type CodegenResult = {
   staticRenderFns: Array<string>
 };
 
+// 生成render函数
 export function generate (
   ast: ASTElement | void,
   options: CompilerOptions
@@ -49,6 +51,7 @@ export function generate (
   }
 }
 
+// 生成元素
 export function genElement (el: ASTElement, state: CodegenState): string {
   if (el.staticRoot && !el.staticProcessed) {
     return genStatic(el, state)
@@ -65,12 +68,12 @@ export function genElement (el: ASTElement, state: CodegenState): string {
   } else {
     // component or element
     let code
-    if (el.component) {
+    if (el.component) { // 组件
       code = genComponent(el.component, el, state)
-    } else {
+    } else { // 非组件
       // el.plain标记节点是否有属性，true表示没有任何属性
       const data = el.plain ? undefined : genData(el, state)
-
+      // 子节点
       const children = el.inlineTemplate ? null : genChildren(el, state, true)
       code = `_c('${el.tag}'${
         data ? `,${data}` : '' // data
@@ -78,7 +81,7 @@ export function genElement (el: ASTElement, state: CodegenState): string {
         children ? `,${children}` : '' // children
       })`
     }
-    // module transforms
+    // module transforms    模块转换。web平台目前没有
     for (let i = 0; i < state.transforms.length; i++) {
       code = state.transforms[i](el, code)
     }
@@ -86,9 +89,10 @@ export function genElement (el: ASTElement, state: CodegenState): string {
   }
 }
 
+// 静态节点
 // hoist static sub-trees out
 function genStatic (el: ASTElement, state: CodegenState): string {
-  el.staticProcessed = true
+  el.staticProcessed = true // 标记已经处理过
   state.staticRenderFns.push(`with(this){return ${genElement(el, state)}}`)
   return `_m(${state.staticRenderFns.length - 1}${el.staticInFor ? ',true' : ''})`
 }
