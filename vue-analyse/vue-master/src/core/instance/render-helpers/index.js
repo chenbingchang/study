@@ -12,19 +12,19 @@ import { bindObjectListeners } from './bind-object-listeners'
 import { resolveScopedSlots } from './resolve-slots'
 
 export function installRenderHelpers (target: any) {
-  target._o = markOnce
-  target._n = toNumber
-  target._s = toString
-  target._l = renderList
-  target._t = renderSlot
-  target._q = looseEqual
-  target._i = looseIndexOf
-  target._m = renderStatic
+  target._o = markOnce //
+  target._n = toNumber // 变成数字
+  target._s = toString // 变成字符串
+  target._l = renderList // 渲染列表
+  target._t = renderSlot // 渲染slot
+  target._q = looseEqual //
+  target._i = looseIndexOf //
+  target._m = renderStatic // 渲染静态节点
   target._f = resolveFilter // 过滤器
-  target._k = checkKeyCodes
-  target._b = bindObjectProps
-  target._v = createTextVNode
-  target._e = createEmptyVNode
-  target._u = resolveScopedSlots
-  target._g = bindObjectListeners
+  target._k = checkKeyCodes // 按键码
+  target._b = bindObjectProps //
+  target._v = createTextVNode  // 创建文本节点
+  target._e = createEmptyVNode // 创建空节点
+  target._u = resolveScopedSlots // 目标插槽
+  target._g = bindObjectListeners //
 }

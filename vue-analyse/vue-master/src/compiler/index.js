@@ -19,8 +19,8 @@ export const createCompiler = createCompilerCreator(function baseCompile (
   // 3、代码生成阶段：将AST转换成渲染函数；
   const code = generate(ast, options)
   return {
-    ast,
-    render: code.render,
-    staticRenderFns: code.staticRenderFns
+    ast, // AST树
+    render: code.render, // render函数的字符串
+    staticRenderFns: code.staticRenderFns // 静态节点渲染函数字符串数组
   }
 })

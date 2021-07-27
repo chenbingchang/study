@@ -38,7 +38,7 @@ Vue.prototype.$mount = function ( // 3. 重写$mount方法
     let template = options.template
     if (template) {  // 5.将模板编译成函数
       if (typeof template === 'string') {
-        if (template.charAt(0) === '#') {// 模板是#开头，表示是一个id选择器
+        if (template.charAt(0) === '#') { // 模板是#开头，表示是一个id选择器
           template = idToTemplate(template) // 通过id查到对应的元素的模板
           /* istanbul ignore if */
           if (process.env.NODE_ENV !== 'production' && !template) {
@@ -66,7 +66,7 @@ Vue.prototype.$mount = function ( // 3. 重写$mount方法
       if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
         mark('compile')
       }
-      
+
       // 编译模板
       const { render, staticRenderFns } = compileToFunctions(template, {
         shouldDecodeNewlines,
@@ -74,7 +74,7 @@ Vue.prototype.$mount = function ( // 3. 重写$mount方法
         comments: options.comments
       }, this)
       options.render = render // 6.将render函数放到options中
-      options.staticRenderFns = staticRenderFns
+      options.staticRenderFns = staticRenderFns // 静态节点渲染函数
 
       /* istanbul ignore if */
       if (process.env.NODE_ENV !== 'production' && config.performance && mark) {

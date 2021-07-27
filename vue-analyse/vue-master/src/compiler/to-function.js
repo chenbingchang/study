@@ -8,6 +8,7 @@ type CompiledFunctionResult = {
   staticRenderFns: Array<Function>;
 };
 
+// 通过new Function把函数字符串变成函数
 function createFunction (code, errors) {
   try {
     return new Function(code)
@@ -17,11 +18,15 @@ function createFunction (code, errors) {
   }
 }
 
+// 创建编译变成函数，动态传入编译器
 export function createCompileToFunctionFn (compile: Function): Function {
   const cache: {
     [key: string]: CompiledFunctionResult;
   } = Object.create(null)
 
+  /*
+  编译器转成函数
+  */
   return function compileToFunctions (
     template: string,
     options?: CompilerOptions,
@@ -53,14 +58,15 @@ export function createCompileToFunctionFn (compile: Function): Function {
     const key = options.delimiters
       ? String(options.delimiters) + template
       : template
+    // 检查是否有缓存
     if (cache[key]) {
       return cache[key]
     }
 
-    // compile
+    // compile    编译器
     const compiled = compile(template, options)
 
-    // check compilation errors/tips
+    // check compilation errors/tips    检查编译后的错误和提示
     if (process.env.NODE_ENV !== 'production') {
       if (compiled.errors && compiled.errors.length) {
         warn(
@@ -74,9 +80,9 @@ export function createCompileToFunctionFn (compile: Function): Function {
       }
     }
 
-    // turn code into functions
+    // turn code into functions   把函数字符串变成函数
     const res = {}
-    const fnGenErrors = []
+    const fnGenErrors = [] // 保存错误
     // 把render函数字符串变成函数
     res.render = createFunction(compiled.render, fnGenErrors)
     res.staticRenderFns = compiled.staticRenderFns.map(code => {
@@ -97,6 +103,7 @@ export function createCompileToFunctionFn (compile: Function): Function {
       }
     }
 
+    // 先缓存，再返回
     return (cache[key] = res)
   }
 }

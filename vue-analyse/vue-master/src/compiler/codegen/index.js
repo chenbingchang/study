@@ -47,7 +47,7 @@ export function generate (
   const code = ast ? genElement(ast, state) : '_c("div")'
   return {
     render: `with(this){return ${code}}`, // render函数的字符串
-    staticRenderFns: state.staticRenderFns
+    staticRenderFns: state.staticRenderFns // 静态节点渲染函数字符串数组
   }
 }
 

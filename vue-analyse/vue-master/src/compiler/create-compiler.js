@@ -4,8 +4,17 @@ import { extend } from 'shared/util'
 import { detectErrors } from './error-detector'
 import { createCompileToFunctionFn } from './to-function'
 
+/*
+创建创建编译器
+
+创建创建编译器，可以动态传入基础编译器
+创建编译器，可以动态传入基础编译选项
+这里有点柯里化的样子
+*/
 export function createCompilerCreator (baseCompile: Function): Function {
+  // 返回创建编译器
   return function createCompiler (baseOptions: CompilerOptions) {
+    // 编译函数
     function compile (
       template: string,
       options?: CompilerOptions
@@ -40,6 +49,7 @@ export function createCompilerCreator (baseCompile: Function): Function {
         }
       }
 
+      // 用基础编译器，编译模板，配置通过合并
       const compiled = baseCompile(template, finalOptions)
       if (process.env.NODE_ENV !== 'production') {
         errors.push.apply(errors, detectErrors(compiled.ast))
@@ -50,8 +60,8 @@ export function createCompilerCreator (baseCompile: Function): Function {
     }
 
     return {
-      compile,
-      compileToFunctions: createCompileToFunctionFn(compile)
+      compile, // 编译函数
+      compileToFunctions: createCompileToFunctionFn(compile) // 把编译结果变成函数的函数
     }
   }
 }
