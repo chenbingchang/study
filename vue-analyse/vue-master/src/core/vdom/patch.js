@@ -29,7 +29,10 @@ import {
 
 export const emptyNode = new VNode('', {}, [])
 
-// 不知道这些对应哪些钩子
+/*
+  各个生命周期，没有对外开放
+  比如'create'，是在'beforeCreate'和'created'之间执行的
+*/
 const hooks = ['create', 'activate', 'update', 'remove', 'destroy']
 
 // 判断两个节点是否相同。a旧节点。b新节点

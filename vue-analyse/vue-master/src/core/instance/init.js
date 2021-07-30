@@ -13,8 +13,9 @@ import { extend, mergeOptions, formatComponentName } from '../util/index'
 let uid = 0
 
 export function initMixin (Vue: Class<Component>) {
+  // 给原型对象添加_init方法
   Vue.prototype._init = function (options?: Object) {
-    const vm: Component = this // 按照 this._init的调用  vm指向Vue.prototype
+    const vm: Component = this // 按照 this._init的调用，并且是用New创建的  vm指向Vue实例
     // a uid
     vm._uid = uid++// 1.每个vue的实例上都有一个唯一的属性_uid
 
@@ -106,12 +107,12 @@ export function resolveConstructorOptions (Ctor: Class<Component>) {
       // need to resolve new options.
       Ctor.superOptions = superOptions // 保存新的父级选项
       // check if there are any late-modified/attached options (#4976)
-      const modifiedOptions = resolveModifiedOptions(Ctor)
+      const modifiedOptions = resolveModifiedOptions(Ctor) // 需要修改的配置
       // update base extend options   更新基础继承的选项
       if (modifiedOptions) {
-        extend(Ctor.extendOptions, modifiedOptions)
+        extend(Ctor.extendOptions, modifiedOptions) // modifiedOptions覆盖Ctor.extendOptions
       }
-      // 合并基础、父级的选项
+      // 合并继承、父级的选项
       options = Ctor.options = mergeOptions(superOptions, Ctor.extendOptions)
       if (options.name) {
         // 用组件的name属性保存组件映射
@@ -122,13 +123,14 @@ export function resolveConstructorOptions (Ctor: Class<Component>) {
   return options
 }
 
+// 解决修改选项
 function resolveModifiedOptions (Ctor: Class<Component>): ?Object {
   let modified
-  const latest = Ctor.options // 本身的选项
-  const extended = Ctor.extendOptions // 基础的选项
+  const latest = Ctor.options // 最新的选项
+  const extended = Ctor.extendOptions // 继承的选项
   const sealed = Ctor.sealedOptions // 内置的选项
   for (const key in latest) {
-    // 如果本身和内置的选项不同
+    // 如果最新和内置的选项不同，以最新的配置为准
     if (latest[key] !== sealed[key]) {
       if (!modified) modified = {}
       modified[key] = dedupe(latest[key], extended[key], sealed[key])
@@ -137,9 +139,12 @@ function resolveModifiedOptions (Ctor: Class<Component>): ?Object {
   return modified
 }
 
-// 去重
+/*
+  以latest配置为准
+  如果latest在extended或者在sealed中有相同的配置，则使用latest的配置
+*/
 function dedupe (latest, extended, sealed) {
-  // 如果是数组，则去重。否则，直接返回latest
+  // 如果是数组，则去重。其它类型直接返回latest
   // compare latest and sealed to ensure lifecycle hooks won't be duplicated
   // between merges
   if (Array.isArray(latest)) {
@@ -147,10 +152,13 @@ function dedupe (latest, extended, sealed) {
     sealed = Array.isArray(sealed) ? sealed : [sealed] // 变成数组
     extended = Array.isArray(extended) ? extended : [extended] // 变成数组
     for (let i = 0; i < latest.length; i++) {
-      // 去掉latest和extended重复的项，去掉latest和sealed重复的项
+      /*
+        如果latest在extended中有相同的配置，则使用latest的配置
+        或者sealed中没有sealed的配置，则添加latest的配置
+       */
       // push original options and not sealed options to exclude duplicated options
       if (extended.indexOf(latest[i]) >= 0 || sealed.indexOf(latest[i]) < 0) {
-        res.push(latest[i])
+        res.push(latest[i]) // 使用latest的配置
       }
     }
     return res

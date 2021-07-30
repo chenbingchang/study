@@ -21,35 +21,28 @@
     <div id="wrap">你这很暴力啊</div>
 
     <script>
-      const webSocket = new WebSocket("ws://47.91.220.207:31793")
+      window.addEventListener("hashchange", () => {
+        const hash = window.location.hash.substr(1)
+        // 根据hash值渲染不同的dom
+        console.log(hash)
+      })
 
-      webSocket.onclose = function (e) {
-        console.log("webSocket.onclose事件", new Date().toLocaleTimeString())
+      window.onpopstate = function(e) {
+        console.log('########')
+        console.log(location.href, e.state)
       }
 
-      setTimeout(() => {
-        console.log("第1次触发close")
-        manualClose()
-      }, 5000)
-      setTimeout(() => {
-        console.log('第2次触发close')
-        manualClose()
-      }, 7000)
-      setTimeout(() => {
-        console.log('第3次触发close')
-        manualClose()
-      }, 9000)
-
-      function manualClose() {
-        webSocket.close()
-        
-        // if (webSocket.readyState === WebSocket.OPEN) {
-        //   console.log("打开中，手动关闭")
-        //   webSocket.close()
-        // } else {
-        //   console.log("已经关闭，不用再关闭")
-        // }
+      function addState() {
+        window.history.pushState(
+          {
+            desc: "修改state",
+          },
+          "pushState方法",
+          "test.html?news"
+        )
       }
+
+      setTimeout(addState, 4000)
     </script>
   </body>
 </html>

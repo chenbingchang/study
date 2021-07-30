@@ -19,18 +19,18 @@ import { patch } from './patch'
 import platformDirectives from './directives/index'
 import platformComponents from './components/index'
 
-// install platform specific utils
+// install platform specific utils    安装平台特殊的工具
 Vue.config.mustUseProp = mustUseProp // Vue.config的全局配置，在创建Vue之前修改
-Vue.config.isReservedTag = isReservedTag
-Vue.config.isReservedAttr = isReservedAttr
-Vue.config.getTagNamespace = getTagNamespace
-Vue.config.isUnknownElement = isUnknownElement
+Vue.config.isReservedTag = isReservedTag // 保留标签
+Vue.config.isReservedAttr = isReservedAttr // 保留属性
+Vue.config.getTagNamespace = getTagNamespace // 标签命名空间
+Vue.config.isUnknownElement = isUnknownElement // 未知元素
 
 // install platform runtime directives & components
 extend(Vue.options.directives, platformDirectives) // 添加平台的指令，model/show
 extend(Vue.options.components, platformComponents) // 添加平台的组件, transition/transitionGroup
 
-// install platform patch function
+// install platform patch function    安装平台path函数
 Vue.prototype.__patch__ = inBrowser ? patch : noop
 
 // public mount method  公共的$mount方法

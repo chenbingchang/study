@@ -8,10 +8,19 @@
 </head>
 <body>
   <div id="app">
-    <div>first {{message}} end</div>
+    <div>占位文字</div>
+    <br>
+    <router-link to="/">to home</router-link><br><br>
+    <router-link to="/about">to about</router-link><br><br>
+    <router-link to="/test">to test</router-link>
+    <!-- <a href="/about" @click="changeUrl($event, '/about')">to about</a><br>
+    <a href="/test" @click="changeUrl($event, '/test')">to test</a> -->
+    <br>
+    <router-view></router-view>
   </div>
 
   <!-- js -->
+  <script src="./myVueRouter.js"></script>
   <script src="./study.js"></script>
 </body>
 </html>
