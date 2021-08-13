@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      /*
+      var的创建和初始化被提升，赋值不会被提升。
+      let的创建被提升，初始化和赋值不会被提升。
+      function的创建、初始化和赋值均会被提升。
+      */
+
+      //
+
+      /*
+        作用域、作用域链、执行上下文、词法作用域、 this、     原型对象、原型链
+
+        1、作用域
+        全局作用域、函数作用域、块级作用域
+        变量、函数，可以访问的范围，以及它们的生命周期
+        作用域是指在程序中定义变量的区域，该位置决定了变量的生命周期。通俗地理解，作用域就是变量与函数的可访问范围，即作用域控制着变量和函数的可见性和生命周期。
+
+        2、作用域链
+        在当前作用域不存在某个变量或函数，就会去上级的作用域查找，查找的链条就称为作用域链。
+        作用域的上下级关系形成的一条链，通过某个固定属性来链接。
+        作用域链是由词法作用域决定的。
+
+        作用域、作用域链，是很多编程语言都有的概念，注意是“概念”。有这些概念的编程语言都有一套实现这两个概念的规则
+        作用域链和this是两套不同的系统
+
+
+        3、词法作用域
+        词法作用域就是指作用域是由代码中函数声明的位置（是声明的位置，而不是执行位置）来决定的，所以词法作用域是静态的作用域，通过它就能够预测代码在执行过程中如何查找标识符。
+        词法作用域是代码编译阶段就决定好的，和函数是怎么调用的没有关系。
+        作用域链由词法作用域决定，而词法作用域由代码结构来确定
+
+
+        4、执行上下文
+        从字面意思就知道是执行时才确定的（即动态）
+
+        5、this
+        当前执行上下文（global、function 或 eval）的一个属性
+        指向执行当前代码的环境对象
+      */
+
+      // var bar = {
+      //   myName: "time.geekbang.com",
+      //   printName: function () { // 这个函数是在全局作用域声明的，根据词法作用域，作用域链指向全局作用域
+      //     // console.log("myName : ", myName)
+      //     console.log("this.myName : ", this.myName)
+      //   },
+      // }
+      // function foo() {
+      //   let myName = "极客时间"
+      //   return bar.printName // 返回bar.printName函数，但是bar.printName的作用域链是全局作用域，因为bar.printName是在全局作用域中声明的
+      // }
+      // let myName = "极客邦"
+      // let _printName = foo()
+      // _printName() // 极客邦
+      // bar.printName() // 极客邦
+      // var varV = "var声明的变量"
+      // const constV = "const声明的变量"
+
+      let jack = {
+        name: "jack.ma",
+        age: 40,
+        like: {
+          dog: {
+            color: "black",
+            age: 3,
+          },
+          cat: {
+            color: "white",
+            age: 2,
+          },
+        },
+      }
+      function copy(src) {
+        let dest
+        //实现拷贝代码，将src的值完整地拷贝给dest
+        //在这里实现
+        
+
+        return dest
+      }
+      let jack2 = copy(jack)
+
+      //比如修改jack2中的内容，不会影响到jack中的值
+      jack2.like.dog.color = "green"
+      console.log(jack.like.dog.color) //打印出来的应该是 "black"
+    </script>
+  </body>
+</html>
