@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebComponent</title>
+    <style>
+      txt-tip {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 定义模板 -->
+    <template id="txt-tip-t">
+      <!-- 定义内部样式 -->
+      <style>
+        .wrap {
+          width: 200px;
+          margin-top: 20px;
+          background-color: bisque;
+          border: 3px solid chocolate;
+          border-radius: 10px;
+        }
+
+        .item {
+          background-color: brown;
+          color: cornsilk;
+        }
+      </style>
+      <div class="wrap">
+        <p class="item">内容111111111</p>
+        <slot name="main">
+          <!-- 具名插槽默认的内容 -->
+          <p class="item">默认内容xxx</p>
+        </slot>
+        <p class="item">内容222222222</p>
+      </div>
+      <script>
+        function foo() {
+          console.log("template 内部定义的函数")
+        }
+      </script>
+    </template>
+
+    <txt-tip addr="aaa">
+      <!-- 嵌入到指定的具名插槽 -->
+      <h1 slot="main">111111</h1>
+    </txt-tip>
+    <div class="wrap">你是谁呀？</div>
+    <div class="wrap">你来自哪里？</div>
+    <txt-tip addr="bbb">
+      <span slot="main">22222</span>
+    </txt-tip>
+    <txt-tip addr="bbb">
+    </txt-tip>
+
+    <!-- js -->
+    <script>
+      /* 
+      shadowDOM会把css和DOM和全局DOM的分开，互不影响
+      想要查询shadowDOM里面的内容需要通过特定的接口
+      */
+      
+      class TxtTip extends HTMLElement {
+        constructor() {
+          super()
+
+          // 获取组件模板
+          const template = document.querySelector("#txt-tip-t")
+          const content = template.content
+          // 创建影子DOM节点
+          const shadowDOM = this.attachShadow({mode: "open"})
+
+          // 将模板添加到影子DOM上
+          shadowDOM.appendChild(content.cloneNode(true))
+        }
+      }
+
+      // 声明自定义元素
+      customElements.define('txt-tip', TxtTip)
+    </script>
+  </body>
+</html>

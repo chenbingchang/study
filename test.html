@@ -1,91 +1,55 @@
-<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8" />
-    <title>Stacking and float</title>
-    <style type="text/css">
-      * {
-        padding: 0;
-        margin: 0;
-      }
-
-      html,
-      body {
-        width: 100%;
-        height: 100%;
-      }
-
-      .wrap {
-        width: 500px;
-        height: 400px;
-        border: 1px solid #333;
-        font-size: 0;
-      }
-
-      .inline {
-        box-sizing: border-box;
-        display: inline-block;
-        font-size: 14px;
-      }
-
-      .first {
-        width: 100px;
-        height: 40px;
-        background-color: chartreuse;
-      }
-
-      .middle {
-        /* width: 200px; */
-        height: 40px;
-        background-color: gold;
-        font-size: 0;
-      }
-
-      .laste {
-        width: 200px;
-        height: 40px;
-        background-color: blue;
-      }
-
-      .item {
-        font-size: 16px;
-      }
-    </style>
+    <title>观察will-change</title>
+    <style></style>
   </head>
 
   <body>
-    
-    <div id="some-element-you-want-to-animate" class="wrap">
-      <div class="inline first">aaaa</div>
-      <div class="inline middle">
-        <span class="item">1111111111111</span>
-        <span class="item">2222222222222</span>
-        <span class="item">3333333333333</span>
-        <span class="item">4444444444444</span>
-        <span class="item">5555555555555</span>
-      </div>
-      <div class="inline laste">cccc</div>
-    </div>
+    <script>
+      let obj = {
+        age: 18, // 声明的属性，属性描述符全是true
+        name: "cbc",
+        desc: "文字描述"
+      };
+      
+      let temp = ""
+
+      Object.defineProperty(obj, 'addr', {
+        configurable: true,
+        enumerable: true,
+        get() {
+          return temp;
+        },
+        set(val) {
+          console.log('设置新值：', val)
+          temp = val
+        }
+      })
+
+      obj.addr = "广东省深圳市xxx"
+      console.log(Object.getOwnPropertyDescriptor(obj, "addr"))
+
+      Object.freeze(obj)
+      console.log(Object.getOwnPropertyDescriptor(obj, "addr"))
+
+      // 对象冻结之后再修改存取器会报错
+      Object.defineProperty(obj, 'addr', {
+        configurable: false,
+        enumerable: true,
+        get() {
+          return temp;
+        },
+        set(val) {
+          console.log('再次修改属性描述符，设置新值：', val)
+          temp = val
+        }
+      })
+
+      obj.addr = "广东省深圳市xxx----------2"
+      console.log(Object.getOwnPropertyDescriptor(obj, "addr"))
+
+
+      
+    </script>
   </body>
-  <script>
-    const element = document.getElementById("some-element-you-want-to-animate")
-    let start
-
-    function step(timestamp) {
-      if (start === undefined) start = timestamp
-      const elapsed = timestamp - start
-      console.log(timestamp, start)
-
-      //这里使用`Math.min()`确保元素刚好停在200px的位置。
-      element.style.transform =
-        "translateX(" + Math.min(0.1 * elapsed, 200) + "px)"
-
-      if (elapsed < 2000) {
-        // 在两秒后停止动画
-        window.requestAnimationFrame(step)
-      }
-    }
-
-    window.requestAnimationFrame(step)
-  </script>
 </html>

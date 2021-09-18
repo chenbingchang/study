@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    /* 
+    1、.then 或者 .catch 的参数期望是函数，传入非函数则会发生值穿透。
+    2、默认为没有指定失败回调函数的.then指定失败回调函数为：reason => { throw reason }    这样就可以不断向后冒泡，注意不是return reason 而是throw reason ；throw保证了返回结果为失败
+    */
+    
+    new Promise((resolve, reject) => {
+      reject(1)
+    }).then(val => {
+      console.log('成功', val)
+    }).then(val => {
+      console.log('成功2', val)
+    }).then(val => {
+      console.log('成功3', val)
+    })
+  </script>
+</body>
+</html>
