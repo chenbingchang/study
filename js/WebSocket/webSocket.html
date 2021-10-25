@@ -7,28 +7,79 @@
 </head>
 <body>
   <script>
-    let total = 5
-    let i = 1
-    let ws
-    let wsUrl = 'ws://120.77.212.58:31365'
-    let t
+    // WebSocket实例
+    let ws 
+    let isInited = false
+    let urlInfo = {
+      valid: 'ws://47.91.220.207:31797', // 有效地址
+      error: 'ws://47.91.220.207:31798' // 错误的地址
+    }
 
-    t = setInterval(function() {
-      if(i === total) {
-        clearInterval(t)
-        return
-      }
+    // 初始化
+    function initWs() {
+      try {
+        /* 
+        虽然绑定监听事件在创建WebSocket的后面，但是如果创建的时候连不上，还是可以触发对应的事件，
+        所以catch里面可以不用加重连，直接在onclose监听器里面加重连机制
+        解析：因为ws = new WebSocket(url) 是异步操作，ws连接结果是放到异步消息队列，而异步消息队列是在本次消息队列执行完后才会进行检查然后执行的
 
-      i++
-      if(ws) {
-        ws.close()
-        ws = null
+        另外：触发error事件，最终会触发close事件。  先onError->onClose
+        */
+        console.log('开始初始化')
+        let url = urlInfo.valid
+
+        // 第二次就用错误的地址
+        if(isInited) {
+          url = urlInfo.error
+        }
+
+        // 判断这个连接是否已经存在，如果存在则先清空
+        if (ws) {
+          // WebSocket.OPEN, WebSocket.CONNECTING这两个状态时关闭webSocket才会触发close事件
+          if (
+            ws instanceof WebSocket &&
+            [WebSocket.OPEN, WebSocket.CONNECTING].includes(ws.readyState)
+          ) {
+            ws.onclose = null; // 删除close事件，不然会触发重连
+            ws.close();
+          }
+          ws = null;
+        }
+
+        ws = new WebSocket(url)
+        ws.onopen = onOpen
+        ws.onclose = onClose
+        ws.onerror = onError
+        ws.onmessage = onMessage
+        isInited = true
+      } catch (error) {
+        console.log('初始化异常')
       }
-      ws = new WebSocket(wsUrl);
-      ws.onmessage = function(evt) {
-        console.log(evt.data)
-      }
-    }, 5000)
+    }
+
+    // WebSocket open事件
+    function onOpen() {
+      console.log('WebSocket--成功打开')
+    }
+
+    // WebSocket close事件
+    function onClose() {
+      console.log('WebSocket--关闭')
+      console.log('WebSocket--重连机制')
+    }
+
+    // WebSocket error事件
+    function onError(e) {
+      console.log('WebSocket--异常', e)
+    }
+
+    // WebSocket message事件
+    function onMessage(e) {
+      console.log('WebSocket--收到推送', e)
+    }
+
+    initWs()
+    setTimeout(initWs, 12000)
   </script>
 </body>
 </html>

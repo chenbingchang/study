@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>子页面</title>
+</head>
+<body>
+  <input type="button" value="使用父页面的方法" onclick="useOpenerMethod()">
+  <br>
+  <br>
+  <input type="button" value="改变父页面的地址" onclick="changeOpenerUrl()">
+  <a href="./html/lifeEvent/lifeEvent.html">打开lifeEvent.html</a>
+
+  <script>
+    function useOpenerMethod() {
+      window.opener.test("来自子页面")
+    }
+
+    function changeOpenerUrl() {
+      window.opener.location.href = "https://www.baidu.com"
+    }
+  </script>
+</body>
+</html>

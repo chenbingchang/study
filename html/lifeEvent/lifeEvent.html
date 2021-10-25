@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <a href="../../child.html">打开子页面</a>
+    <input type="text" placeholder="请输入姓名">
+    <script>
+      let queue = "";
+
+      window.addEventListener("DOMContentLoaded", function () {
+        console.log("DOMContentLoaded")
+        queue += "DOMContentLoaded, "
+      })
+
+      window.addEventListener("load", function () {
+        console.log("load")
+        queue += "load, "
+      })
+
+      window.addEventListener("pageshow", function (event) {
+        console.log("pageshow :", event)
+        queue += "pageshow, "
+      })
+
+      window.addEventListener("beforeunload", function (event) {
+        console.log("beforeunload :", event)
+        queue += "beforeunload, "
+      })
+
+      // 导航后退、前进的页面和当前页不同时，或者关闭页面都会触发pagehide
+      window.addEventListener("pagehide", function (event) {
+        console.log("pagehide :", event)
+        queue += "pagehide, "
+      })
+
+      window.addEventListener("unload", function (event) {
+        console.log("unload :", event)
+        queue += "unload, "
+        window.localStorage.setItem("时间", new Date().toLocaleString())
+        window.localStorage.setItem("顺序", queue)
+      })
+
+      // DOMContentLoaded, load, pageshow, beforeunload, pagehide, unload,
+    </script>
+  </body>
+</html>
