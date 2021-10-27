@@ -76,3 +76,28 @@ inputEl.onchange = e => {
   // 重置
   e.target.value = "";
 }
+
+function run() {
+  console.log("开始");
+  
+  console.log("执行1");
+  throw new Error("手动抛出错误");
+  // try {
+  // } catch (error) {
+  //   console.log(error);
+  // }
+  console.log("执行2");
+  console.log("执行3");
+  console.log("结束");
+}
+
+try {
+  
+  run()
+} catch (error) {
+  console.log("捕获run()的异常");
+}
+console.log("aaaa");
+// run()
+// console.log("bbbbb");
+// setTimeout(run, 0)
