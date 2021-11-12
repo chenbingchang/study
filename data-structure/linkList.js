@@ -166,4 +166,152 @@ console.log(linkArr.head);
 // linkArr.remove(2)
 // linkArr.set(2, ["数组", 'aaa'])
 // console.log(linkArr.getNode(2));
-console.log(linkArr.head);
+// console.log(linkArr.head);
+
+
+/**
+ * 反转单链表
+ * @param {Object} head 单链表的表头
+ * 时间复杂度: O(2n)
+ * 空间复杂度：O(n)
+ */
+function reverLinkList(head) {
+  // 链表里的所有元素。从整体看elList，会发现他像是栈结构一样，先进后出
+  let elList = [];
+
+  // 下一个元素，从表头开始
+  let nextEl = head;
+  // 循环链表
+  while (nextEl !== null) {
+    // 把当前的元素保存到数组
+    elList.push(nextEl);
+    // 改变下一个元素
+    nextEl = nextEl.next;
+  }
+
+  // 倒序遍历elList，并且重新链接上即可
+  let i = elList.length - 1;
+  // 新的表头指向最后一个元素
+  let newHead = elList[i];
+
+  while(i > -1) {
+    // 当前元素
+    let curNode = elList[i];
+    // 下一个元素，默认null
+    let nextNode = null;
+
+    if (i > 0) {
+      // 因为是倒序，所以下一个，其实是数组中的前面一个
+      nextNode = elList[i - 1];
+    }
+
+    // 修改当前元素的next指针
+    curNode.next = nextNode;
+
+    // 改变循环变量
+    i--;
+  }
+
+  return newHead;
+}
+
+/**
+ * 反转单链表，迭代反转法，保存当前节点、前节点、后节点，然后改变next方向
+ * 时间复杂度: O(n)
+ * 空间复杂度：O(1)
+ * @param {Object} head 表头
+ * @returns 
+ */
+function reverLinkList_2(head) {
+  // 因为要反转，所以前节点，一开始是null
+  let pre = null;
+  let cur = head;
+
+  while (cur !== null) {
+    // 先保存后节点，因为改变当前节点的next时，当前节点和后节点的链断开，如果不保存后节点，会导致丢失指针而不知道轮到那个节点
+    let nextTemp = cur.next;
+
+    // 反转当前节点
+    cur.next = pre;
+    // 反转完成后，当前节点变成前节点。后节点变成当前节点
+    pre = cur;
+    cur = nextTemp;
+  }
+
+  // 全部反转完，前节点就是最后的节点，也就是反转后的第一个节点（表头）
+  return pre;
+}
+
+/**
+ * 和迭代反转法的思想恰好相反，递归反转法的实现思想是从链表的尾节点开始，依次向前遍历，遍历过程依次改变各节点的指向，即另其指向前一个节点。
+ * 时间复杂度：O(n)
+ * 空间复杂度：O(n)
+ * 递归的方法不好，会导致调用栈溢出
+ * @param {*} head 
+ */
+function reverLinkList_3(head) {
+  // 空链、链表尾部，则返回，要当新链的表头
+  if (head === null || head.next === null) {
+    return head;
+  } else {
+    let newHead = reverLinkList_3(head.next);
+
+    // 后节点的next指向当前节点，进行反转
+    head.next.next = head;
+    // 当前节点next指向null
+    head.next = null;
+
+    return newHead;
+  }
+}
+
+/**
+ * 头插法，是指在原有链表的基础上，依次将位于链表头部的节点摘下，然后采用从头部插入的方式生成一个新链表，则此链表即为原链表的反转版。
+ * 时间复杂度：O(n)
+ * 空间复杂度：O(1)
+ */
+function reverLinkList_4(head) {
+  let newHead = null;
+  let cur = head;
+
+  while(cur !== null) {
+    // 先保存下一个节点
+    let nextNode = cur.next;
+    // 当前节点的next指向newHead
+    cur.next = newHead;
+    // newHead再指向当前节点
+    newHead = cur;
+
+    // 指向下一个节点
+    cur = nextNode;
+  }
+
+  return newHead;
+}
+
+/**
+ * 就地逆置法
+ * 时间复杂度：O(n)
+ * 空间复杂度：O(1)
+ */
+function reverLinkList_5(head) {
+  let start = head;
+  let end = start ? start.next : null;
+
+  while (start && start.next !== null) {
+    // 开始节点指向结束节点的下个节点
+    start.next = end.next;
+    // 改变结束节点的指向
+    end.next = head;
+    // 表头指向结束节点
+    head = end;
+
+    // 改变结束节点
+    end = start.next;
+  }
+
+  return head;
+}
+
+console.log("####################################");
+console.log(reverLinkList_5(linkArr.head));

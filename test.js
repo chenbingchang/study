@@ -82,13 +82,6 @@ function run() {
   
   console.log("执行1");
   throw new Error("手动抛出错误");
-  // try {
-  // } catch (error) {
-  //   console.log(error);
-  // }
-  console.log("执行2");
-  console.log("执行3");
-  console.log("结束");
 }
 
 try {
@@ -101,3 +94,22 @@ console.log("aaaa");
 // run()
 // console.log("bbbbb");
 // setTimeout(run, 0)
+
+let p1 = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve("https://www.baidu.com")
+  }, 1000)
+})
+
+let p2 = p1;
+console.log(p1, p2);
+
+Promise.all([p1, p2]).then(([r1, r2]) => {
+  console.log('r1', r1)
+  console.log('r2', r2)
+}).catch(e => {
+  console.log("Promise.all   异常 ");
+})
+
+
+let styleEl =  document.getElementById("style")
