@@ -42,10 +42,42 @@ class StaticLinkList {
   }
 
   /**
+   * 在数据链表的表头添加元素
+   * @param {*} data 数据
+   */
+  unshift(data) {
+    if (this.isEmpty()) {
+      // 原来是空链表
+      this.list[1].data = data
+      this.list[1].cur = 0
+      return true
+    }
+
+    let freeCur = this.malloc()
+
+    if (freeCur === 0) {
+      console.error("链表已经没有空闲的位置")
+      return false
+    }
+
+    // 先保存旧的表头
+    let oldHead = this.list[1]
+
+    // 把旧的表头移到新的空闲的位置
+    this.list[freeCur].data = oldHead.data
+    this.list[freeCur].cur = oldHead.cur
+    // 更新新表头的信息
+    this.list[1].data = data
+    this.list[1].cur = freeCur
+
+    return true
+  }
+
+  /**
    * 在数据链表的表尾添加元素
    * @param {*} data 数据
    */
-  add(data) {
+  push(data) {
     let freeCur = this.malloc()
 
     if (freeCur === 0) {
@@ -71,11 +103,49 @@ class StaticLinkList {
   
   /**
    * 在指定数据链表下标插入节点
+   * 如果数据链表为空、大于数据链表最大下标，则插入尾部
+   * 如果下标小于0，则当0
    * @param {number} dataIndex 在数据链表中的下标，null表示最后一个
    * @param {*} data 数据
+   * @returns {*} 插入的数据，失败返回null
    */
   insert(dataIndex, data) {
+    // 静态链表已经满了无法再插入，返回null
+    if(this.isFull()) {
+      return null
+    }
 
+    // 下标小于0，或者数据链表为空，则当0
+    if (dataIndex < 0 || this.isEmpty()) {
+      dataIndex = 0
+    }
+
+    // 插入尾部
+    if(dataIndex === null) {
+      let isSuccess = this.push(data)
+      return isSuccess ? data : null
+    } else if(dataIndex === 0) {
+      // 插入头部
+      let isSuccess =  this.unshift(data)
+      return isSuccess ? data : null
+    }
+
+    // 查找前继元素的下标
+    let preCur = this.findCur(dataIndex - 1)
+    let preNode = this.list[preCur]
+    // 新的下标
+    let newCur = this.malloc()
+    let newNode = this.list[newCur]
+    // 保存下一个的下标
+    let nextCur = preNode.cur
+
+    // 修改新的节点的信息
+    newNode.data = data
+    newNode.cur = nextCur
+    // 更新前继元素的cur
+    preNode.cur = newCur
+
+    return data
   }
 
   /**
