@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <input id="input" type="text">
+  <button id="btn">确定</button>
+  <div id="result"></div>
+
+  <script>
+    let inpEl = document.querySelectorAll("#input")[0]
+    let btnEl = document.querySelectorAll("#btn")[0]
+    let resultEl = document.querySelectorAll("#result")[0]
+
+    btnEl.onclick = function(e) {
+      let value = inpEl.value
+      sessionStorage.setItem("key", value)
+
+    }
+
+    resultEl.innerText = sessionStorage.getItem("key")
+  </script>
+</body>
+</html>

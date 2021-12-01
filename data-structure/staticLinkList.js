@@ -93,12 +93,14 @@ class StaticLinkList {
     let lastCur = this.findCur(null)
 
     if (lastCur === -1) {
-      // 数据链表为空
-      return true
+      // 找不到
+      return false
     }
 
     // 表尾的cur指向新的节点下标
     this.list[lastCur].cur = freeCur
+
+    return true
   }
   
   /**
@@ -149,70 +151,204 @@ class StaticLinkList {
   }
 
   /**
+   * 删除数据链表的头部
+   * @returns {*} 返回删除位置的数据
+   */
+  shift() {
+    // 数据链表为空，返回null
+    if (this.isEmpty) {
+      return null;
+    }
+
+    // 删除数据链表的表头，需要维持list[1]是数据链表中的表头，后继元素要移到list[1]的位置
+    // 当前的表头
+    let head = this.list[1]
+    // 要删除节点的数据
+    let deleteData = head.data
+    // 下一个节点，可能是空节点
+    let nextNode = this.list[head.cur]
+    // 需要回收的下标
+    let recoverCur
+    
+    // 更新表头的数据
+    head.data = nextNode.data
+    if (head.cur === 0) {
+      // 数据链表中只有表头一个元素
+      recoverCur = 1
+    } else {
+      recoverCur = head.cur
+      // 更新表头的后继元素
+      head.cur = nextNode.cur
+    }
+
+    // 回收
+    this.recover(recoverCur)
+
+    return deleteData
+  }
+
+  /**
+   * 删除数据链表的尾部
+   * @returns {*} 返回删除位置的数据
+   */
+  pop() {
+    // 数据链表为空，返回null
+    if (this.isEmpty) {
+      return null;
+    }
+    
+    // 遍历找到数据链表尾部的前一个节点的下标
+    let node = this.list[1]
+    // 有两种结果：1、数据链表只有一个元素，cur是尾部；2、数据链表元素 >= 2，cur是尾部的前一个
+    let cur = 1
+
+    while(node.cur !== 0) {
+      // 当前节点的后继节点为尾部，则停止循环
+      if (this.list[node.cur].cur === 0) {
+        break;
+      }
+      
+      // 继续下一个
+      cur = node.cur
+      node = this.list[cur]
+    }
+
+    // 要删除节点的数据
+    let deleteData
+    // 需要回收的下标，即要删除节点的下标
+    let recoverCur
+
+    if (node.cur === 0) {
+      // 当前node是尾部，则证明数据链表只有一个元素
+      deleteData = node.data
+      recoverCur = cur
+    } else {
+      // 当前节点的下一个才是尾部
+      deleteData = this.list[node.cur].data
+      recoverCur = node.cur
+    }
+    // 回收
+    this.recover(recoverCur)
+    
+    return deleteData
+  }
+
+  /**
    * 删除在数据链表中指定下标的节点
-   * @param {number} dataIndex 在数据链表中的下标，null表示最后一个
+   * @param {number} dataIndex 在数据链表中的下标，null表示最后一个，小于0当0
    * @returns {*} 返回删除位置的数据
    */
   delete(dataIndex) {
     // 数据链表为空，返回null
-    if (this.isEmpty || dataIndex < 0) {
+    if (this.isEmpty) {
       return null;
     }
 
-    if (dataIndex === 0) {
-      // 删除数据链表的表头，需要维持list[1]是数据链表中的表头，后继元素要移到list[1]的位置
-      // 表头
-      let head = this.list[1]
-      // 要删除节点的数据
-      let deleteData = head.data
-      // 下一个节点
-      let nextNode = this.list[head.cur]
-      // 需要回收的下标
-      let recoverCur
-      
-      // 更新表头的数据
-      head.data = nextNode.data
-      if (head.cur === 0) {
-        // 数据链表中只有表头一个元素
-        recoverCur = 1
-      } else {
-        recoverCur = head.cur
-        // 更新表头的后继元素
-        head.cur = nextNode.cur
-      }
-
-      // 回收
-      this.recover(recoverCur)
-
-      return deleteData
-    } else {
-      // 前继元素的下标
-      let preCur = this.findCur(dataIndex - 1)
-      // 没有找到前继元素
-      if (preCur === -1) {
-        return null
-      }
-
-      let preNode = this.list[preCur]
-      if (preNode.cur === 0) {
-        // 要删除下标的前继元素已经是最后的节点，说明要删除的下标节点不存在
-        return null
-      }
-
-      // 要删除的节点
-      let deleteNode = this.list[preNode.cur]
-      // 要删除节点的数据
-      let deleteData = deleteNode.data
-      // 需要回收的下标，即要删除节点的下标
-      let recoverCur = preNode.cur
-
-      // 改变前继元素的指向
-      preNode.cur = deleteNode.cur
-      // 回收
-      this.recover(recoverCur)
-
-      return deleteData
+    if (dataIndex < 0) {
+      dataIndex = 0
     }
+
+    if (dataIndex === 0) {
+      // 删除数据链表的头部
+      return this.shift()
+    } else if (dataIndex === null) {
+      // 删除数据链表的尾部
+      return this.pop()
+    }
+
+    // 前继元素的下标
+    let preCur = this.findCur(dataIndex - 1)
+    // 没有找到前继元素
+    if (preCur === -1) {
+      return null
+    }
+
+    let preNode = this.list[preCur]
+    if (preNode.cur === 0) {
+      // 要删除下标的前继元素已经是最后的节点，说明要删除的下标节点不存在
+      return null
+    }
+
+    // 要删除的节点
+    let deleteNode = this.list[preNode.cur]
+    // 要删除节点的数据
+    let deleteData = deleteNode.data
+    // 需要回收的下标，即要删除节点的下标
+    let recoverCur = preNode.cur
+
+    // 改变前继元素的指向
+    preNode.cur = deleteNode.cur
+    // 回收
+    this.recover(recoverCur)
+
+    return deleteData
+  }
+
+  /**
+   * 修改指定数据链表中指定下标的节点
+   * @param {number} dataIndex 在数据链表中的下标，null表示最后一个，小于0当0
+   * @param {*} data 数据
+   * @returns {*} 成功返回data参数，失败返回null
+   */
+  update(dataIndex, data) {
+    if (dataIndex < 0) {
+      dataIndex = 0
+    }
+
+    // 找到在静态链表中的下标
+    let cur = this.findCur(dataIndex)
+
+    if (cur === -1) {
+      // 找不到
+      return null
+    }
+
+    // 更新数据
+    this.list[cur].data = data
+
+    return data
+  }
+
+  /**
+   * 获取指定数据链表中指定下标节点的数据
+   * @param {number} dataIndex 在数据链表中的下标，null表示最后一个，小于0当0
+   * @returns {*} 成功返回data参数，失败返回null
+   */
+  get(dataIndex) {
+    if (dataIndex < 0) {
+      dataIndex = 0
+    }
+
+    // 找到在静态链表中的下标
+    let cur = this.findCur(dataIndex)
+
+    if (cur === -1) {
+      // 找不到
+      return null
+    }
+
+    return this.list[cur].data
+  }
+
+  /**
+   * 获取指定数据链表中指定下标的节点
+   * @param {number} dataIndex 在数据链表中的下标，null表示最后一个，小于0当0
+   * @returns {*} 成功返回节点，失败返回null
+   */
+  getNode() {
+    if (dataIndex < 0) {
+      dataIndex = 0
+    }
+
+    // 找到在静态链表中的下标
+    let cur = this.findCur(dataIndex)
+
+    if (cur === -1) {
+      // 找不到
+      return null
+    }
+
+    return this.list[cur]
   }
 
   /**
@@ -277,7 +413,7 @@ class StaticLinkList {
    * 查找数据链表中指定下标在静态链表的下标。
    * 如果大于数据链表的最大下标或者到了数据链表的表尾还没找到则返回表尾在静态链表中的下标
    * @param {number | null} dataIndex 在数据链表中的下标，null表示最后一个
-   * @return {number} 静态链表的下标，数据链表为空则返回-1
+   * @return {number} 静态链表的下标，找不到则返回-1
    */
   findCur(dataIndex) {
     // 静态链表的下标
@@ -292,9 +428,12 @@ class StaticLinkList {
       return -1
     }
 
-    while (node.cur !== 0) {
-      // 下标相等
-      if (n === dataIndex) {
+    let isFind = false
+
+    while (node && node.data !== null) {
+      // 下标相等，或者要找到时最后一个
+      if (n === dataIndex || (node.cur === 0 && dataIndex === null)) {
+        isFind = true
         break
       }
 
@@ -305,6 +444,6 @@ class StaticLinkList {
       n++
     }
 
-    return cur
+    return isFind ? cur : -1
   }
 }
