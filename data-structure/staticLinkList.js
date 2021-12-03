@@ -14,7 +14,7 @@ class NodeOfArr {
   cur = 0
 
   constructor(data, cur) {
-    this.data = datat
+    this.data = data
     this.cur = cur
   }
 }
@@ -34,11 +34,14 @@ class StaticLinkList {
     this.size = size
 
     // 初始化数组
-    for (let i = 0; i < size; i++) {
-      list[i] = new NodeOfArr(null, i)
+    for (let i = 0; i < this.size; i++) {
+      let cur = i + 1 > this.size - 1 ? 0 : i + 1
+
+     
+      this.list[i] = new NodeOfArr(null, cur)
     }
     // 链尾的cur为0
-    list[size - 1].cur = 0
+    this.list[size - 1].cur = 0
   }
 
   /**
@@ -78,6 +81,8 @@ class StaticLinkList {
    * @param {*} data 数据
    */
   push(data) {
+    
+
     let freeCur = this.malloc()
 
     if (freeCur === 0) {
@@ -85,17 +90,17 @@ class StaticLinkList {
       return false
     }
 
-    // 先更新节点的数据、指向
-    this.list[freeCur].data = data
-    this.list[freeCur].cur = 0
-    
     // 找到表尾的在静态链表的下标
     let lastCur = this.findCur(null)
 
     if (lastCur === -1) {
-      // 找不到
-      return false
+      // 找不到，表示数据链表为空
+      lastCur = 0
     }
+
+    // 先更新节点的数据、指向
+    this.list[freeCur].data = data
+    this.list[freeCur].cur = 0
 
     // 表尾的cur指向新的节点下标
     this.list[lastCur].cur = freeCur
@@ -447,3 +452,13 @@ class StaticLinkList {
     return isFind ? cur : -1
   }
 }
+
+// 测试
+let list = new StaticLinkList(5)
+
+console.log(list.list);
+
+// 测出push有问题，当时空的时候，push不对
+list.push("AAA")
+
+console.log(list);
