@@ -49,18 +49,18 @@ class StaticLinkList {
    * @param {*} data 数据
    */
   unshift(data) {
-    if (this.isEmpty()) {
-      // 原来是空链表
-      this.list[1].data = data
-      this.list[1].cur = 0
-      return true
-    }
-
     let freeCur = this.malloc()
 
     if (freeCur === 0) {
       console.error("链表已经没有空闲的位置")
       return false
+    }
+
+    if (this.isEmpty()) {
+      // 原来是空链表，freeCur是1
+      this.list[freeCur].data = data
+      this.list[freeCur].cur = 0
+      return true
     }
 
     // 先保存旧的表头
@@ -81,8 +81,6 @@ class StaticLinkList {
    * @param {*} data 数据
    */
   push(data) {
-    
-
     let freeCur = this.malloc()
 
     if (freeCur === 0) {
@@ -101,9 +99,11 @@ class StaticLinkList {
     // 先更新节点的数据、指向
     this.list[freeCur].data = data
     this.list[freeCur].cur = 0
-
-    // 表尾的cur指向新的节点下标
-    this.list[lastCur].cur = freeCur
+    
+    if (lastCur !== 0) {
+      // 表尾不为空，表尾的cur指向新的节点下标
+      this.list[lastCur].cur = freeCur
+    }
 
     return true
   }
@@ -161,7 +161,7 @@ class StaticLinkList {
    */
   shift() {
     // 数据链表为空，返回null
-    if (this.isEmpty) {
+    if (this.isEmpty()) {
       return null;
     }
 
@@ -198,7 +198,7 @@ class StaticLinkList {
    */
   pop() {
     // 数据链表为空，返回null
-    if (this.isEmpty) {
+    if (this.isEmpty()) {
       return null;
     }
     
@@ -231,6 +231,8 @@ class StaticLinkList {
       // 当前节点的下一个才是尾部
       deleteData = this.list[node.cur].data
       recoverCur = node.cur
+      // 下一个节点删除后，当前节点就是尾部，把cur改成0
+      node.cur = 0
     }
     // 回收
     this.recover(recoverCur)
@@ -245,7 +247,7 @@ class StaticLinkList {
    */
   delete(dataIndex) {
     // 数据链表为空，返回null
-    if (this.isEmpty) {
+    if (this.isEmpty()) {
       return null;
     }
 
@@ -340,7 +342,7 @@ class StaticLinkList {
    * @param {number} dataIndex 在数据链表中的下标，null表示最后一个，小于0当0
    * @returns {*} 成功返回节点，失败返回null
    */
-  getNode() {
+  getNode(dataIndex) {
     if (dataIndex < 0) {
       dataIndex = 0
     }
@@ -361,6 +363,7 @@ class StaticLinkList {
    * @returns {boolean} 结果
    */
   isEmpty() {
+    // 1是表头的位置，表头都是空，则数据链表肯定为空
     return this.list[1].data === null
   }
 
@@ -403,7 +406,7 @@ class StaticLinkList {
   recover(cur) {
     // 当前备用链表的表头
     let head = this.list[0]
-    // 需要回收掉下标
+    // 需要回收的下标
     let recover = this.list[cur]
 
     // 清空数据
@@ -443,8 +446,8 @@ class StaticLinkList {
       }
 
       // 更新节点
-      node = this.list[node.cur]
       cur = node.cur
+      node = this.list[node.cur]
       // 下标+1
       n++
     }
@@ -456,9 +459,24 @@ class StaticLinkList {
 // 测试
 let list = new StaticLinkList(5)
 
-console.log(list.list);
+
 
 // 测出push有问题，当时空的时候，push不对
-list.push("AAA")
+list.insert(0, "AAA")
+list.insert(1, "BBB")
+list.insert(2, "CCC")
+list.insert(null, "DDD")
+// list.insert("EEE")
 
-console.log(list);
+console.log(list.list);
+
+console.log("获取的数据：", list.getNode(0));
+console.log("获取的数据：", list.getNode(19));
+console.log("获取的数据：", list.getNode(null));
+console.log("获取的数据：", list.getSize());
+// console.log("获取的数据：", list.get(2));
+// console.log("删除的数据：", list.delete(2));
+// console.log("删除的数据：", list.pop());
+// console.log("删除的数据：", list.pop());
+
+console.log(list.list);
