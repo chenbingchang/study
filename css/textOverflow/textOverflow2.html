@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="box">
+    <!-- 文字盒子 -->
+    <div class="box__text">
+      <div class="box__inner">
+        腾讯以技术丰富互联网用户的生活。通过通信及社交软件微信和 QQ 促进用户联系，并助其连接数字内容和生活服务，尽在弹指间。
+      </div>
+      <!-- <div class="box__abs">
+        腾讯以技术丰富互联网用户的生活。通过通信及社交软件微信和 QQ 促进用户联系，并助其连接数字内容和生活服务，尽在弹指间。
+      </div> -->
+    </div>
+
+    <div class="box__abs">
+      <div class="box__fake-text">
+        腾讯以技术丰富互联网用户的生活。通过通信及社交软件微信和 QQ 促进用户联系，并助其连接数字内容和生活服务，尽在弹指间。
+      </div>
+      <div class="box__placeholder"></div>
+      <div class="box__more">... 展开</div>
+    </div>
+    <!-- 占位盒子 -->
+    <!-- <div class="box__placeholder"></div> -->
+    <!-- 自定义省略盒子 -->
+    <!-- <div class="box__more">...展开</div> -->
+  </div>
+  
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .box {
+      position: relative;
+      width: 300px;
+      height: 60px;
+      overflow: hidden;
+    }
+
+    .box__text {
+      width: 100%;
+      /* line-height: 20px; */
+      margin-left: -60px;
+      float: right;
+      /* background-color: pink; */
+
+      position: relative;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      font-size: 60px;
+      line-height: 0;
+      letter-spacing: 0; /* 重置了行高和文字间距，保证省略号占位只受字体大小的影响 */
+      /* 为了方便演示，我们先给省略号一个颜色 */
+      /* color: red; */
+      /* 隐藏默认的省略号 */
+      color: transparent;
+
+    }
+
+    .box__inner {
+      font-size: 16px;
+      line-height: 20px;
+      color: #000;
+      vertical-align: top;
+      display: inline;
+    }
+
+    .box__placeholder {
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+      float: right;
+    }
+
+    .box__more {
+      position: relative;
+      left: 100%;
+      transform: translate(-100%, -100%);
+      width: 60px;
+      text-align: right;
+      float: right;
+      color: #1890ff;
+      /* background-color: yellow; */
+      cursor: pointer;
+    }
+
+    .box__abs {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+
+    .box__fake-text {
+      width: 100%;
+      margin-left: -60px;
+      line-height: 20px;
+      float: right;
+      color: transparent; /* 文案是为了撑开高度，配合浮动实现多行溢出省略 */
+    }
+
+
+  </style>
+</body>
+</html>
