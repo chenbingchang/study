@@ -1,60 +1,77 @@
-let indexEl = document.getElementById('index')
-let btnEl = document.getElementById('btn')
-let listEl = document.getElementsByClassName('list')[0]
-let totalEl = document.getElementById('total')
-let num = 0
-let firstHeight = listEl.clientHeight
-let isFirstView = true
+// function test () {
+//   console.log("开始");
 
-btnEl.onclick = function (e) {
-  let index = indexEl.value
+//   setTimeout(function() {
+//     console.log("setTimeout方法");
+//   }, 0)
 
-  if (index) {
-    index = parseInt(index)
+//   let p = new Promise(function (resolve, reject) {
+//     console.log("Promise里面");
+//     resolve("aaa")
+//   })
+
+//   p.then(() => {
+//     console.log("then");
+//     let p2 = new Promise(function (resolve, reject) {
+//       console.log("新的promise里面");
+//       resolve("aaa")
+//     })
+//     p2.then(() => {
+//       console.log("新的promise的then");
+//     })
+//   })
+
+//   console.log("结束");
+// }
+
+// test()
+
+let total = 40
+
+function zeroDelay() {
+  total--
+  console.timeEnd('执行间隔')
+  console.log(Date.now())
+
+  console.time('执行间隔')
+  if (total) {
+    setTimeout(zeroDelay, 200)
   }
-
-  let newLiEl = document.createElement('li')
-  newLiEl.classList.add('item')
-  newLiEl.innerText = `${++num}`
-
-  let itemList = document.querySelectorAll(".list .item")
-
-  if (index > itemList.length) {
-    listEl.appendChild(newLiEl)
-  } else {
-    listEl.insertBefore(newLiEl, itemList[index])
-  }
-
-  itemList = document.querySelectorAll(".list .item")
-
-  for (let i = 0; i < itemList.length; i++) {
-    let text = itemList[i].innerText
-    let arr = text.split('----')
-    let oldText = arr[1] ? arr[1] : text
-
-    itemList[i].innerText = `偏移${i}个----${oldText}` 
-  }
-
-  totalEl.innerText = `总共：${num}个`
-
-  window.requestAnimationFrame(function () {
-    let firstChild = listEl.children[0]
-
-    firstHeight += firstChild.offsetHeight + 20
-  })
 }
 
+console.time('执行间隔')
+// setTimeout(zeroDelay, 200)
 
-listEl.onscroll = function (e) {
-  if (listEl.scrollTop > firstHeight) {
-    isFirstView = false
-  } else {
-    isFirstView = true
+let arr = [71, 41, 64, 1, 8, 84, 32, 63, 28, 68]
+
+
+function shellSort(arr) {
+  var len = arr.length,
+      temp,
+      gap = 1;
+  while(gap < len/3) {          //动态定义间隔序列
+      gap =gap*3+1;
   }
-  console.log("是否首屏：", isFirstView);
+  for (gap; gap > 0; gap = Math.floor(gap/3)) {
+      for (var i = gap; i < len; i++) {
+          temp = arr[i];
+          for (var j = i-gap; j >= 0 && arr[j] > temp; j-=gap) {
+              arr[j+gap] = arr[j];
+          }
+          arr[j+gap] = temp;
+      }
+  }
+  return arr;
 }
 
-window.onresize = function (e) {
-  console.log("window大小重新调整");
-  console.log(e);
-}
+console.log(shellSort(arr));
+
+// gap = 4; i = 4
+  0   1   2  3  4   5   6   7   8   9
+[71, 41, 64, 1, 8, 84, 32, 63, 28, 68]
+
+// i = 5
+[8, 41, 64, 1, 71, 84, 32, 63, 28, 68]
+// i = 6
+[8, 41, 64, 1, 71, 84, 32, 63, 28, 68]
+
