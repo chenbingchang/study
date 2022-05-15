@@ -59,7 +59,7 @@ class ConcreteProduct2 implements Product {
 }
 
 function clientCode (type: string) {
-  let creator: Creator = null;
+  let creator: Creator | null = null;
 
   switch(type) {
     case '1': 
