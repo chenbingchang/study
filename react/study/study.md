@@ -182,3 +182,30 @@ class Toggle extends React.Component {
 在这两种情况下，React 的事件对象 e 会被作为第二个参数传递
 
 ## 7. 条件渲染
+1. 元素变量
+```jsx
+let button;
+if (isLoggedIn) {
+  button = <LogoutButton onClick={this.handleLogoutClick} />;
+} else {
+  button = <LoginButton onClick={this.handleLoginClick} />;
+}
+```
+2. 与运算符 &&
+```js
+<div>  
+  {unreadMessages.length > 0 && <h2>xxx</h2>}
+</div>
+```
+3. 三目运算符
+```jsx
+<div>
+  {isLoggedIn
+    ? <LogoutButton onClick={this.handleLogoutClick} />
+    : <LoginButton onClick={this.handleLoginClick} />
+  }
+</div>
+```
+4. 阻止组件渲染。`render`方法直接返回`null`，而不进行任何渲染。**注意：**在组件的 `render` 方法中返回 `null` 并不会影响组件的生命周期的执行
+
+## 8. 列表&Key
