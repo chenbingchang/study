@@ -1,0 +1,9 @@
+<view>selectable-group with custom-radio</view>
+<selectable-group generic:selectable="custom-radio" />
+
+<text>\n</text>
+<view>换行啊</view>
+<text>\n</text>
+
+<view>selectable-group with custom-checkbox</view>
+<selectable-group generic:selectable="custom-checkbox" />

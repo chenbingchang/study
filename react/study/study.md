@@ -209,3 +209,89 @@ if (isLoggedIn) {
 4. 阻止组件渲染。`render`方法直接返回`null`，而不进行任何渲染。**注意：**在组件的 `render` 方法中返回 `null` 并不会影响组件的生命周期的执行
 
 ## 8. 列表&Key
+
+## 10. 状态提升
+子组件共用的状态提升到父组件，不是尝试在不同组件间同步`state`。
+父组件给需要的子组件通过`props`传递值（比如`value`），以及传递一个可以修改父组件状态的函数`props`（比如`onXXXChange`，`onXXXChange`定义在父组件中）
+```js
+class Parent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: '' // 共用的状态
+    }
+  }
+
+  handleValueChange = (value) => {
+    // 传递给子组件，子组件变化时通知父组件来修改值
+    this.setState({value})
+  }
+  
+  render() {
+    return (
+      <div>
+        <Child1 value={value} onValueChange={this.handleValueChange}></Child1>
+        <Child2 value={value} onValueChange={this.handleValueChange}></Child2>
+      </div>
+    );
+  }
+}
+```
+
+## 11. 组合vs继承
+1. jsx中组件标签包含的所有内容会作为一个`children` `prop` 传递给组件，组件通过在渲染函数中加`{props.children}`来渲染出来
+```js
+function FancyBorder(props) {
+  return (
+    <div className={'fancy-border fancy-border-' + props.color}>
+      {props.children}
+    </div>
+  )
+}
+
+function WelcomeDialog(props) {
+  return(
+    <FancyBorder color='blue'>
+      <h1 className="Dialog-title">
+        Welcome
+      </h1>
+      <p className="Dialog-message">
+        Thank you for visiting our spacecraft!
+      </p >
+    </FancyBorder>
+  )
+}
+```
+2. 预定位置（和vue的插槽类似）  
+jsx中元素可以作为变量，而变量也可以插入到jsx中。所以可以循环嵌套😀:sunglasses:  
+所以直接通过`props`传递指定的元素，然后在渲染函数中通过嵌套变量的方式来实现  
+```js
+function SplitPane(props) {
+  return (
+    <div className="SplitPane">
+      <div className="SplitPane-left">
+        {props.left}
+      </div>
+      <div className="SplitPane-right">
+        {props.right}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <SplitPane
+      left={
+        <Contacts />
+      }
+      right={
+        <Chat />
+      } />
+  );
+}
+```
+继承，没有使用的场景，因为props和组合已经可以完全满足，官方是这么说的：
+> Props 和组合为你提供了清晰而安全地定制组件外观和行为的灵活方式。注意：组件可以接受任意 props，包括基本数据类型，React 元素以及函数。
+
+## 12. React哲学

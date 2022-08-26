@@ -1,59 +1,93 @@
-function numWays(n: number, relation: number[][], k: number): number {
-  // 收集信息，key: 下标，value: 能传递到的数组
-  let nextMap: {[key: string]: number[]} = {}
+// 官方解法，typescript
+function myAtoi(s: string): number {
+  const automaton = new Automaton()
 
-  // 遍历relation收集所能传的下一个的信息
-  // for (let [pos, next] of relation) {
-  //     if (!nextMap[pos]) {
-  //         // 不存在，则新建
-  //         nextMap[pos] = []
-  //     }
+  for(let c of s) {
+      if (automaton.get(c)) {
+          // 溢出了直接停止
+          break
+      }
+  }
 
-  //     // 收集能传递的下一个
-  //     nextMap[pos].push(next)
-  // }
-  
-  // let ways: number = 0
-  // 栈，深度优先
-  // let stack: Array<{pos: number, k: number}> = [{
-  //     pos: 0, // 当前的位置
-  //     k: k // 还有几轮
-  // }]
-
-  // while(stack.length) {
-  //     let info = stack.pop()
-
-  //     if (!info) {
-  //         continue
-  //     }
-  //     let pos = info.pos
-  //     let k = info.k
-
-  //     if (k === 1) {
-  //         // 还差最后一轮，如果下一轮包含n-1，则是一条可行的方案
-  //         if (nextMap[pos] && nextMap[pos].includes(n - 1)) {
-  //             ways++
-  //         }
-  //         continue
-  //     }
-
-  //     // 下一轮的可以有哪些位置
-  //     let nextList: number[] = nextMap[pos] || []
-      
-  //     // 下一轮所有的位置都放到栈中去执行
-  //     for(let next of nextList) {
-  //         stack.push({
-  //             pos: next,
-  //             k: --k
-  //         })
-  //     }
-  // }
-
-  return 0
+  return automaton.sign * automaton.ans
 };
 
-numWays(
-  5,
-  [[0,2],[2,1],[3,4],[2,3],[1,4],[2,0],[0,4]],
-  3
-)
+// 状态
+enum State {
+  Start = 0,
+  Signed = 1,
+  InNumber = 2,
+  End = 3
+}
+
+class Automaton {
+  // 最大值
+  INT_MAX: number = 2 ** 31 - 1
+  // 最小值
+  INT_MIN: number = 2 ** 31
+  // 当前状态
+  state: State = State.Start
+  // 符号
+  sign: number = 1
+  // 结果
+  ans: number = 0
+  // 状态转换表
+  table: {
+      [key: string]: number[]
+  } = {
+      [State.Start]: [State.Start, State.Signed, State.InNumber, State.End],
+      [State.Signed]: [State.End, State.End, State.InNumber, State.End],
+      [State.InNumber]: [State.End, State.End, State.InNumber, State.End],
+      [State.End]: [State.End, State.End, State.End, State.End],
+  }
+
+  get(c: string): boolean {
+      this.state = this.table[this.state][this.getCol(c)]
+
+      if (this.state === State.InNumber) {
+          // 数字
+          let num = parseInt(c)
+
+          // 判断是否会溢出
+          if (
+              this.ans > this.INT_MAX / 10 || 
+              (
+                  this.ans === this.INT_MAX / 10 &&
+                  (
+                      (this.sign > 0 && num > 7) ||
+                      (this.sign < 0 && num > 8)
+                  )
+              )
+          ) {
+              // 溢出
+              this.ans = this.sign > 0 ? this.INT_MAX : this.INT_MIN
+              return true
+          }
+
+          this.ans = this.ans * 10 + num
+      } else if (this.state === State.Signed) {
+          // 符号
+          this.sign = c === '+' ? 1 : -1
+      } else if (this.state === State.End) {
+          // 结束
+          return true
+      }
+
+      return false
+  }
+
+  getCol(c: string): State {
+      if (c === ' ') {
+          return State.Start
+      } else if (c === '-' || c === '+') {
+          return State.Signed
+      }  else if (c.charCodeAt(0) >= 48 && c.charCodeAt(0) <= 57) {
+          // 48~47是数字的码点
+          return State.InNumber
+      } else {
+          return State.End
+      }
+  }
+}
+
+myAtoi("2147483648")
