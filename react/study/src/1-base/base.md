@@ -149,6 +149,7 @@ componentWillUnmount（销毁前触发）
       Click me
     </button>
     ```
+    <br>
 ```js
 class Toggle extends React.Component {
   constructor(props) {

@@ -4,14 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "concurrently 'npm:babel' 'npm:live-server'",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "babel": "babel --watch src --out-dir . --presets react-app/prod"
+    "babel": "babel --watch src --out-dir dist --presets react-app/prod",
+    "live-server": "live-server --open=src"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-react-app": "^3.1.2"
+    "babel-preset-react-app": "^3.1.2",
+    "concurrently": "^7.4.0",
+    "live-server": "^1.2.2"
   }
 }

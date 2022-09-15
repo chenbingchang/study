@@ -111,16 +111,5 @@ var FancyButton = React.forwardRef(function King(props, ref) {
 FancyButton.displayName = 'Dnf';
 
 var Test = logProps(FancyButton);
-var ref = React.createRef();
 
-function Baz(props) {
-  return React.createElement(
-    'div',
-    null,
-    '\u4F60\u597D\u554A'
-  );
-}
-
-var testRef = React.createRef();
-
-root.render(React.createElement(Baz, { ref: testRef }));
+root.render(React.createElement(Test, null));

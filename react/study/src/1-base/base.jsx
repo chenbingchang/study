@@ -56,16 +56,5 @@ const FancyButton = React.forwardRef(function King(props, ref) {
 FancyButton.displayName = 'Dnf'
 
 const Test = logProps(FancyButton)
-const ref = React.createRef()
 
-function Baz(props) {
-  return (
-    <div>
-      你好啊
-    </div>
-  )
-}
-
-const testRef = React.createRef()
-
-root.render(<Baz ref={testRef}></Baz>)
+root.render(<Test></Test>)
